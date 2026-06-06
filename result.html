@@ -10,4 +10,73 @@
     <p>{{ description }}</p>
     <a href="/">Back to form</a>
 </body>
+    <canvas id="smokeCanvas"></canvas>
+
+<script>
+const canvas = document.getElementById("smokeCanvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// Linear function y = x mapped to screen
+function lin(x) {
+    return x;
+}
+
+// Smoke particle class
+class SmokeNumber {
+    constructor() {
+        this.x = Math.random() * 100;      // domain 0–100
+        this.y = lin(this.x);              // linear mapping
+        this.screenX = this.x * (canvas.width / 100);
+        this.screenY = canvas.height - this.y * (canvas.height / 100);
+
+        this.opacity = 1;
+        this.size = 20 + Math.random() * 20;
+        this.speedX = (Math.random() - 0.5) * 0.5;
+        this.speedY = -1 - Math.random();
+        this.fade = 0.005 + Math.random() * 0.01;
+
+        this.text = Math.floor(this.x);
+    }
+
+    update() {
+        this.screenX += this.speedX;
+        this.screenY += this.speedY;
+        this.opacity -= this.fade;
+    }
+
+    draw() {
+        ctx.globalAlpha = this.opacity;
+        ctx.fillStyle = "white";
+        ctx.font = `${this.size}px monospace`;
+        ctx.fillText(this.text, this.screenX, this.screenY);
+        ctx.globalAlpha = 1;
+    }
+}
+
+let particles = [];
+
+function animate() {
+    ctx.fillStyle = "rgba(0,0,0,0.1)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    if (particles.length < 200) {
+        particles.push(new SmokeNumber());
+    }
+
+    particles = particles.filter(p => p.opacity > 0);
+
+    particles.forEach(p => {
+        p.update();
+        p.draw();
+    });
+
+    requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+
 </html>
