@@ -428,15 +428,13 @@
       }
     });
 
+    // Reset tracked keywords on every page refresh
     window.addEventListener("DOMContentLoaded", () => {
-      const saved = JSON.parse(localStorage.getItem("searchLogs") || "[]");
-      const list = document.getElementById("keywordList");
-      saved.reverse().forEach(entry => {
-        const li = document.createElement("li");
-        li.textContent = entry;
-        list.appendChild(li);
-      });
+      // Clear previous history
+      localStorage.removeItem("searchLogs");
+      document.getElementById("keywordList").innerHTML = "";
 
+      // Preload a new random keyword
       const preload = preloadWords[Math.floor(Math.random() * preloadWords.length)];
       setKeyword(preload);
     });
