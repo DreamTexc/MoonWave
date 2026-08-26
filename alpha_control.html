@@ -1,383 +1,535 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Alpha Math Wizard</title>
-  <style>
-    /* (same CSS as previous version – black & white UI, lizard, banner, modal, etc.) */
-    :root {
-      --bg: #0a0a0a; --surface: #141414; --border: #2a2a2a;
-      --text: #f0f0f0; --muted: #999999; --glow: rgba(255,255,255,0.15);
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: "Segoe UI", system-ui, sans-serif;
-      background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.5; overflow-x: hidden;
-    }
-    #backgroundLayer {
-      position: fixed; inset: 0;
-      background-image: url('https://keystagewiki.com/images/thumb/a/ab/Ne-20_WK.PNG/400px-Ne-20_WK.PNG');
-      background-size: contain; background-repeat: no-repeat; background-position: center top;
-      opacity: 0.32; z-index: 0; pointer-events: none;
-    }
-    #mainContent {
-      position: relative; z-index: 1; max-width: 900px; margin: 0 auto;
-      padding: 2rem 1.25rem 4rem; display: flex; flex-direction: column; gap: 1.75rem;
-    }
-    h1 {
-      text-align: center; font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 700;
-      color: #fff; margin-bottom: 0.5rem; text-shadow: 0 0 20px rgba(255,255,255,0.2);
-    }
-    .section {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
-      padding: 1.5rem; box-shadow: 0 4px 24px rgba(0,0,0,0.5);
-    }
-    .section h2, .section h3 { font-size: 1.15rem; font-weight: 600; margin-bottom: 1rem; color: #fff; }
-
-    .lizard-row { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; }
-    .overlay-img {
-      width: 100%; max-width: 220px; border-radius: 12px; opacity: 0.9;
-      transition: transform 0.35s, opacity 0.35s; box-shadow: 0 8px 24px rgba(0,0,0,0.6); filter: grayscale(100%);
-    }
-    .overlay-img:hover { opacity: 1; transform: scale(1.03); }
-
-    #lizard-right {
-      position: fixed; top: 50%; right: 1.5rem; transform: translateY(-50%);
-      max-width: 180px; z-index: 10; opacity: 0.95;
-      transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), filter 0.35s;
-      border-radius: 12px; box-shadow: 0 0 30px rgba(255,255,255,0.1); filter: grayscale(100%);
-    }
-    #lizard-right.lizard-idle { transform: translateY(-50%) scale(1); }
-    #lizard-right.lizard-alert { transform: translateY(-50%) scale(1.12); filter: grayscale(100%) drop-shadow(0 0 14px rgba(255,255,255,0.45)); }
-    #lizard-right.lizard-tilt { transform: translateY(-50%) rotate(-12deg) scale(1.05); }
-
-    #periodic-links {
-      position: fixed; top: 42%; right: 13.5rem; transform: translateY(-50%);
-      z-index: 12; display: flex; flex-direction: column; gap: 0.35rem; text-align: right;
-    }
-    #periodic-links a {
-      color: #fff; font-size: 0.95rem; font-weight: 600; text-decoration: none;
-      padding: 0.25rem 0.5rem; border-radius: 6px; background: rgba(0,0,0,0.55);
-      border: 1px solid #555; transition: all 0.2s; white-space: nowrap;
-    }
-    #periodic-links a:hover { background: rgba(255,255,255,0.15); border-color: #fff; transform: translateX(-3px); }
-
-    input[type="text"], input[type="number"] {
-      width: 100%; padding: 0.75rem 1rem; font-size: 1rem;
-      border: 1px solid var(--border); border-radius: 10px; background: #0d0d0d; color: var(--text); outline: none;
-    }
-    input:focus { border-color: #fff; box-shadow: 0 0 0 3px var(--glow); }
-
-    button {
-      margin-top: 0.75rem; padding: 0.7rem 1.4rem; font-size: 0.95rem; font-weight: 600;
-      border: 1px solid #555; border-radius: 10px;
-      background: linear-gradient(135deg, #e8e8e8, #c0c0c0); color: #111; cursor: pointer;
-    }
-    button:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,255,255,0.12); }
-
-    #collectorPanel img { display: block; margin: 0 auto 1rem; width: 120px; border-radius: 10px; filter: grayscale(100%); }
-    #keywordList { list-style: none; max-height: 180px; overflow-y: auto; font-size: 0.9rem; color: var(--muted); }
-    #keywordList li { padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border); font-family: ui-monospace, monospace; }
-    #result { margin-top: 1rem; font-size: 1.1rem; font-weight: 600; color: #fff; min-height: 1.5em; }
-
-    #alchemicBanner {
-      overflow: hidden; white-space: nowrap; background: #0d0d0d;
-      border: 1px solid #333; border-radius: 10px; padding: 0.6rem 0; margin-bottom: 1rem;
-    }
-    #alchemicTrack { display: inline-flex; gap: 1.5rem; animation: bannerCycle 35s linear infinite; }
-    #alchemicTrack.paused { animation-play-state: paused; }
-    @keyframes bannerCycle { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-
-    .elem-chip {
-      display: inline-block; padding: 0.35rem 0.9rem; background: #1a1a1a;
-      border: 1px solid #444; border-radius: 20px; font-size: 0.9rem; font-weight: 600;
-      cursor: pointer; user-select: none; transition: all 0.2s;
-    }
-    .elem-chip:hover, .elem-chip.selected { background: #fff; color: #000; border-color: #fff; }
-
-    #alchemicControls { display: flex; gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; }
-    #alchemicControls button { margin-top: 0; padding: 0.45rem 1rem; font-size: 0.85rem; }
-
-    #flowLog {
-      background: #0a0a0a; border: 1px solid #333; border-radius: 8px;
-      padding: 0.75rem 1rem; font-family: ui-monospace, monospace; font-size: 0.82rem;
-      color: #ccc; max-height: 120px; overflow-y: auto; margin-bottom: 1rem;
-    }
-
-    #dotChart {
-      display: grid; grid-template-columns: repeat(12, 1fr); gap: 6px;
-      background: #0a0a0a; border: 1px solid #333; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;
-    }
-    .dot { width: 100%; aspect-ratio: 1; border-radius: 50%; background: #222; transition: background 0.3s; }
-    .dot.active { background: #fff; box-shadow: 0 0 6px rgba(255,255,255,0.5); }
-    #dotLabel { text-align: center; font-size: 0.85rem; color: #aaa; margin-bottom: 0.5rem; }
-
-    /* Modal */
-    #compoundModal {
-      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88);
-      z-index: 100; align-items: center; justify-content: center; padding: 1rem;
-    }
-    #compoundModal.open { display: flex; }
-    .modal-content {
-      background: #111; border: 1px solid #555; border-radius: 16px;
-      padding: 1.75rem 1.5rem; max-width: 420px; width: 100%; text-align: center; position: relative;
-    }
-    .modal-content h3 { margin-bottom: 0.25rem; color: #fff; font-size: 1.25rem; }
-    .modal-content .subtitle { font-size: 0.85rem; color: #aaa; margin-bottom: 0.8rem; }
-    .modal-content .formula { font-size: 1.6rem; font-weight: 700; letter-spacing: 0.06em; margin: 0.5rem 0 1rem; color: #fff; }
-    .modal-content img {
-      max-width: 100%; border-radius: 12px; background: #fff;
-      margin: 0.5rem 0 1rem; border: 1px solid #333;
-    }
-    .modal-content .structure-desc {
-      font-size: 0.95rem; color: #ddd; line-height: 1.45; text-align: left;
-      background: #0a0a0a; border: 1px solid #333; border-radius: 8px;
-      padding: 0.85rem 1rem; margin-top: 0.5rem;
-    }
-    .modal-close {
-      position: absolute; top: 0.6rem; right: 0.9rem; background: none; border: none;
-      color: #fff; font-size: 1.5rem; cursor: pointer; margin: 0; padding: 0; line-height: 1;
-    }
-
-    @media (max-width: 700px) {
-      #lizard-right { position: static; transform: none; display: block; margin: 1rem auto 0; max-width: 160px; }
-      #periodic-links { position: static; transform: none; margin: 0.75rem auto 0; text-align: center; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alpha Control — Advanced Molecular Module Crafter</title>
+    <style>
+        :root {
+            --bg: #1a1030;
+            --panel: #000000;
+            --accent: #ffffff;
+            --accent2: #d0d0d0;
+            --text: #ffffff;
+            --muted: #b0b0b0;
+            --cell: #111111;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "Segoe UI", system-ui, sans-serif;
+            background:
+                radial-gradient(ellipse at 20% 0%, rgba(80, 40, 140, 0.55), transparent 50%),
+                radial-gradient(ellipse at 90% 80%, rgba(20, 80, 140, 0.4), transparent 45%),
+                linear-gradient(180deg, #1a1030 0%, #0a0614 100%);
+            color: var(--text);
+            line-height: 1.45;
+        }
+        h1, h2, h3 { margin: 0 0 0.6rem; color: #ffffff; }
+        h1 {
+            text-align: center;
+            padding: 1.2rem 1rem 0.4rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            color: #ffffff;
+        }
+        .sub { text-align: center; color: #c8c8c8; margin-bottom: 1.2rem; font-size: 0.95rem; }
+        .wrap { max-width: 1280px; margin: 0 auto; padding: 0 16px 48px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+        .panel {
+            background: #000000;
+            border: 1px solid #ffffff;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        /* Periodic table */
+        .ptable {
+            display: grid;
+            grid-template-columns: repeat(18, minmax(0, 1fr));
+            gap: 3px;
+            font-size: 10px;
+        }
+        .el {
+            background: var(--cell);
+            border-radius: 4px;
+            padding: 3px 1px;
+            text-align: center;
+            cursor: pointer;
+            min-height: 38px;
+            transition: transform 0.12s, box-shadow 0.12s;
+            user-select: none;
+        }
+        .el:hover { transform: scale(1.12); z-index: 2; box-shadow: 0 0 0 1px #ffffff; }
+        .el.sel { outline: 2px solid #ffffff; filter: brightness(1.25); }
+        .el .z { display: block; font-size: 8px; opacity: 0.75; }
+        .el .sym { display: block; font-weight: 700; font-size: 12px; }
+        /* element examples keep color */
+        .s { background: #c0392b; color: #fff5f5; }
+        .p-non { background: #8e44ad; color: #f5e9ff; }
+        .p-met { background: #16a085; color: #e8fff8; }
+        .d { background: #2471a3; color: #eaf4ff; }
+        .f-la { background: #ad1457; color: #ffe6f0; }
+        .f-ac { background: #b71c1c; color: #ffe8e8; }
+        .noble { background: #00838f; color: #e6ffff; }
+        .blank { visibility: hidden; pointer-events: none; }
+        .frow { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(18, 1fr); gap: 3px; margin-top: 6px; }
+        /* Chain */
+        #chainDisplay {
+            min-height: 48px;
+            display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+            font-family: ui-monospace, monospace;
+        }
+        .bead {
+            padding: 4px 8px; border-radius: 999px;
+            font-weight: 700; font-size: 13px;
+            color: #fff;
+        }
+        .bond { color: #ffffff; }
+        button {
+            background: #ffffff;
+            border: 1px solid #ffffff;
+            color: #000000; font-weight: 700;
+            padding: 8px 14px; border-radius: 8px; cursor: pointer; margin: 4px 4px 0 0;
+        }
+        button.ghost { background: #000000; border: 1px solid #ffffff; color: #ffffff; }
+        input[type=text], input[type=number] {
+            width: 100%; padding: 8px 10px; border-radius: 8px;
+            border: 1px solid #ffffff; background: #000000; color: #ffffff;
+            font-size: 15px;
+        }
+        /* Matrix */
+        .matrix {
+            display: inline-grid; gap: 4px; font-family: ui-monospace, monospace;
+            padding: 8px 16px; border-left: 3px solid #ffffff;
+            border-right: 3px solid #ffffff; border-radius: 8px;
+            background: #000000; color: #ffffff;
+        }
+        .matrix span { min-width: 42px; text-align: center; padding: 4px; }
+        /* Blip path */
+        #blipSvg { width: 100%; height: 140px; background: #000000; border-radius: 8px; }
+        /* Polymers */
+        .poly-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        @media (max-width: 700px) { .poly-row { grid-template-columns: 1fr; } }
+        .poly-card { background: #000000; border: 1px solid #ffffff; border-radius: 8px; padding: 8px; text-align: center; }
+        .poly-card svg { width: 100%; height: 110px; }
+        .poly-card h4 { margin: 0 0 6px; font-size: 13px; color: #ffffff; }
+        /* Calc */
+        .calc-out { font-family: ui-monospace, Georgia, serif; font-size: 1.05rem; color: #ffffff; }
+        #keywordList { max-height: 120px; overflow: auto; padding-left: 18px; color: #c0c0c0; }
+        .hint { font-size: 12px; color: #b8b8b8; }
+    </style>
 </head>
 <body>
-  <div id="backgroundLayer"></div>
+    <h1>Alpha Control — Advanced Molecular Module Crafter</h1>
+    <p class="sub">Parent class · polymer chain · matrix signal · blip path · elementary calculus · all 118 elements</p>
 
-  <div id="mainContent">
-    <h1>Alpha Control for Dots with Visible Lizards</h1>
+    <div class="wrap">
+        <div class="panel">
+            <h2>Periodic Table — click to craft chain</h2>
+            <p class="hint">Every element Z=1…118 is present. Click to append to the synthesis chain. Shift-click to set as parent backbone atom.</p>
+            <div id="ptable" class="ptable"></div>
+        </div>
 
-    <div class="section">
-      <h2>Visual Lizard Overlay</h2>
-      <div class="lizard-row">
-        <img class="overlay-img" src="https://th.bing.com/th/id/R.7033cac703e4237dff3e46f11f0078c5?rik=WTKoP1HVgdjXvw&riu=http%3a%2f%2fs4.favim.com%2forig%2f150211%2fgif-lizard-Favim.com-2469514.gif&ehk=s2EwnJYK%2bn%2fv2gM%2fbPl9TP7RNp22EE18OEapR9zlVh0%3d&risl=&pid=ImgRaw&r=0" alt="lizard">
-        <img class="overlay-img" src="https://th.bing.com/th/id/R.7033cac703e4237dff3e46f11f0078c5?rik=WTKoP1HVgdjXvw&riu=http%3a%2f%2fs4.favim.com%2forig%2f150211%2fgif-lizard-Favim.com-2469514.gif&ehk=s2EwnJYK%2bn%2fv2gM%2fbPl9TP7RNp22EE18OEapR9zlVh0%3d&risl=&pid=ImgRaw&r=0" alt="lizard">
-      </div>
+        <div class="grid-2">
+            <div class="panel">
+                <h2>Module Chain <span class="hint" id="parentLabel">(parent: C)</span></h2>
+                <div id="chainDisplay"><span class="hint">Select elements…</span></div>
+                <div style="margin-top:10px">
+                    <button id="btnClear">Clear chain</button>
+                    <button id="btnPop" class="ghost">Pop last</button>
+                    <button id="btnCraft">Craft module</button>
+                </div>
+                <p id="craftLog" class="hint" style="margin-top:8px"></p>
+            </div>
+            <div class="panel">
+                <h2>Mathematical Matrix Box</h2>
+                <p class="hint">Signal matrix derived from atomic numbers of the chain (padded / folded to 3×3). Parent class seeds the (1,1) term.</p>
+                <div id="matrixBox" class="matrix" style="grid-template-columns: repeat(3, auto);"></div>
+                <p id="matrixNote" class="hint"></p>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>Blip Path — backbone trajectory</h2>
+            <p class="hint">Animated blip travels the designed polymer backbone path. Path mutates with chain length and parent class.</p>
+            <svg id="blipSvg" viewBox="0 0 800 140" preserveAspectRatio="xMidYMid meet">
+                <defs>
+                    <linearGradient id="g1" x1="0" x2="1">
+                        <stop offset="0" stop-color="#ffffff"/>
+                        <stop offset="1" stop-color="#888888"/>
+                    </linearGradient>
+                </defs>
+                <path id="polyPath" fill="none" stroke="url(#g1)" stroke-width="2.5" d="M40 70 C 120 20, 200 120, 280 70 S 440 20, 520 70 S 680 120, 760 70"/>
+                <circle id="blip" r="7" fill="#ffffff">
+                    <animateMotion id="blipAnim" dur="4s" repeatCount="indefinite">
+                        <mpath href="#polyPath"/>
+                    </animateMotion>
+                </circle>
+            </svg>
+        </div>
+
+        <div class="panel">
+            <h2>Three Polymer Synthesis Shapes</h2>
+            <p class="hint">Outline geometries the crafted molecule would present: linear (step-growth), branched (graft), and cross-linked network.</p>
+            <div class="poly-row">
+                <div class="poly-card">
+                    <h4>1 · Linear chain</h4>
+                    <svg viewBox="0 0 200 80" id="svgLinear"></svg>
+                </div>
+                <div class="poly-card">
+                    <h4>2 · Branched / graft</h4>
+                    <svg viewBox="0 0 200 80" id="svgBranch"></svg>
+                </div>
+                <div class="poly-card">
+                    <h4>3 · Cross-linked network</h4>
+                    <svg viewBox="0 0 200 80" id="svgNet"></svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="panel">
+                <h2>Elementary Calculus</h2>
+                <p class="hint">Sample rate / concentration model f(t) = a t² + b t + c seeded by chain stats. Derivative = instantaneous growth; integral = accumulated yield.</p>
+                <p class="calc-out" id="fExpr"></p>
+                <p class="calc-out" id="dfExpr"></p>
+                <p class="calc-out" id="intExpr"></p>
+            </div>
+            <div class="panel">
+                <h2>Advanced Browser Search</h2>
+                <p class="hint">Builds an introductory query matching polymer synthesis + selected elements + structure outline. Opens Bing Images.</p>
+                <input type="text" id="searchBox" placeholder="Query will auto-compose from the chain…">
+                <button id="searchButton">Search images</button>
+                <button id="composeBtn" class="ghost">Recompose query</button>
+                <p>Tracked queries:</p>
+                <ul id="keywordList"></ul>
+            </div>
+        </div>
     </div>
 
-    <img id="lizard-right" class="overlay-img lizard-idle"
-         src="https://thumbs.dreamstime.com/b/colorful-lizard-perched-tree-next-to-plant-vivid-red-green-hues-colorful-lizard-perched-tree-next-to-plant-vivid-318406389.jpg"
-         alt="ECKO">
+<script>
+/* ========== Element data: all 118 ========== */
+const ELEMENTS = [
+  {z:1,s:"H",n:"Hydrogen",g:1,p:1,c:"p-non"},{z:2,s:"He",n:"Helium",g:18,p:1,c:"noble"},
+  {z:3,s:"Li",n:"Lithium",g:1,p:2,c:"s"},{z:4,s:"Be",n:"Beryllium",g:2,p:2,c:"s"},
+  {z:5,s:"B",n:"Boron",g:13,p:2,c:"p-non"},{z:6,s:"C",n:"Carbon",g:14,p:2,c:"p-non"},
+  {z:7,s:"N",n:"Nitrogen",g:15,p:2,c:"p-non"},{z:8,s:"O",n:"Oxygen",g:16,p:2,c:"p-non"},
+  {z:9,s:"F",n:"Fluorine",g:17,p:2,c:"p-non"},{z:10,s:"Ne",n:"Neon",g:18,p:2,c:"noble"},
+  {z:11,s:"Na",n:"Sodium",g:1,p:3,c:"s"},{z:12,s:"Mg",n:"Magnesium",g:2,p:3,c:"s"},
+  {z:13,s:"Al",n:"Aluminum",g:13,p:3,c:"p-met"},{z:14,s:"Si",n:"Silicon",g:14,p:3,c:"p-non"},
+  {z:15,s:"P",n:"Phosphorus",g:15,p:3,c:"p-non"},{z:16,s:"S",n:"Sulfur",g:16,p:3,c:"p-non"},
+  {z:17,s:"Cl",n:"Chlorine",g:17,p:3,c:"p-non"},{z:18,s:"Ar",n:"Argon",g:18,p:3,c:"noble"},
+  {z:19,s:"K",n:"Potassium",g:1,p:4,c:"s"},{z:20,s:"Ca",n:"Calcium",g:2,p:4,c:"s"},
+  {z:21,s:"Sc",n:"Scandium",g:3,p:4,c:"d"},{z:22,s:"Ti",n:"Titanium",g:4,p:4,c:"d"},
+  {z:23,s:"V",n:"Vanadium",g:5,p:4,c:"d"},{z:24,s:"Cr",n:"Chromium",g:6,p:4,c:"d"},
+  {z:25,s:"Mn",n:"Manganese",g:7,p:4,c:"d"},{z:26,s:"Fe",n:"Iron",g:8,p:4,c:"d"},
+  {z:27,s:"Co",n:"Cobalt",g:9,p:4,c:"d"},{z:28,s:"Ni",n:"Nickel",g:10,p:4,c:"d"},
+  {z:29,s:"Cu",n:"Copper",g:11,p:4,c:"d"},{z:30,s:"Zn",n:"Zinc",g:12,p:4,c:"d"},
+  {z:31,s:"Ga",n:"Gallium",g:13,p:4,c:"p-met"},{z:32,s:"Ge",n:"Germanium",g:14,p:4,c:"p-non"},
+  {z:33,s:"As",n:"Arsenic",g:15,p:4,c:"p-non"},{z:34,s:"Se",n:"Selenium",g:16,p:4,c:"p-non"},
+  {z:35,s:"Br",n:"Bromine",g:17,p:4,c:"p-non"},{z:36,s:"Kr",n:"Krypton",g:18,p:4,c:"noble"},
+  {z:37,s:"Rb",n:"Rubidium",g:1,p:5,c:"s"},{z:38,s:"Sr",n:"Strontium",g:2,p:5,c:"s"},
+  {z:39,s:"Y",n:"Yttrium",g:3,p:5,c:"d"},{z:40,s:"Zr",n:"Zirconium",g:4,p:5,c:"d"},
+  {z:41,s:"Nb",n:"Niobium",g:5,p:5,c:"d"},{z:42,s:"Mo",n:"Molybdenum",g:6,p:5,c:"d"},
+  {z:43,s:"Tc",n:"Technetium",g:7,p:5,c:"d"},{z:44,s:"Ru",n:"Ruthenium",g:8,p:5,c:"d"},
+  {z:45,s:"Rh",n:"Rhodium",g:9,p:5,c:"d"},{z:46,s:"Pd",n:"Palladium",g:10,p:5,c:"d"},
+  {z:47,s:"Ag",n:"Silver",g:11,p:5,c:"d"},{z:48,s:"Cd",n:"Cadmium",g:12,p:5,c:"d"},
+  {z:49,s:"In",n:"Indium",g:13,p:5,c:"p-met"},{z:50,s:"Sn",n:"Tin",g:14,p:5,c:"p-met"},
+  {z:51,s:"Sb",n:"Antimony",g:15,p:5,c:"p-non"},{z:52,s:"Te",n:"Tellurium",g:16,p:5,c:"p-non"},
+  {z:53,s:"I",n:"Iodine",g:17,p:5,c:"p-non"},{z:54,s:"Xe",n:"Xenon",g:18,p:5,c:"noble"},
+  {z:55,s:"Cs",n:"Cesium",g:1,p:6,c:"s"},{z:56,s:"Ba",n:"Barium",g:2,p:6,c:"s"},
+  {z:57,s:"La",n:"Lanthanum",g:3,p:6,c:"f-la"},
+  {z:72,s:"Hf",n:"Hafnium",g:4,p:6,c:"d"},{z:73,s:"Ta",n:"Tantalum",g:5,p:6,c:"d"},
+  {z:74,s:"W",n:"Tungsten",g:6,p:6,c:"d"},{z:75,s:"Re",n:"Rhenium",g:7,p:6,c:"d"},
+  {z:76,s:"Os",n:"Osmium",g:8,p:6,c:"d"},{z:77,s:"Ir",n:"Iridium",g:9,p:6,c:"d"},
+  {z:78,s:"Pt",n:"Platinum",g:10,p:6,c:"d"},{z:79,s:"Au",n:"Gold",g:11,p:6,c:"d"},
+  {z:80,s:"Hg",n:"Mercury",g:12,p:6,c:"d"},{z:81,s:"Tl",n:"Thallium",g:13,p:6,c:"p-met"},
+  {z:82,s:"Pb",n:"Lead",g:14,p:6,c:"p-met"},{z:83,s:"Bi",n:"Bismuth",g:15,p:6,c:"p-met"},
+  {z:84,s:"Po",n:"Polonium",g:16,p:6,c:"p-met"},{z:85,s:"At",n:"Astatine",g:17,p:6,c:"p-non"},
+  {z:86,s:"Rn",n:"Radon",g:18,p:6,c:"noble"},
+  {z:87,s:"Fr",n:"Francium",g:1,p:7,c:"s"},{z:88,s:"Ra",n:"Radium",g:2,p:7,c:"s"},
+  {z:89,s:"Ac",n:"Actinium",g:3,p:7,c:"f-ac"},
+  {z:104,s:"Rf",n:"Rutherfordium",g:4,p:7,c:"d"},{z:105,s:"Db",n:"Dubnium",g:5,p:7,c:"d"},
+  {z:106,s:"Sg",n:"Seaborgium",g:6,p:7,c:"d"},{z:107,s:"Bh",n:"Bohrium",g:7,p:7,c:"d"},
+  {z:108,s:"Hs",n:"Hassium",g:8,p:7,c:"d"},{z:109,s:"Mt",n:"Meitnerium",g:9,p:7,c:"d"},
+  {z:110,s:"Ds",n:"Darmstadtium",g:10,p:7,c:"d"},{z:111,s:"Rg",n:"Roentgenium",g:11,p:7,c:"d"},
+  {z:112,s:"Cn",n:"Copernicium",g:12,p:7,c:"d"},{z:113,s:"Nh",n:"Nihonium",g:13,p:7,c:"p-met"},
+  {z:114,s:"Fl",n:"Flerovium",g:14,p:7,c:"p-met"},{z:115,s:"Mc",n:"Moscovium",g:15,p:7,c:"p-met"},
+  {z:116,s:"Lv",n:"Livermorium",g:16,p:7,c:"p-met"},{z:117,s:"Ts",n:"Tennessine",g:17,p:7,c:"p-non"},
+  {z:118,s:"Og",n:"Oganesson",g:18,p:7,c:"noble"},
+  /* f-block */
+  {z:58,s:"Ce",n:"Cerium",g:0,p:8,c:"f-la"},{z:59,s:"Pr",n:"Praseodymium",g:0,p:8,c:"f-la"},
+  {z:60,s:"Nd",n:"Neodymium",g:0,p:8,c:"f-la"},{z:61,s:"Pm",n:"Promethium",g:0,p:8,c:"f-la"},
+  {z:62,s:"Sm",n:"Samarium",g:0,p:8,c:"f-la"},{z:63,s:"Eu",n:"Europium",g:0,p:8,c:"f-la"},
+  {z:64,s:"Gd",n:"Gadolinium",g:0,p:8,c:"f-la"},{z:65,s:"Tb",n:"Terbium",g:0,p:8,c:"f-la"},
+  {z:66,s:"Dy",n:"Dysprosium",g:0,p:8,c:"f-la"},{z:67,s:"Ho",n:"Holmium",g:0,p:8,c:"f-la"},
+  {z:68,s:"Er",n:"Erbium",g:0,p:8,c:"f-la"},{z:69,s:"Tm",n:"Thulium",g:0,p:8,c:"f-la"},
+  {z:70,s:"Yb",n:"Ytterbium",g:0,p:8,c:"f-la"},{z:71,s:"Lu",n:"Lutetium",g:0,p:8,c:"f-la"},
+  {z:90,s:"Th",n:"Thorium",g:0,p:9,c:"f-ac"},{z:91,s:"Pa",n:"Protactinium",g:0,p:9,c:"f-ac"},
+  {z:92,s:"U",n:"Uranium",g:0,p:9,c:"f-ac"},{z:93,s:"Np",n:"Neptunium",g:0,p:9,c:"f-ac"},
+  {z:94,s:"Pu",n:"Plutonium",g:0,p:9,c:"f-ac"},{z:95,s:"Am",n:"Americium",g:0,p:9,c:"f-ac"},
+  {z:96,s:"Cm",n:"Curium",g:0,p:9,c:"f-ac"},{z:97,s:"Bk",n:"Berkelium",g:0,p:9,c:"f-ac"},
+  {z:98,s:"Cf",n:"Californium",g:0,p:9,c:"f-ac"},{z:99,s:"Es",n:"Einsteinium",g:0,p:9,c:"f-ac"},
+  {z:100,s:"Fm",n:"Fermium",g:0,p:9,c:"f-ac"},{z:101,s:"Md",n:"Mendelevium",g:0,p:9,c:"f-ac"},
+  {z:102,s:"No",n:"Nobelium",g:0,p:9,c:"f-ac"},{z:103,s:"Lr",n:"Lawrencium",g:0,p:9,c:"f-ac"}
+];
 
-    <div id="periodic-links">
-      <a href="https://en.wikipedia.org/wiki/Periodic_table" target="_blank" rel="noopener">元素周期表</a>
-      <a href="https://zh.wikipedia.org/wiki/%E5%85%83%E7%B4%A0%E5%91%A8%E6%9C%9F%E8%A1%A8" target="_blank" rel="noopener">元素周期表</a>
-    </div>
+const BY_Z = Object.fromEntries(ELEMENTS.map(e => [e.z, e]));
 
-    <div class="section">
-      <h2>Alchemic Flow System · Space-Filling Models</h2>
-      <p style="color:var(--muted); font-size:0.9rem; margin-bottom:0.75rem;">
-        Click / tap → AC dots + real space-filling (van-der-Waals) model when available
-      </p>
-
-      <div id="alchemicBanner"><div id="alchemicTrack"></div></div>
-      <div id="alchemicControls">
-        <button type="button" id="pauseBanner">Pause Cycle</button>
-        <button type="button" id="resumeBanner">Resume Cycle</button>
-      </div>
-      <div id="flowLog"><div>Waiting for element selection…</div></div>
-      <div id="dotLabel">AC Call Density</div>
-      <div id="dotChart"></div>
-    </div>
-
-    <div class="section">
-      <h2>Search Bing Images</h2>
-      <input type="text" id="searchBox" placeholder="Type a keyword…" autocomplete="off">
-      <button id="searchButton" type="button">Search Images</button>
-    </div>
-
-    <div class="section" id="collectorPanel">
-      <h3>Collector Panel</h3>
-      <img src="https://www.bing.com/th/id/OGC.639ecef65ef9e35ec637290670bb931d?pid=1.7&rurl=https%3a%2f%2fi.pinimg.com%2foriginals%2fc1%2f7c%2fcf%2fc17ccf3660873f7b133d505c38ed0d3c.gif&ehk=6LwT1GJ%2fbhMNwT7ciitYhXKweOzg59yVaCrlO0zn3j0%3d" alt="">
-      <p style="margin-bottom:0.5rem; color:var(--muted); font-size:0.9rem;">Tracked Keywords:</p>
-      <ul id="keywordList"></ul>
-    </div>
-
-    <div class="section">
-      <h2>Decimal Place Tracker</h2>
-      <form id="returnBoxForm">
-        <label for="numberInput" style="display:block; margin-bottom:0.4rem; color:var(--muted); font-size:0.9rem;">Enter a number:</label>
-        <input type="number" id="numberInput" step="any" required placeholder="e.g. 3.14159">
-        <button type="submit">Check Decimal Places</button>
-      </form>
-      <p id="result"></p>
-    </div>
-  </div>
-
-  <div id="compoundModal">
-    <div class="modal-content">
-      <button class="modal-close" id="closeModal">×</button>
-      <h3 id="modalTitle">Element</h3>
-      <div class="subtitle">Space-filling Structural Elemental Build</div>
-      <div class="formula" id="modalFormula">—</div>
-      <img id="modalImage" src="" alt="Space-filling model" style="display:none;">
-      <div class="structure-desc" id="modalBuild">Loading…</div>
-    </div>
-  </div>
-
-  <script>
-    // (keyword, lizard, decimal code – same as before)
-    const shadowWords = ["absolute","value","function","centroid","dura"];
-    const preloadWords = ["lizard","forest","pixel","abstract","neon","geometry","vivid"];
-    function countDecimalPlaces(n){if(!Number.isFinite(n))return 0;const s=n.toString();return s.includes(".")?s.split(".")[1].replace(/0+$/,"").length||0:0;}
-    document.getElementById("returnBoxForm").addEventListener("submit",e=>{e.preventDefault();const v=parseFloat(document.getElementById("numberInput").value);document.getElementById("result").textContent=Number.isFinite(v)?`Decimal places: ${countDecimalPlaces(v)}`:"Invalid";});
-    function logKeyword(k){const entry=`${k} · ${new Date().toLocaleTimeString()}`;let logs=JSON.parse(localStorage.getItem("searchLogs")||"[]");logs.push(entry);if(logs.length>50)logs=logs.slice(-50);localStorage.setItem("searchLogs",JSON.stringify(logs));const li=document.createElement("li");li.textContent=entry;document.getElementById("keywordList").prepend(li);}
-    function setKeyword(base){const full=`${base} ${shadowWords[Math.floor(Math.random()*shadowWords.length)]}`;document.getElementById("searchBox").value=full;logKeyword(full);}
-    document.getElementById("searchButton").onclick=()=>{const k=document.getElementById("searchBox").value.trim();if(!k)return alert("Enter a keyword");logKeyword(k);window.open(`https://www.bing.com/images/search?q=${encodeURIComponent(k)}`,"_blank");};
-    document.getElementById("searchBox").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("searchButton").click();});
-    function handleLizardAction(tag){const l=document.getElementById("lizard-right");l.classList.remove("lizard-idle","lizard-alert","lizard-tilt");if(tag==="LIZARD_POSE_IDLE")l.classList.add("lizard-idle");else if(tag==="LIZARD_POSE_ALERT")l.classList.add("lizard-alert");else if(tag==="LIZARD_POSE_TILT")l.classList.add("lizard-tilt");else if(tag==="LIZARD_SPEAK_INIT"){alert("Lizard says: Analyzing input stream…");l.classList.add("lizard-alert");setTimeout(()=>{l.classList.remove("lizard-alert");l.classList.add("lizard-idle");},1800);}}
-    const odmTags={Digit1:"LIZARD_POSE_IDLE",Digit2:"LIZARD_POSE_ALERT",Digit3:"LIZARD_POSE_TILT",KeyL:"LIZARD_SPEAK_INIT",Escape:"SYSTEM_OVERRIDE"};
-    document.addEventListener("keydown",e=>{if(e.target.matches("input,textarea"))return;const r=odmTags[e.code]?{status:"accepted",action:odmTags[e.code]}:{status:"refuted"};if(r.status==="accepted"&&r.action!=="SYSTEM_OVERRIDE")handleLizardAction(r.action);});
-
-    const elements = [
-      {sym:"H",name:"Hydrogen",mass:1.008},{sym:"He",name:"Helium",mass:4.003},
-      {sym:"Li",name:"Lithium",mass:6.941},{sym:"Be",name:"Beryllium",mass:9.012},
-      {sym:"B",name:"Boron",mass:10.81},{sym:"C",name:"Carbon",mass:12.01},
-      {sym:"N",name:"Nitrogen",mass:14.01},{sym:"O",name:"Oxygen",mass:16.00},
-      {sym:"F",name:"Fluorine",mass:19.00},{sym:"Ne",name:"Neon",mass:20.18},
-      {sym:"Na",name:"Sodium",mass:22.99},{sym:"Mg",name:"Magnesium",mass:24.31},
-      {sym:"Al",name:"Aluminium",mass:26.98},{sym:"Si",name:"Silicon",mass:28.09},
-      {sym:"P",name:"Phosphorus",mass:30.97},{sym:"S",name:"Sulfur",mass:32.07},
-      {sym:"Cl",name:"Chlorine",mass:35.45},{sym:"Ar",name:"Argon",mass:39.95},
-      {sym:"K",name:"Potassium",mass:39.10},{sym:"Ca",name:"Calcium",mass:40.08}
-    ];
-
-    // Known high-quality Wikimedia space-filling (3D-vdW) images for common compounds
-    const spaceFillingImages = {
-      "C": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Carbon-tetrachloride-3D-vdW.png/400px-Carbon-tetrachloride-3D-vdW.png",
-      "Cl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Carbon-tetrachloride-3D-vdW.png/400px-Carbon-tetrachloride-3D-vdW.png",
-      "O":  "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Oxygen-3D-vdW.png/400px-Oxygen-3D-vdW.png",
-      "N":  "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Nitrogen-3D-vdW.png/400px-Nitrogen-3D-vdW.png",
-      "H":  "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Hydrogen-3D-vdW.png/400px-Hydrogen-3D-vdW.png",
-      "S":  "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Sulfur-3D-vdW.png/400px-Sulfur-3D-vdW.png",
-      "P":  "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/White-phosphorus-3D-vdW.png/400px-White-phosphorus-3D-vdW.png"
-      // more can be added as needed
-    };
-
-    const structuralBuilds = {
-      "H":"Diatomic H–H. Space-filling model shows two overlapping spheres.",
-      "He":"Monatomic noble gas. Single closed-shell sphere.",
-      "Li":"Body-centred cubic metal. Large atomic radius in space-filling view.",
-      "Be":"Hexagonal close-packed. Smaller spheres than lithium.",
-      "B":"Icosahedral clusters. Tightly packed boron spheres.",
-      "C":"Tetrahedral (diamond) or planar (graphite). Space-filling of CCl₄ shown as example.",
-      "N":"Diatomic N≡N. Two spheres with short contact.",
-      "O":"Diatomic O=O. Two red spheres in space-filling model.",
-      "F":"Diatomic F–F. Two green spheres.",
-      "Ne":"Monatomic. Single sphere.",
-      "Na":"Body-centred cubic. Very large spheres.",
-      "Mg":"Hexagonal close-packed.",
-      "Al":"Face-centred cubic metal.",
-      "Si":"Diamond-type tetrahedral network.",
-      "P":"P₄ tetrahedra (white phosphorus). Four spheres.",
-      "S":"S₈ crown rings. Puckered ring of eight spheres.",
-      "Cl":"Diatomic Cl–Cl or in CCl₄ as shown.",
-      "Ar":"Monatomic noble gas.",
-      "K":"Body-centred cubic. Extremely large atomic radius.",
-      "Ca":"Face-centred cubic."
-    };
-
-    let acCallCount = 0;
-
-    function initAlchemicSystem() {
-      const track = document.getElementById("alchemicTrack");
-      const doubled = [...elements, ...elements];
-      doubled.forEach(el => {
-        const chip = document.createElement("span");
-        chip.className = "elem-chip";
-        chip.textContent = `${el.sym} · ${el.mass}`;
-        chip.dataset.sym = el.sym;
-        chip.addEventListener("click", () => selectElement(el));
-        track.appendChild(chip);
-      });
-      document.getElementById("pauseBanner").onclick = () => track.classList.add("paused");
-      document.getElementById("resumeBanner").onclick = () => track.classList.remove("paused");
-      renderDotChart(0);
+/* ========== Parent / child module classes ========== */
+class AlphaModule {
+    constructor(name = "AlphaModule") {
+        this.name = name;
+        this.created = Date.now();
     }
+    signal() { return this.name; }
+}
 
-    function renderDotChart(count) {
-      const chart = document.getElementById("dotChart");
-      chart.innerHTML = "";
-      for (let i = 0; i < 48; i++) {
+class PolymerChain extends AlphaModule {
+    constructor(parentEl) {
+        super("PolymerChain");
+        this.parent = parentEl || BY_Z[6];
+        this.units = [];
+    }
+    append(el) { this.units.push(el); }
+    pop() { return this.units.pop(); }
+    clear() { this.units = []; }
+    formula() {
+        if (!this.units.length) return this.parent.s;
+        const counts = {};
+        counts[this.parent.s] = (counts[this.parent.s] || 0) + 1;
+        this.units.forEach(u => { counts[u.s] = (counts[u.s] || 0) + 1; });
+        return Object.entries(counts).map(([k,v]) => k + (v>1?v:"")).join("");
+    }
+    zs() { return [this.parent.z, ...this.units.map(u => u.z)]; }
+    signal() {
+        return { parent: this.parent.s, n: this.units.length, formula: this.formula() };
+    }
+}
+
+const chain = new PolymerChain(BY_Z[6]);
+
+/* ========== Render periodic table ========== */
+function renderTable() {
+    const root = document.getElementById("ptable");
+    root.innerHTML = "";
+    const place = (z) => {
+        const e = BY_Z[z];
         const d = document.createElement("div");
-        d.className = "dot" + (i < Math.min(count, 48) ? " active" : "");
-        chart.appendChild(d);
-      }
-      document.getElementById("dotLabel").textContent = `AC Call Density · ${count} calls`;
+        d.className = "el " + e.c;
+        d.dataset.z = z;
+        d.innerHTML = `<span class="z">${e.z}</span><span class="sym">${e.s}</span>`;
+        d.title = `${e.n} (Z=${e.z})`;
+        d.addEventListener("click", ev => {
+            if (ev.shiftKey) {
+                chain.parent = e;
+                document.getElementById("parentLabel").textContent = `(parent: ${e.s})`;
+            } else {
+                chain.append(e);
+            }
+            refreshAll();
+        });
+        return d;
+    };
+    const blank = () => { const d = document.createElement("div"); d.className = "el blank"; return d; };
+
+    // Period 1
+    root.appendChild(place(1));
+    for (let i=0;i<16;i++) root.appendChild(blank());
+    root.appendChild(place(2));
+    // Period 2
+    root.appendChild(place(3)); root.appendChild(place(4));
+    for (let i=0;i<10;i++) root.appendChild(blank());
+    for (let z=5;z<=10;z++) root.appendChild(place(z));
+    // Period 3
+    root.appendChild(place(11)); root.appendChild(place(12));
+    for (let i=0;i<10;i++) root.appendChild(blank());
+    for (let z=13;z<=18;z++) root.appendChild(place(z));
+    // Period 4
+    for (let z=19;z<=36;z++) root.appendChild(place(z));
+    // Period 5
+    for (let z=37;z<=54;z++) root.appendChild(place(z));
+    // Period 6 (La placeholder then Hf-Rn)
+    root.appendChild(place(55)); root.appendChild(place(56)); root.appendChild(place(57));
+    for (let z=72;z<=86;z++) root.appendChild(place(z));
+    // Period 7
+    root.appendChild(place(87)); root.appendChild(place(88)); root.appendChild(place(89));
+    for (let z=104;z<=118;z++) root.appendChild(place(z));
+
+    // Lanthanides row
+    const la = document.createElement("div");
+    la.className = "frow";
+    la.style.gridColumn = "1 / -1";
+    // spacer to align under group 4-ish
+    for (let i=0;i<3;i++) { const b=document.createElement("div"); b.className="el blank"; la.appendChild(b); }
+    for (let z=58;z<=71;z++) la.appendChild(place(z));
+    root.appendChild(la);
+
+    const ac = document.createElement("div");
+    ac.className = "frow";
+    for (let i=0;i<3;i++) { const b=document.createElement("div"); b.className="el blank"; ac.appendChild(b); }
+    for (let z=90;z<=103;z++) ac.appendChild(place(z));
+    root.appendChild(ac);
+}
+
+/* ========== Matrix ========== */
+function foldMatrix(vals) {
+    const m = Array(9).fill(0);
+    vals.forEach((v,i) => { m[i % 9] += v; });
+    // mix
+    for (let i=0;i<9;i++) m[i] = Math.round((m[i] + (i===0?vals[0]||6:0)) % 997);
+    return m;
+}
+
+function renderMatrix() {
+    const box = document.getElementById("matrixBox");
+    const m = foldMatrix(chain.zs());
+    box.innerHTML = m.map(n => `<span>${n}</span>`).join("");
+    const detApprox = m[0]*(m[4]*m[8]-m[5]*m[7]) - m[1]*(m[3]*m[8]-m[5]*m[6]) + m[2]*(m[3]*m[7]-m[4]*m[6]);
+    document.getElementById("matrixNote").textContent = `det≈ ${detApprox}  ·  parent seeds (1,1)`;
+}
+
+/* ========== Blip path ========== */
+function updatePath() {
+    const n = Math.max(3, chain.units.length + 2);
+    const w = 800, h = 140;
+    let d = `M 30 ${h/2}`;
+    for (let i=1;i<=n;i++) {
+        const x = 30 + (i/n)*(w-60);
+        const amp = 28 + (chain.parent.z % 17);
+        const y = h/2 + Math.sin(i * 1.2 + chain.parent.z) * amp * (i%2?1:-0.7);
+        const cpx = x - (w-60)/n/2;
+        const cpy = h/2 + Math.cos(i + chain.units.length) * amp;
+        d += ` Q ${cpx.toFixed(1)} ${cpy.toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)}`;
+    }
+    document.getElementById("polyPath").setAttribute("d", d);
+}
+
+/* ========== Polymer SVGs ========== */
+function atomDot(svg, x, y, label, r=6) {
+    const c = document.createElementNS("http://www.w3.org/2000/svg","circle");
+    c.setAttribute("cx",x); c.setAttribute("cy",y); c.setAttribute("r",r);
+    c.setAttribute("fill","#ffffff"); svg.appendChild(c);
+    if (label) {
+        const t = document.createElementNS("http://www.w3.org/2000/svg","text");
+        t.setAttribute("x",x); t.setAttribute("y",y-10);
+        t.setAttribute("text-anchor","middle"); t.setAttribute("fill","#ffffff");
+        t.setAttribute("font-size","8"); t.textContent = label;
+        svg.appendChild(t);
+    }
+}
+function line(svg,x1,y1,x2,y2) {
+    const l = document.createElementNS("http://www.w3.org/2000/svg","line");
+    l.setAttribute("x1",x1); l.setAttribute("y1",y1); l.setAttribute("x2",x2); l.setAttribute("y2",y2);
+    l.setAttribute("stroke","#ffffff"); l.setAttribute("stroke-width","2");
+    svg.appendChild(l);
+}
+function drawPolymers() {
+    const units = chain.units.length ? chain.units : [chain.parent, BY_Z[1], chain.parent];
+    const lab = (i) => units[i % units.length].s;
+
+    const lin = document.getElementById("svgLinear");
+    lin.innerHTML = "";
+    const n = 6;
+    for (let i=0;i<n;i++) {
+        const x = 18 + i*30;
+        if (i) line(lin, x-30, 40, x, 40);
+        atomDot(lin, x, 40, lab(i));
     }
 
-    async function selectElement(el) {
-      document.querySelectorAll(".elem-chip").forEach(c => c.classList.remove("selected"));
-      document.querySelectorAll(`.elem-chip[data-sym="${el.sym}"]`).forEach(c => c.classList.add("selected"));
+    const br = document.getElementById("svgBranch");
+    br.innerHTML = "";
+    const bx = [20,50,80,110,140,170];
+    bx.forEach((x,i)=>{ if(i) line(br,bx[i-1],50,x,50); atomDot(br,x,50,lab(i)); });
+    line(br,80,50,80,22); atomDot(br,80,18,lab(1),5);
+    line(br,140,50,155,22); atomDot(br,160,18,lab(2),5);
+    line(br,50,50,40,22); atomDot(br,36,18,lab(3),5);
 
-      acCallCount = Math.floor(el.mass * 1.7 + Math.random() * 12);
-      renderDotChart(acCallCount);
+    const net = document.getElementById("svgNet");
+    net.innerHTML = "";
+    const nodes = [[30,20],[80,18],[140,22],[185,30],[40,55],[95,50],[155,58],[25,75],[90,78],[150,72]];
+    const edges = [[0,1],[1,2],[2,3],[0,4],[1,5],[2,6],[3,6],[4,5],[5,6],[4,7],[5,8],[6,9],[7,8],[8,9]];
+    edges.forEach(([a,b]) => line(net, nodes[a][0],nodes[a][1], nodes[b][0],nodes[b][1]));
+    nodes.forEach((p,i) => atomDot(net, p[0], p[1], lab(i), 5));
+}
 
-      const log = document.getElementById("flowLog");
-      log.innerHTML = "";
-      ["→ AC-INCALL " + el.sym, "→ loading space-filling model…"].forEach((s, i) => {
-        setTimeout(() => { const d = document.createElement("div"); d.textContent = s; log.appendChild(d); }, i * 200);
-      });
+/* ========== Calculus ========== */
+function renderCalc() {
+    const zs = chain.zs();
+    const a = ((zs.reduce((s,v)=>s+v,0) % 9) + 1) / 4;
+    const b = ((chain.parent.z % 11) - 5);
+    const c = zs.length;
+    const aS = a.toFixed(2), bS = (b>=0?"+ ":"+ ") + Math.abs(b);
+    document.getElementById("fExpr").innerHTML = `f(t) = ${aS} t² ${bS} t + ${c}`;
+    document.getElementById("dfExpr").innerHTML = `f′(t) = ${ (2*a).toFixed(2) } t ${bS}`;
+    document.getElementById("intExpr").innerHTML = `∫ f(t) dt = ${(a/3).toFixed(2)} t³ ${b>=0?"+":"−"} ${(Math.abs(b)/2).toFixed(2)} t² + ${c} t + C`;
+}
 
-      // Prefer known Wikimedia space-filling image
-      let imgUrl = spaceFillingImages[el.sym] || null;
-      let formula = el.sym;
-
-      // Fallback to PubChem 3D if no Commons image
-      if (!imgUrl) {
-        try {
-          const cidRes = await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(el.name)}/cids/JSON`);
-          const cidData = await cidRes.json();
-          const cid = cidData?.IdentifierList?.CID?.[0];
-          if (cid) {
-            imgUrl = `https://pubchem.ncbi.nlm.nih.gov/image/imgsrv.fcgi?cid=${cid}&t=3d`;
-            const propRes = await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/property/MolecularFormula/JSON`);
-            const propData = await propRes.json();
-            formula = propData?.PropertyTable?.Properties?.[0]?.MolecularFormula || el.sym;
-          }
-        } catch (e) {}
-      }
-
-      showStructuralPopup({
-        title: `${el.name} (${el.sym})`,
-        formula: formula,
-        img: imgUrl,
-        build: structuralBuilds[el.sym] || "Structural data unavailable."
-      });
-    }
-
-    function showStructuralPopup({ title, formula, img, build }) {
-      document.getElementById("modalTitle").textContent = title;
-      document.getElementById("modalFormula").textContent = formula;
-      document.getElementById("modalBuild").textContent = build;
-
-      const imgEl = document.getElementById("modalImage");
-      if (img) {
-        imgEl.src = img;
-        imgEl.style.display = "block";
-        imgEl.onerror = () => { imgEl.style.display = "none"; };
-      } else {
-        imgEl.style.display = "none";
-      }
-      document.getElementById("compoundModal").classList.add("open");
-    }
-
-    document.getElementById("closeModal").onclick = () => document.getElementById("compoundModal").classList.remove("open");
-    document.getElementById("compoundModal").addEventListener("click", e => {
-      if (e.target.id === "compoundModal") e.target.classList.remove("open");
+/* ========== Chain UI + search ========== */
+function renderChain() {
+    const el = document.getElementById("chainDisplay");
+    const parts = [chain.parent, ...chain.units];
+    el.innerHTML = parts.map((e,i) =>
+        (i?`<span class="bond">—</span>`:"") + `<span class="bead ${e.c}" title="${e.n}">${e.s}</span>`
+    ).join("");
+    document.querySelectorAll(".el").forEach(d => {
+        d.classList.toggle("sel", parts.some(p => String(p.z) === d.dataset.z));
     });
+}
 
-    window.addEventListener("DOMContentLoaded", () => {
-      localStorage.removeItem("searchLogs");
-      document.getElementById("keywordList").innerHTML = "";
-      setKeyword(preloadWords[Math.floor(Math.random() * preloadWords.length)]);
-      initAlchemicSystem();
-    });
-  </script>
+function composeQuery() {
+    const form = chain.formula();
+    const names = [...new Set([chain.parent.n, ...chain.units.map(u=>u.n)])].slice(0,6).join(" ");
+    const q = `polymer synthesis ${form} ${names} molecular structure outline 3D chain branched crosslinked backbone visualization introductory`;
+    document.getElementById("searchBox").value = q;
+    return q;
+}
+
+function logKeyword(keyword) {
+    const timestamp = new Date().toLocaleTimeString();
+    const entry = `${keyword.slice(0,80)}… @ ${timestamp}`;
+    let logs = JSON.parse(localStorage.getItem("mwCraftLogs") || "[]");
+    logs.push(entry);
+    if (logs.length > 30) logs = logs.slice(-30);
+    localStorage.setItem("mwCraftLogs", JSON.stringify(logs));
+    const li = document.createElement("li");
+    li.textContent = entry;
+    document.getElementById("keywordList").prepend(li);
+}
+
+function refreshAll() {
+    renderChain();
+    renderMatrix();
+    updatePath();
+    drawPolymers();
+    renderCalc();
+    composeQuery();
+}
+
+document.getElementById("btnClear").onclick = () => { chain.clear(); refreshAll(); };
+document.getElementById("btnPop").onclick = () => { chain.pop(); refreshAll(); };
+document.getElementById("btnCraft").onclick = () => {
+    const sig = chain.signal();
+    document.getElementById("craftLog").textContent =
+        `Crafted ${sig.name || "PolymerChain"} · parent ${sig.parent} · n=${sig.n} · ${sig.formula}`;
+    refreshAll();
+};
+document.getElementById("composeBtn").onclick = composeQuery;
+document.getElementById("searchButton").onclick = () => {
+    const q = document.getElementById("searchBox").value.trim() || composeQuery();
+    logKeyword(q);
+    window.open(`https://www.bing.com/images/search?q=${encodeURIComponent(q)}`, "_blank");
+};
+
+renderTable();
+refreshAll();
+// restore logs
+(JSON.parse(localStorage.getItem("mwCraftLogs") || "[]")).reverse().forEach(e => {
+    const li = document.createElement("li"); li.textContent = e;
+    document.getElementById("keywordList").appendChild(li);
+});
+</script>
 </body>
 </html>
