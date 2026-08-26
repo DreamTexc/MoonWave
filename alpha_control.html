@@ -5,86 +5,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Alpha Math Wizard</title>
   <style>
+    /* (same CSS as previous version – black & white UI, lizard, banner, modal, etc.) */
     :root {
-      --bg: #0a0a0a;
-      --surface: #141414;
-      --border: #2a2a2a;
-      --text: #f0f0f0;
-      --muted: #999999;
-      --glow: rgba(255, 255, 255, 0.15);
+      --bg: #0a0a0a; --surface: #141414; --border: #2a2a2a;
+      --text: #f0f0f0; --muted: #999999; --glow: rgba(255,255,255,0.15);
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
-      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      line-height: 1.5;
-      overflow-x: hidden;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.5; overflow-x: hidden;
     }
-
     #backgroundLayer {
-      position: fixed;
-      inset: 0;
+      position: fixed; inset: 0;
       background-image: url('https://keystagewiki.com/images/thumb/a/ab/Ne-20_WK.PNG/400px-Ne-20_WK.PNG');
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center top;
-      opacity: 0.32;
-      z-index: 0;
-      pointer-events: none;
+      background-size: contain; background-repeat: no-repeat; background-position: center top;
+      opacity: 0.32; z-index: 0; pointer-events: none;
     }
-
     #mainContent {
-      position: relative;
-      z-index: 1;
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 2rem 1.25rem 4rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1.75rem;
+      position: relative; z-index: 1; max-width: 900px; margin: 0 auto;
+      padding: 2rem 1.25rem 4rem; display: flex; flex-direction: column; gap: 1.75rem;
     }
-
     h1 {
-      text-align: center;
-      font-size: clamp(1.6rem, 4vw, 2.2rem);
-      font-weight: 700;
-      color: #ffffff;
-      margin-bottom: 0.5rem;
-      text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+      text-align: center; font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 700;
+      color: #fff; margin-bottom: 0.5rem; text-shadow: 0 0 20px rgba(255,255,255,0.2);
     }
-
     .section {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.5rem;
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      padding: 1.5rem; box-shadow: 0 4px 24px rgba(0,0,0,0.5);
     }
-
-    .section h2, .section h3 {
-      font-size: 1.15rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-      color: #ffffff;
-    }
+    .section h2, .section h3 { font-size: 1.15rem; font-weight: 600; margin-bottom: 1rem; color: #fff; }
 
     .lizard-row { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; }
     .overlay-img {
       width: 100%; max-width: 220px; border-radius: 12px; opacity: 0.9;
-      transition: transform 0.35s ease, opacity 0.35s ease;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6); filter: grayscale(100%);
+      transition: transform 0.35s, opacity 0.35s; box-shadow: 0 8px 24px rgba(0,0,0,0.6); filter: grayscale(100%);
     }
     .overlay-img:hover { opacity: 1; transform: scale(1.03); }
 
     #lizard-right {
       position: fixed; top: 50%; right: 1.5rem; transform: translateY(-50%);
       max-width: 180px; z-index: 10; opacity: 0.95;
-      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.35s ease;
-      border-radius: 12px; box-shadow: 0 0 30px rgba(255, 255, 255, 0.1); filter: grayscale(100%);
+      transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), filter 0.35s;
+      border-radius: 12px; box-shadow: 0 0 30px rgba(255,255,255,0.1); filter: grayscale(100%);
     }
     #lizard-right.lizard-idle { transform: translateY(-50%) scale(1); }
     #lizard-right.lizard-alert { transform: translateY(-50%) scale(1.12); filter: grayscale(100%) drop-shadow(0 0 14px rgba(255,255,255,0.45)); }
@@ -103,8 +65,7 @@
 
     input[type="text"], input[type="number"] {
       width: 100%; padding: 0.75rem 1rem; font-size: 1rem;
-      border: 1px solid var(--border); border-radius: 10px;
-      background: #0d0d0d; color: var(--text); outline: none;
+      border: 1px solid var(--border); border-radius: 10px; background: #0d0d0d; color: var(--text); outline: none;
     }
     input:focus { border-color: #fff; box-shadow: 0 0 0 3px var(--glow); }
 
@@ -120,7 +81,6 @@
     #keywordList li { padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border); font-family: ui-monospace, monospace; }
     #result { margin-top: 1rem; font-size: 1.1rem; font-weight: 600; color: #fff; min-height: 1.5em; }
 
-    /* Alchemic */
     #alchemicBanner {
       overflow: hidden; white-space: nowrap; background: #0d0d0d;
       border: 1px solid #333; border-radius: 10px; padding: 0.6rem 0; margin-bottom: 1rem;
@@ -153,18 +113,17 @@
     .dot.active { background: #fff; box-shadow: 0 0 6px rgba(255,255,255,0.5); }
     #dotLabel { text-align: center; font-size: 0.85rem; color: #aaa; margin-bottom: 0.5rem; }
 
-    /* Modal – space-filling focused */
+    /* Modal */
     #compoundModal {
       display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88);
       z-index: 100; align-items: center; justify-content: center; padding: 1rem;
     }
     #compoundModal.open { display: flex; }
-
     .modal-content {
       background: #111; border: 1px solid #555; border-radius: 16px;
-      padding: 1.75rem 1.5rem; max-width: 400px; width: 100%; text-align: center; position: relative;
+      padding: 1.75rem 1.5rem; max-width: 420px; width: 100%; text-align: center; position: relative;
     }
-    .modal-content h3 { margin-bottom: 0.3rem; color: #fff; font-size: 1.25rem; }
+    .modal-content h3 { margin-bottom: 0.25rem; color: #fff; font-size: 1.25rem; }
     .modal-content .subtitle { font-size: 0.85rem; color: #aaa; margin-bottom: 0.8rem; }
     .modal-content .formula { font-size: 1.6rem; font-weight: 700; letter-spacing: 0.06em; margin: 0.5rem 0 1rem; color: #fff; }
     .modal-content img {
@@ -211,9 +170,9 @@
     </div>
 
     <div class="section">
-      <h2>Alchemic Flow System · Space-Filling Structural Build</h2>
+      <h2>Alchemic Flow System · Space-Filling Models</h2>
       <p style="color:var(--muted); font-size:0.9rem; margin-bottom:0.75rem;">
-        Click / tap any element → AC-call dots + space-filling model + full structural description
+        Click / tap → AC dots + real space-filling (van-der-Waals) model when available
       </p>
 
       <div id="alchemicBanner"><div id="alchemicTrack"></div></div>
@@ -250,7 +209,6 @@
     </div>
   </div>
 
-  <!-- Space-filling Structural Modal -->
   <div id="compoundModal">
     <div class="modal-content">
       <button class="modal-close" id="closeModal">×</button>
@@ -263,57 +221,18 @@
   </div>
 
   <script>
+    // (keyword, lizard, decimal code – same as before)
     const shadowWords = ["absolute","value","function","centroid","dura"];
     const preloadWords = ["lizard","forest","pixel","abstract","neon","geometry","vivid"];
-
-    function countDecimalPlaces(n) {
-      if (!Number.isFinite(n)) return 0;
-      const s = n.toString();
-      return s.includes(".") ? s.split(".")[1].replace(/0+$/,"").length || 0 : 0;
-    }
-    document.getElementById("returnBoxForm").addEventListener("submit", e => {
-      e.preventDefault();
-      const v = parseFloat(document.getElementById("numberInput").value);
-      document.getElementById("result").textContent = Number.isFinite(v) ? `Decimal places: ${countDecimalPlaces(v)}` : "Invalid";
-    });
-
-    function logKeyword(k) {
-      const entry = `${k} · ${new Date().toLocaleTimeString()}`;
-      let logs = JSON.parse(localStorage.getItem("searchLogs") || "[]");
-      logs.push(entry); if (logs.length > 50) logs = logs.slice(-50);
-      localStorage.setItem("searchLogs", JSON.stringify(logs));
-      const li = document.createElement("li"); li.textContent = entry;
-      document.getElementById("keywordList").prepend(li);
-    }
-    function setKeyword(base) {
-      const full = `${base} ${shadowWords[Math.floor(Math.random()*shadowWords.length)]}`;
-      document.getElementById("searchBox").value = full; logKeyword(full);
-    }
-    document.getElementById("searchButton").onclick = () => {
-      const k = document.getElementById("searchBox").value.trim();
-      if (!k) return alert("Enter a keyword");
-      logKeyword(k); window.open(`https://www.bing.com/images/search?q=${encodeURIComponent(k)}`,"_blank");
-    };
-    document.getElementById("searchBox").addEventListener("keydown", e => { if (e.key==="Enter") document.getElementById("searchButton").click(); });
-
-    function handleLizardAction(tag) {
-      const l = document.getElementById("lizard-right");
-      l.classList.remove("lizard-idle","lizard-alert","lizard-tilt");
-      if (tag==="LIZARD_POSE_IDLE") l.classList.add("lizard-idle");
-      else if (tag==="LIZARD_POSE_ALERT") l.classList.add("lizard-alert");
-      else if (tag==="LIZARD_POSE_TILT") l.classList.add("lizard-tilt");
-      else if (tag==="LIZARD_SPEAK_INIT") {
-        alert("Lizard says: Analyzing input stream…");
-        l.classList.add("lizard-alert");
-        setTimeout(()=>{ l.classList.remove("lizard-alert"); l.classList.add("lizard-idle"); },1800);
-      }
-    }
-    const odmTags = {Digit1:"LIZARD_POSE_IDLE",Digit2:"LIZARD_POSE_ALERT",Digit3:"LIZARD_POSE_TILT",KeyL:"LIZARD_SPEAK_INIT",Escape:"SYSTEM_OVERRIDE"};
-    document.addEventListener("keydown", e => {
-      if (e.target.matches("input,textarea")) return;
-      const r = odmTags[e.code] ? {status:"accepted",action:odmTags[e.code]} : {status:"refuted"};
-      if (r.status==="accepted" && r.action!=="SYSTEM_OVERRIDE") handleLizardAction(r.action);
-    });
+    function countDecimalPlaces(n){if(!Number.isFinite(n))return 0;const s=n.toString();return s.includes(".")?s.split(".")[1].replace(/0+$/,"").length||0:0;}
+    document.getElementById("returnBoxForm").addEventListener("submit",e=>{e.preventDefault();const v=parseFloat(document.getElementById("numberInput").value);document.getElementById("result").textContent=Number.isFinite(v)?`Decimal places: ${countDecimalPlaces(v)}`:"Invalid";});
+    function logKeyword(k){const entry=`${k} · ${new Date().toLocaleTimeString()}`;let logs=JSON.parse(localStorage.getItem("searchLogs")||"[]");logs.push(entry);if(logs.length>50)logs=logs.slice(-50);localStorage.setItem("searchLogs",JSON.stringify(logs));const li=document.createElement("li");li.textContent=entry;document.getElementById("keywordList").prepend(li);}
+    function setKeyword(base){const full=`${base} ${shadowWords[Math.floor(Math.random()*shadowWords.length)]}`;document.getElementById("searchBox").value=full;logKeyword(full);}
+    document.getElementById("searchButton").onclick=()=>{const k=document.getElementById("searchBox").value.trim();if(!k)return alert("Enter a keyword");logKeyword(k);window.open(`https://www.bing.com/images/search?q=${encodeURIComponent(k)}`,"_blank");};
+    document.getElementById("searchBox").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("searchButton").click();});
+    function handleLizardAction(tag){const l=document.getElementById("lizard-right");l.classList.remove("lizard-idle","lizard-alert","lizard-tilt");if(tag==="LIZARD_POSE_IDLE")l.classList.add("lizard-idle");else if(tag==="LIZARD_POSE_ALERT")l.classList.add("lizard-alert");else if(tag==="LIZARD_POSE_TILT")l.classList.add("lizard-tilt");else if(tag==="LIZARD_SPEAK_INIT"){alert("Lizard says: Analyzing input stream…");l.classList.add("lizard-alert");setTimeout(()=>{l.classList.remove("lizard-alert");l.classList.add("lizard-idle");},1800);}}
+    const odmTags={Digit1:"LIZARD_POSE_IDLE",Digit2:"LIZARD_POSE_ALERT",Digit3:"LIZARD_POSE_TILT",KeyL:"LIZARD_SPEAK_INIT",Escape:"SYSTEM_OVERRIDE"};
+    document.addEventListener("keydown",e=>{if(e.target.matches("input,textarea"))return;const r=odmTags[e.code]?{status:"accepted",action:odmTags[e.code]}:{status:"refuted"};if(r.status==="accepted"&&r.action!=="SYSTEM_OVERRIDE")handleLizardAction(r.action);});
 
     const elements = [
       {sym:"H",name:"Hydrogen",mass:1.008},{sym:"He",name:"Helium",mass:4.003},
@@ -328,27 +247,39 @@
       {sym:"K",name:"Potassium",mass:39.10},{sym:"Ca",name:"Calcium",mass:40.08}
     ];
 
+    // Known high-quality Wikimedia space-filling (3D-vdW) images for common compounds
+    const spaceFillingImages = {
+      "C": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Carbon-tetrachloride-3D-vdW.png/400px-Carbon-tetrachloride-3D-vdW.png",
+      "Cl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Carbon-tetrachloride-3D-vdW.png/400px-Carbon-tetrachloride-3D-vdW.png",
+      "O":  "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Oxygen-3D-vdW.png/400px-Oxygen-3D-vdW.png",
+      "N":  "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Nitrogen-3D-vdW.png/400px-Nitrogen-3D-vdW.png",
+      "H":  "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Hydrogen-3D-vdW.png/400px-Hydrogen-3D-vdW.png",
+      "S":  "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Sulfur-3D-vdW.png/400px-Sulfur-3D-vdW.png",
+      "P":  "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/White-phosphorus-3D-vdW.png/400px-White-phosphorus-3D-vdW.png"
+      // more can be added as needed
+    };
+
     const structuralBuilds = {
-      "H":"Diatomic H–H. Single covalent bond. Linear. 1s¹. Space-filling model shows two overlapping spheres.",
-      "He":"Monatomic noble gas. Complete 1s² shell. Spherical closed-shell atom. No bonds.",
-      "Li":"Body-centred cubic metallic lattice. Each atom has 8 neighbours. Soft metal, large atomic radius in space-filling view.",
-      "Be":"Hexagonal close-packed. Strong covalent character. Smaller spheres than lithium in space-filling models.",
-      "B":"Icosahedral B₁₂ clusters. Complex 3-centre bonding. Space-filling shows tightly packed boron spheres.",
-      "C":"Diamond (tetrahedral) or graphite (planar sheets). Space-filling models of diamond show dense tetrahedral packing.",
-      "N":"Diatomic N≡N triple bond. Linear. Space-filling model is two spheres with short contact distance.",
-      "O":"Diatomic O=O (diradical). Space-filling shows two overlapping red spheres.",
-      "F":"Diatomic F–F. Weak bond, large lone-pair repulsion. Space-filling model has two green spheres close together.",
-      "Ne":"Monatomic noble gas. Perfect closed shell. Single sphere in space-filling representation.",
-      "Na":"Body-centred cubic metal. Large atomic radius. Soft, highly reactive.",
-      "Mg":"Hexagonal close-packed. Medium-sized spheres in space-filling metallic lattice.",
-      "Al":"Face-centred cubic. Strong oxide layer. Space-filling metal model is dense packing of medium spheres.",
-      "Si":"Diamond-type tetrahedral network. Same geometry as diamond carbon but larger atoms.",
-      "P":"White phosphorus = P₄ tetrahedra. Space-filling shows four spheres at tetrahedron vertices.",
-      "S":"Crown-shaped S₈ rings. Space-filling model is a puckered ring of eight yellow spheres.",
-      "Cl":"Diatomic Cl–Cl. Space-filling shows two large green spheres.",
-      "Ar":"Monatomic noble gas. Single closed-shell sphere.",
-      "K":"Body-centred cubic. Very large atomic radius in space-filling models.",
-      "Ca":"Face-centred cubic. Large spheres, ionic Ca²⁺ in compounds."
+      "H":"Diatomic H–H. Space-filling model shows two overlapping spheres.",
+      "He":"Monatomic noble gas. Single closed-shell sphere.",
+      "Li":"Body-centred cubic metal. Large atomic radius in space-filling view.",
+      "Be":"Hexagonal close-packed. Smaller spheres than lithium.",
+      "B":"Icosahedral clusters. Tightly packed boron spheres.",
+      "C":"Tetrahedral (diamond) or planar (graphite). Space-filling of CCl₄ shown as example.",
+      "N":"Diatomic N≡N. Two spheres with short contact.",
+      "O":"Diatomic O=O. Two red spheres in space-filling model.",
+      "F":"Diatomic F–F. Two green spheres.",
+      "Ne":"Monatomic. Single sphere.",
+      "Na":"Body-centred cubic. Very large spheres.",
+      "Mg":"Hexagonal close-packed.",
+      "Al":"Face-centred cubic metal.",
+      "Si":"Diamond-type tetrahedral network.",
+      "P":"P₄ tetrahedra (white phosphorus). Four spheres.",
+      "S":"S₈ crown rings. Puckered ring of eight spheres.",
+      "Cl":"Diatomic Cl–Cl or in CCl₄ as shown.",
+      "Ar":"Monatomic noble gas.",
+      "K":"Body-centred cubic. Extremely large atomic radius.",
+      "Ca":"Face-centred cubic."
     };
 
     let acCallCount = 0;
@@ -374,7 +305,7 @@
       chart.innerHTML = "";
       for (let i = 0; i < 48; i++) {
         const d = document.createElement("div");
-        d.className = "dot" + (i < Math.min(count,48) ? " active" : "");
+        d.className = "dot" + (i < Math.min(count, 48) ? " active" : "");
         chart.appendChild(d);
       }
       document.getElementById("dotLabel").textContent = `AC Call Density · ${count} calls`;
@@ -389,30 +320,28 @@
 
       const log = document.getElementById("flowLog");
       log.innerHTML = "";
-      ["→ AC-INCALL element="+el.sym, "→ density="+acCallCount, "→ loading space-filling model…"].forEach((s,i)=>{
-        setTimeout(()=>{ const d=document.createElement("div"); d.textContent=s; log.appendChild(d); }, i*200);
+      ["→ AC-INCALL " + el.sym, "→ loading space-filling model…"].forEach((s, i) => {
+        setTimeout(() => { const d = document.createElement("div"); d.textContent = s; log.appendChild(d); }, i * 200);
       });
 
-      let imgUrl = null;
+      // Prefer known Wikimedia space-filling image
+      let imgUrl = spaceFillingImages[el.sym] || null;
       let formula = el.sym;
 
-      try {
-        // Get a CID
-        const cidRes = await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(el.name)}/cids/JSON`);
-        const cidData = await cidRes.json();
-        const cid = cidData?.IdentifierList?.CID?.[0];
-
-        if (cid) {
-          // Prefer 3D / space-filling style render
-          imgUrl = `https://pubchem.ncbi.nlm.nih.gov/image/imgsrv.fcgi?cid=${cid}&t=3d`;
-          // Also try classic large structure as fallback
-          // imgUrl = `https://pubchem.ncbi.nlm.nih.gov/image/imgsrv.fcgi?cid=${cid}&t=l`;
-
-          const propRes = await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/property/MolecularFormula/JSON`);
-          const propData = await propRes.json();
-          formula = propData?.PropertyTable?.Properties?.[0]?.MolecularFormula || el.sym;
-        }
-      } catch(e) {}
+      // Fallback to PubChem 3D if no Commons image
+      if (!imgUrl) {
+        try {
+          const cidRes = await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(el.name)}/cids/JSON`);
+          const cidData = await cidRes.json();
+          const cid = cidData?.IdentifierList?.CID?.[0];
+          if (cid) {
+            imgUrl = `https://pubchem.ncbi.nlm.nih.gov/image/imgsrv.fcgi?cid=${cid}&t=3d`;
+            const propRes = await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/property/MolecularFormula/JSON`);
+            const propData = await propRes.json();
+            formula = propData?.PropertyTable?.Properties?.[0]?.MolecularFormula || el.sym;
+          }
+        } catch (e) {}
+      }
 
       showStructuralPopup({
         title: `${el.name} (${el.sym})`,
@@ -422,7 +351,7 @@
       });
     }
 
-    function showStructuralPopup({title, formula, img, build}) {
+    function showStructuralPopup({ title, formula, img, build }) {
       document.getElementById("modalTitle").textContent = title;
       document.getElementById("modalFormula").textContent = formula;
       document.getElementById("modalBuild").textContent = build;
@@ -446,7 +375,7 @@
     window.addEventListener("DOMContentLoaded", () => {
       localStorage.removeItem("searchLogs");
       document.getElementById("keywordList").innerHTML = "";
-      setKeyword(preloadWords[Math.floor(Math.random()*preloadWords.length)]);
+      setKeyword(preloadWords[Math.floor(Math.random() * preloadWords.length)]);
       initAlchemicSystem();
     });
   </script>
