@@ -6,14 +6,14 @@
   <title>Alpha Math Wizard</title>
   <style>
     :root {
-      --bg: #0f1419;
-      --surface: #1a2332;
-      --border: #2d3a4f;
-      --text: #e6edf3;
-      --muted: #8b9cb3;
-      --accent: #00d4aa;
-      --accent-dim: #00a88a;
-      --glow: rgba(0, 212, 170, 0.25);
+      --bg: #0a0a0a;
+      --surface: #141414;
+      --border: #2a2a2a;
+      --text: #f0f0f0;
+      --muted: #999999;
+      --accent: #e0e0e0;
+      --accent-dim: #b0b0b0;
+      --glow: rgba(255, 255, 255, 0.15);
     }
 
     * {
@@ -31,7 +31,7 @@
       overflow-x: hidden;
     }
 
-    /* Background atomic layer */
+    /* Background atomic layer – kept colorful so it stands out against the B&W UI */
     #backgroundLayer {
       position: fixed;
       inset: 0;
@@ -39,10 +39,9 @@
       background-size: contain;
       background-repeat: no-repeat;
       background-position: center top;
-      opacity: 0.12;
+      opacity: 0.28;
       z-index: 0;
       pointer-events: none;
-      filter: hue-rotate(160deg) brightness(1.2);
     }
 
     #mainContent {
@@ -61,11 +60,9 @@
       font-size: clamp(1.6rem, 4vw, 2.2rem);
       font-weight: 700;
       letter-spacing: -0.02em;
-      background: linear-gradient(135deg, var(--accent), #7ee8fa);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: #ffffff;
       margin-bottom: 0.5rem;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.25);
     }
 
     .section {
@@ -73,7 +70,7 @@
       border: 1px solid var(--border);
       border-radius: 16px;
       padding: 1.5rem;
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
     }
 
     .section h2,
@@ -81,7 +78,7 @@
       font-size: 1.15rem;
       font-weight: 600;
       margin-bottom: 1rem;
-      color: var(--accent);
+      color: #ffffff;
     }
 
     /* Lizard overlays */
@@ -97,14 +94,16 @@
       width: 100%;
       max-width: 220px;
       border-radius: 12px;
-      opacity: 0.85;
+      opacity: 0.9;
       transition: transform 0.35s ease, opacity 0.35s ease, filter 0.35s ease;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      filter: grayscale(0.3); /* slight desaturation so they don't overpower the background */
     }
 
     .overlay-img:hover {
       opacity: 1;
       transform: scale(1.03);
+      filter: grayscale(0);
     }
 
     #lizard-right {
@@ -114,28 +113,29 @@
       transform: translateY(-50%);
       max-width: 180px;
       z-index: 10;
-      opacity: 0.9;
+      opacity: 0.95;
       transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
                   filter 0.35s ease,
                   opacity 0.35s ease;
       border-radius: 12px;
-      box-shadow: 0 0 30px var(--glow);
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.12);
+      filter: grayscale(0.25);
     }
 
     /* Lizard poses */
     #lizard-right.lizard-idle {
       transform: translateY(-50%) scale(1);
-      filter: none;
+      filter: grayscale(0.25);
     }
 
     #lizard-right.lizard-alert {
       transform: translateY(-50%) scale(1.12);
-      filter: drop-shadow(0 0 12px var(--accent));
+      filter: grayscale(0) drop-shadow(0 0 14px rgba(255, 255, 255, 0.5));
     }
 
     #lizard-right.lizard-tilt {
       transform: translateY(-50%) rotate(-12deg) scale(1.05);
-      filter: hue-rotate(40deg);
+      filter: grayscale(0.1);
     }
 
     /* Form controls */
@@ -146,14 +146,14 @@
       font-size: 1rem;
       border: 1px solid var(--border);
       border-radius: 10px;
-      background: var(--bg);
+      background: #0d0d0d;
       color: var(--text);
       outline: none;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
 
     input:focus {
-      border-color: var(--accent);
+      border-color: #ffffff;
       box-shadow: 0 0 0 3px var(--glow);
     }
 
@@ -162,18 +162,18 @@
       padding: 0.7rem 1.4rem;
       font-size: 0.95rem;
       font-weight: 600;
-      border: none;
+      border: 1px solid #555;
       border-radius: 10px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-dim));
-      color: #0a0f14;
+      background: linear-gradient(135deg, #e8e8e8, #c0c0c0);
+      color: #111;
       cursor: pointer;
       transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
     }
 
     button:hover {
       transform: translateY(-1px);
-      box-shadow: 0 6px 20px var(--glow);
-      filter: brightness(1.08);
+      box-shadow: 0 6px 20px rgba(255, 255, 255, 0.15);
+      filter: brightness(1.1);
     }
 
     button:active {
@@ -182,7 +182,7 @@
 
     /* Collector */
     #collectorPanel {
-      background: linear-gradient(160deg, #1a2332 0%, #15202b 100%);
+      background: linear-gradient(160deg, #141414 0%, #0f0f0f 100%);
     }
 
     #collectorPanel img {
@@ -190,6 +190,7 @@
       margin: 0 auto 1rem;
       width: 120px;
       border-radius: 10px;
+      filter: grayscale(0.4);
     }
 
     #keywordList {
@@ -214,7 +215,7 @@
       margin-top: 1rem;
       font-size: 1.1rem;
       font-weight: 600;
-      color: var(--accent);
+      color: #ffffff;
       min-height: 1.5em;
     }
 
@@ -248,10 +249,10 @@
       width: 6px;
     }
     #keywordList::-webkit-scrollbar-track {
-      background: var(--bg);
+      background: #0a0a0a;
     }
     #keywordList::-webkit-scrollbar-thumb {
-      background: var(--border);
+      background: #333;
       border-radius: 3px;
     }
   </style>
@@ -319,7 +320,7 @@
       if (!Number.isFinite(number)) return 0;
       const str = number.toString();
       if (!str.includes(".")) return 0;
-      return str.split(".")[1].replace(/0+$/, "").length || 0; // trim trailing zeros for nicer feel
+      return str.split(".")[1].replace(/0+$/, "").length || 0;
     }
 
     document.getElementById("returnBoxForm").addEventListener("submit", (e) => {
@@ -336,14 +337,13 @@
 
       let logs = JSON.parse(localStorage.getItem("searchLogs") || "[]");
       logs.push(entry);
-      // keep last 50
       if (logs.length > 50) logs = logs.slice(-50);
       localStorage.setItem("searchLogs", JSON.stringify(logs));
 
       const li = document.createElement("li");
       li.textContent = entry;
       const list = document.getElementById("keywordList");
-      list.prepend(li); // newest first
+      list.prepend(li);
     }
 
     function setKeyword(base) {
@@ -368,7 +368,6 @@
       redirectToBing(keyword);
     });
 
-    // Allow Enter key in search box
     document.getElementById("searchBox").addEventListener("keydown", (e) => {
       if (e.key === "Enter") document.getElementById("searchButton").click();
     });
@@ -377,7 +376,6 @@
       const lizard = document.getElementById("lizard-right");
       if (!lizard) return;
 
-      // Reset classes
       lizard.classList.remove("lizard-idle", "lizard-alert", "lizard-tilt");
 
       switch (tag) {
@@ -403,7 +401,6 @@
       }
     }
 
-    // ODM-style mapping using modern e.code
     const odmTags = {
       "Digit1": "LIZARD_POSE_IDLE",
       "Digit2": "LIZARD_POSE_ALERT",
@@ -424,7 +421,6 @@
     }
 
     document.addEventListener("keydown", (e) => {
-      // Ignore when typing in inputs
       if (e.target.matches("input, textarea")) return;
 
       const result = refuteODM(e.code);
@@ -435,7 +431,6 @@
       }
     });
 
-    // Restore previous logs + preload
     window.addEventListener("DOMContentLoaded", () => {
       const saved = JSON.parse(localStorage.getItem("searchLogs") || "[]");
       const list = document.getElementById("keywordList");
