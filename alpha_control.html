@@ -11,8 +11,6 @@
       --border: #2a2a2a;
       --text: #f0f0f0;
       --muted: #999999;
-      --accent: #e0e0e0;
-      --accent-dim: #b0b0b0;
       --glow: rgba(255, 255, 255, 0.15);
     }
 
@@ -31,7 +29,7 @@
       overflow-x: hidden;
     }
 
-    /* Background atomic layer – kept colorful so it stands out against the B&W UI */
+    /* Only the background keeps color */
     #backgroundLayer {
       position: fixed;
       inset: 0;
@@ -39,7 +37,7 @@
       background-size: contain;
       background-repeat: no-repeat;
       background-position: center top;
-      opacity: 0.28;
+      opacity: 0.32;
       z-index: 0;
       pointer-events: none;
     }
@@ -62,7 +60,7 @@
       letter-spacing: -0.02em;
       color: #ffffff;
       margin-bottom: 0.5rem;
-      text-shadow: 0 0 20px rgba(255, 255, 255, 0.25);
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
     }
 
     .section {
@@ -81,7 +79,7 @@
       color: #ffffff;
     }
 
-    /* Lizard overlays */
+    /* All images forced to grayscale */
     .lizard-row {
       display: flex;
       flex-wrap: wrap;
@@ -95,15 +93,14 @@
       max-width: 220px;
       border-radius: 12px;
       opacity: 0.9;
-      transition: transform 0.35s ease, opacity 0.35s ease, filter 0.35s ease;
+      transition: transform 0.35s ease, opacity 0.35s ease;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-      filter: grayscale(0.3); /* slight desaturation so they don't overpower the background */
+      filter: grayscale(100%);
     }
 
     .overlay-img:hover {
       opacity: 1;
       transform: scale(1.03);
-      filter: grayscale(0);
     }
 
     #lizard-right {
@@ -118,24 +115,24 @@
                   filter 0.35s ease,
                   opacity 0.35s ease;
       border-radius: 12px;
-      box-shadow: 0 0 30px rgba(255, 255, 255, 0.12);
-      filter: grayscale(0.25);
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+      filter: grayscale(100%);
     }
 
-    /* Lizard poses */
+    /* Lizard poses (still grayscale) */
     #lizard-right.lizard-idle {
       transform: translateY(-50%) scale(1);
-      filter: grayscale(0.25);
+      filter: grayscale(100%);
     }
 
     #lizard-right.lizard-alert {
       transform: translateY(-50%) scale(1.12);
-      filter: grayscale(0) drop-shadow(0 0 14px rgba(255, 255, 255, 0.5));
+      filter: grayscale(100%) drop-shadow(0 0 14px rgba(255, 255, 255, 0.45));
     }
 
     #lizard-right.lizard-tilt {
       transform: translateY(-50%) rotate(-12deg) scale(1.05);
-      filter: grayscale(0.1);
+      filter: grayscale(100%);
     }
 
     /* Form controls */
@@ -172,8 +169,8 @@
 
     button:hover {
       transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(255, 255, 255, 0.15);
-      filter: brightness(1.1);
+      box-shadow: 0 6px 20px rgba(255, 255, 255, 0.12);
+      filter: brightness(1.08);
     }
 
     button:active {
@@ -190,7 +187,7 @@
       margin: 0 auto 1rem;
       width: 120px;
       border-radius: 10px;
-      filter: grayscale(0.4);
+      filter: grayscale(100%);
     }
 
     #keywordList {
