@@ -155,7 +155,6 @@
       background: #0d0d0d;
       color: var(--text);
       outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
     input:focus {
@@ -182,12 +181,6 @@
       filter: brightness(1.08);
     }
 
-    button:active { transform: translateY(0); }
-
-    #collectorPanel {
-      background: linear-gradient(160deg, #141414 0%, #0f0f0f 100%);
-    }
-
     #collectorPanel img {
       display: block;
       margin: 0 auto 1rem;
@@ -210,8 +203,6 @@
       font-family: ui-monospace, monospace;
     }
 
-    #keywordList li:last-child { border-bottom: none; }
-
     #result {
       margin-top: 1rem;
       font-size: 1.1rem;
@@ -220,7 +211,7 @@
       min-height: 1.5em;
     }
 
-    /* ===== Alchemic System ===== */
+    /* Alchemic banner */
     #alchemicBanner {
       overflow: hidden;
       white-space: nowrap;
@@ -229,7 +220,6 @@
       border-radius: 10px;
       padding: 0.6rem 0;
       margin-bottom: 1rem;
-      position: relative;
     }
 
     #alchemicTrack {
@@ -286,51 +276,101 @@
       font-family: ui-monospace, monospace;
       font-size: 0.82rem;
       color: #ccc;
-      max-height: 140px;
+      max-height: 120px;
       overflow-y: auto;
       margin-bottom: 1rem;
     }
 
-    #flowLog div { margin-bottom: 0.25rem; }
-    #flowLog .ok { color: #fff; }
-    #flowLog .diff { color: #aaa; }
-
-    #xprChart {
-      display: flex;
-      align-items: flex-end;
+    /* Dot chart */
+    #dotChart {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
       gap: 6px;
-      height: 140px;
-      padding: 0.5rem;
       background: #0a0a0a;
       border: 1px solid #333;
       border-radius: 8px;
-      margin-top: 0.5rem;
+      padding: 1rem;
+      margin-bottom: 1rem;
     }
 
-    .xpr-bar {
-      flex: 1;
-      background: linear-gradient(to top, #444, #ddd);
-      border-radius: 4px 4px 0 0;
-      min-width: 18px;
-      transition: height 0.6s cubic-bezier(0.34, 1.2, 0.64, 1);
-      position: relative;
+    .dot {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: #222;
+      transition: background 0.3s;
     }
 
-    .xpr-bar span {
-      position: absolute;
-      bottom: -1.4rem;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.7rem;
-      color: #888;
-      white-space: nowrap;
+    .dot.active {
+      background: #fff;
+      box-shadow: 0 0 6px rgba(255,255,255,0.5);
     }
 
-    .xpr-label {
+    #dotLabel {
       text-align: center;
       font-size: 0.85rem;
       color: #aaa;
-      margin-top: 1.8rem;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Modal popup */
+    #compoundModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    #compoundModal.open {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #111;
+      border: 1px solid #444;
+      border-radius: 16px;
+      padding: 1.5rem;
+      max-width: 360px;
+      width: 100%;
+      text-align: center;
+      position: relative;
+    }
+
+    .modal-content h3 {
+      margin-bottom: 0.75rem;
+      color: #fff;
+    }
+
+    .modal-content img {
+      max-width: 100%;
+      border-radius: 8px;
+      background: #fff;
+      margin: 0.75rem 0;
+      filter: grayscale(20%);
+    }
+
+    .modal-content .formula {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      margin: 0.5rem 0;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 0.6rem;
+      right: 0.8rem;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.4rem;
+      cursor: pointer;
+      margin: 0;
+      padding: 0;
     }
 
     @media (max-width: 700px) {
@@ -341,24 +381,13 @@
         margin: 1rem auto 0;
         max-width: 160px;
       }
-      #lizard-right.lizard-idle,
-      #lizard-right.lizard-alert,
-      #lizard-right.lizard-tilt { transform: none; }
-      #lizard-right.lizard-alert { transform: scale(1.1); }
-      #lizard-right.lizard-tilt { transform: rotate(-10deg) scale(1.05); }
-
       #periodic-links {
         position: static;
         transform: none;
         margin: 0.75rem auto 0;
         text-align: center;
-        right: auto;
       }
     }
-
-    #keywordList::-webkit-scrollbar { width: 6px; }
-    #keywordList::-webkit-scrollbar-track { background: #0a0a0a; }
-    #keywordList::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
   </style>
 </head>
 <body>
@@ -367,38 +396,30 @@
   <div id="mainContent">
     <h1>Alpha Control for Dots with Visible Lizards</h1>
 
-    <!-- Visual Lizard Overlay -->
     <div class="section">
       <h2>Visual Lizard Overlay</h2>
       <div class="lizard-row">
-        <img class="overlay-img"
-             src="https://th.bing.com/th/id/R.7033cac703e4237dff3e46f11f0078c5?rik=WTKoP1HVgdjXvw&riu=http%3a%2f%2fs4.favim.com%2forig%2f150211%2fgif-lizard-Favim.com-2469514.gif&ehk=s2EwnJYK%2bn%2fv2gM%2fbPl9TP7RNp22EE18OEapR9zlVh0%3d&risl=&pid=ImgRaw&r=0"
-             alt="Animated lizard 1">
-        <img class="overlay-img"
-             src="https://th.bing.com/th/id/R.7033cac703e4237dff3e46f11f0078c5?rik=WTKoP1HVgdjXvw&riu=http%3a%2f%2fs4.favim.com%2forig%2f150211%2fgif-lizard-Favim.com-2469514.gif&ehk=s2EwnJYK%2bn%2fv2gM%2fbPl9TP7RNp22EE18OEapR9zlVh0%3d&risl=&pid=ImgRaw&r=0"
-             alt="Animated lizard 2">
+        <img class="overlay-img" src="https://th.bing.com/th/id/R.7033cac703e4237dff3e46f11f0078c5?rik=WTKoP1HVgdjXvw&riu=http%3a%2f%2fs4.favim.com%2forig%2f150211%2fgif-lizard-Favim.com-2469514.gif&ehk=s2EwnJYK%2bn%2fv2gM%2fbPl9TP7RNp22EE18OEapR9zlVh0%3d&risl=&pid=ImgRaw&r=0" alt="Animated lizard 1">
+        <img class="overlay-img" src="https://th.bing.com/th/id/R.7033cac703e4237dff3e46f11f0078c5?rik=WTKoP1HVgdjXvw&riu=http%3a%2f%2fs4.favim.com%2forig%2f150211%2fgif-lizard-Favim.com-2469514.gif&ehk=s2EwnJYK%2bn%2fv2gM%2fbPl9TP7RNp22EE18OEapR9zlVh0%3d&risl=&pid=ImgRaw&r=0" alt="Animated lizard 2">
       </div>
     </div>
 
-    <!-- Fixed right lizard -->
     <img id="lizard-right" class="overlay-img lizard-idle"
          src="https://thumbs.dreamstime.com/b/colorful-lizard-perched-tree-next-to-plant-vivid-red-green-hues-colorful-lizard-perched-tree-next-to-plant-vivid-318406389.jpg"
-         alt="ECKO the colorful lizard">
+         alt="ECKO">
 
-    <!-- Periodic Table links near the eye -->
     <div id="periodic-links">
       <a href="https://en.wikipedia.org/wiki/Periodic_table" target="_blank" rel="noopener noreferrer">元素周期表</a>
       <a href="https://zh.wikipedia.org/wiki/%E5%85%83%E7%B4%A0%E5%91%A8%E6%9C%9F%E8%A1%A8" target="_blank" rel="noopener noreferrer">元素周期表</a>
     </div>
 
-    <!-- ===== NEW: Alchemic Flow System ===== -->
+    <!-- Alchemic System -->
     <div class="section">
-      <h2>Alchemic Flow System · XPR Resistance</h2>
+      <h2>Alchemic Flow System · AC Calls + Structure</h2>
       <p style="color:var(--muted); font-size:0.9rem; margin-bottom:0.75rem;">
-        Controlled banner cycle · Select an element to trigger API-style incall & weight-differential chart
+        Click / tap any element → algorithmic AC-call dot chart + PubChem-derived formula & molecular structure popup
       </p>
 
-      <!-- Cycling banner list -->
       <div id="alchemicBanner">
         <div id="alchemicTrack"></div>
       </div>
@@ -408,39 +429,29 @@
         <button type="button" id="resumeBanner">Resume Cycle</button>
       </div>
 
-      <!-- Simulated API flow log -->
-      <div id="flowLog">
-        <div>Waiting for element selection…</div>
-      </div>
+      <div id="flowLog"><div>Waiting for element selection…</div></div>
 
-      <!-- XPR Up/Down Resistance Chart -->
-      <div class="xpr-label">XPR Resistance Chart (atomic-weight differentials)</div>
-      <div id="xprChart"></div>
+      <div id="dotLabel">AC Call Density (algorithmic dots)</div>
+      <div id="dotChart"></div>
     </div>
 
-    <!-- Search -->
     <div class="section">
       <h2>Search Bing Images</h2>
       <input type="text" id="searchBox" placeholder="Type a keyword or wait for preload…" autocomplete="off">
       <button id="searchButton" type="button">Search Images</button>
     </div>
 
-    <!-- Collector -->
     <div class="section" id="collectorPanel">
       <h3>Collector Panel</h3>
-      <img src="https://www.bing.com/th/id/OGC.639ecef65ef9e35ec637290670bb931d?pid=1.7&rurl=https%3a%2f%2fi.pinimg.com%2foriginals%2fc1%2f7c%2fcf%2fc17ccf3660873f7b133d505c38ed0d3c.gif&ehk=6LwT1GJ%2fbhMNwT7ciitYhXKweOzg59yVaCrlO0zn3j0%3d"
-           alt="Collector animation">
+      <img src="https://www.bing.com/th/id/OGC.639ecef65ef9e35ec637290670bb931d?pid=1.7&rurl=https%3a%2f%2fi.pinimg.com%2foriginals%2fc1%2f7c%2fcf%2fc17ccf3660873f7b133d505c38ed0d3c.gif&ehk=6LwT1GJ%2fbhMNwT7ciitYhXKweOzg59yVaCrlO0zn3j0%3d" alt="Collector">
       <p style="margin-bottom: 0.5rem; color: var(--muted); font-size: 0.9rem;">Tracked Keywords:</p>
       <ul id="keywordList"></ul>
     </div>
 
-    <!-- Decimal tracker -->
     <div class="section">
       <h2>Decimal Place Tracker</h2>
       <form id="returnBoxForm">
-        <label for="numberInput" style="display:block; margin-bottom:0.4rem; color:var(--muted); font-size:0.9rem;">
-          Enter a number:
-        </label>
+        <label for="numberInput" style="display:block; margin-bottom:0.4rem; color:var(--muted); font-size:0.9rem;">Enter a number:</label>
         <input type="number" id="numberInput" step="any" required placeholder="e.g. 3.14159">
         <button type="submit">Check Decimal Places</button>
       </form>
@@ -448,8 +459,18 @@
     </div>
   </div>
 
+  <!-- Popup Modal -->
+  <div id="compoundModal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeModal">×</button>
+      <h3 id="modalTitle">Compound</h3>
+      <div class="formula" id="modalFormula">—</div>
+      <img id="modalImage" src="" alt="Molecular structure" style="display:none;">
+      <p id="modalBuild" style="color:#aaa; font-size:0.9rem;"></p>
+    </div>
+  </div>
+
   <script>
-    /* ---------- existing code (keywords, lizards, etc.) ---------- */
     const shadowWords = ["absolute", "value", "function", "centroid", "dura"];
     const preloadWords = ["lizard", "forest", "pixel", "abstract", "neon", "geometry", "vivid"];
 
@@ -488,8 +509,7 @@
     }
 
     function redirectToBing(keyword) {
-      const url = `https://www.bing.com/images/search?q=${encodeURIComponent(keyword)}`;
-      window.open(url, "_blank", "noopener,noreferrer");
+      window.open(`https://www.bing.com/images/search?q=${encodeURIComponent(keyword)}`, "_blank", "noopener,noreferrer");
     }
 
     document.getElementById("searchButton").addEventListener("click", () => {
@@ -519,7 +539,6 @@
             lizard.classList.add("lizard-idle");
           }, 1800);
           break;
-        default: console.warn("Unhandled tag:", tag);
       }
     }
 
@@ -527,16 +546,13 @@
       "Digit1": "LIZARD_POSE_IDLE",
       "Digit2": "LIZARD_POSE_ALERT",
       "Digit3": "LIZARD_POSE_TILT",
-      "KeyA": "KEY_ANALYSIS_TRIGGER",
-      "KeyS": "REFUTE_DECIMAL_STREAM",
       "KeyL": "LIZARD_SPEAK_INIT",
       "Escape": "SYSTEM_OVERRIDE"
     };
 
     function refuteODM(code) {
       const tag = odmTags[code];
-      if (!tag) return { status: "refuted", reason: "Unknown tag" };
-      if (tag === "SYSTEM_OVERRIDE") return { status: "refuted", reason: "System override active" };
+      if (!tag || tag === "SYSTEM_OVERRIDE") return { status: "refuted" };
       return { status: "accepted", action: tag };
     }
 
@@ -546,19 +562,7 @@
       if (result.status === "accepted") handleLizardAction(result.action);
     });
 
-    window.addEventListener("DOMContentLoaded", () => {
-      localStorage.removeItem("searchLogs");
-      document.getElementById("keywordList").innerHTML = "";
-      const preload = preloadWords[Math.floor(Math.random() * preloadWords.length)];
-      setKeyword(preload);
-
-      /* ---------- Alchemic System init ---------- */
-      initAlchemicSystem();
-    });
-
-    /* ============================================================
-       ALCHEMIC FLOW SYSTEM
-       ============================================================ */
+    /* ===================== ALCHEMIC + PUBCHEM ===================== */
     const elements = [
       { sym: "H",  name: "Hydrogen",  mass: 1.008 },
       { sym: "He", name: "Helium",    mass: 4.003 },
@@ -582,9 +586,10 @@
       { sym: "Ca", name: "Calcium",   mass: 40.08 }
     ];
 
+    let acCallCount = 0;
+
     function initAlchemicSystem() {
       const track = document.getElementById("alchemicTrack");
-      // Duplicate list for seamless infinite scroll
       const doubled = [...elements, ...elements];
       doubled.forEach(el => {
         const chip = document.createElement("span");
@@ -595,93 +600,119 @@
         track.appendChild(chip);
       });
 
-      document.getElementById("pauseBanner").onclick = () => {
-        track.classList.add("paused");
-      };
-      document.getElementById("resumeBanner").onclick = () => {
-        track.classList.remove("paused");
-      };
+      document.getElementById("pauseBanner").onclick = () => track.classList.add("paused");
+      document.getElementById("resumeBanner").onclick = () => track.classList.remove("paused");
+
+      // init empty dots
+      renderDotChart(0);
     }
 
-    function selectElement(el) {
-      // Highlight
+    function renderDotChart(count) {
+      const chart = document.getElementById("dotChart");
+      chart.innerHTML = "";
+      const totalDots = 48;
+      const active = Math.min(count, totalDots);
+      for (let i = 0; i < totalDots; i++) {
+        const d = document.createElement("div");
+        d.className = "dot" + (i < active ? " active" : "");
+        chart.appendChild(d);
+      }
+      document.getElementById("dotLabel").textContent =
+        `AC Call Density · ${count} calls archived for current element`;
+    }
+
+    async function selectElement(el) {
+      // highlight
       document.querySelectorAll(".elem-chip").forEach(c => c.classList.remove("selected"));
       document.querySelectorAll(`.elem-chip[data-sym="${el.sym}"]`).forEach(c => c.classList.add("selected"));
 
-      // Simulated API incall flow
+      // algorithmic AC calls
+      acCallCount = Math.floor(el.mass * 1.7 + Math.random() * 12);
+      renderDotChart(acCallCount);
+
+      // flow log
       const log = document.getElementById("flowLog");
       log.innerHTML = "";
       const steps = [
-        `→ INCALL  /alchemic/v1/select  { element: "${el.sym}" }`,
-        `← 200 OK  payload received`,
-        `→ RESOLVE mass = ${el.mass}`,
-        `→ COMPUTE differentials vs neighbours…`
+        `→ AC-INCALL  element=${el.sym}`,
+        `→ archive density = ${acCallCount}`,
+        `→ resolve PubChem structure…`
       ];
-
-      let i = 0;
-      function nextStep() {
-        if (i < steps.length) {
+      steps.forEach((s, i) => {
+        setTimeout(() => {
           const div = document.createElement("div");
-          div.className = "ok";
-          div.textContent = steps[i];
+          div.textContent = s;
           log.appendChild(div);
           log.scrollTop = log.scrollHeight;
-          i++;
-          setTimeout(nextStep, 280);
-        } else {
-          // Calculate differentials
-          const idx = elements.findIndex(e => e.sym === el.sym);
-          const prev = elements[idx - 1] || elements[elements.length - 1];
-          const next = elements[idx + 1] || elements[0];
-
-          const dPrev = +(el.mass - prev.mass).toFixed(3);
-          const dNext = +(next.mass - el.mass).toFixed(3);
-
-          const diff1 = document.createElement("div");
-          diff1.className = "diff";
-          diff1.textContent = `Δ prev (${prev.sym}): ${dPrev > 0 ? "+" : ""}${dPrev}`;
-          log.appendChild(diff1);
-
-          const diff2 = document.createElement("div");
-          diff2.className = "diff";
-          diff2.textContent = `Δ next (${next.sym}): ${dNext > 0 ? "+" : ""}${dNext}`;
-          log.appendChild(diff2);
-
-          // Build XPR resistance chart
-          buildXprChart(el, prev, next, dPrev, dNext);
-        }
-      }
-      nextStep();
-    }
-
-    function buildXprChart(el, prev, next, dPrev, dNext) {
-      const chart = document.getElementById("xprChart");
-      chart.innerHTML = "";
-
-      // Normalise for visual height (base 40–120 px)
-      const values = [
-        { label: prev.sym, val: Math.abs(dPrev) },
-        { label: el.sym,   val: el.mass * 0.8 },          // centre reference
-        { label: next.sym, val: Math.abs(dNext) },
-        { label: "XPR↑",   val: Math.max(0, dNext) * 4 },
-        { label: "XPR↓",   val: Math.max(0, -dPrev) * 4 }
-      ];
-
-      const max = Math.max(...values.map(v => v.val), 1);
-
-      values.forEach(v => {
-        const bar = document.createElement("div");
-        bar.className = "xpr-bar";
-        const h = 30 + (v.val / max) * 100;
-        bar.style.height = "0px";
-        bar.innerHTML = `<span>${v.label}</span>`;
-        chart.appendChild(bar);
-        // animate
-        requestAnimationFrame(() => {
-          bar.style.height = h + "px";
-        });
+        }, i * 220);
       });
+
+      // Fetch real compound data from PubChem (no link to docs page)
+      try {
+        const cidRes = await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(el.name)}/cids/JSON`);
+        const cidData = await cidRes.json();
+        const cid = cidData?.IdentifierList?.CID?.[0];
+
+        if (!cid) throw new Error("No CID");
+
+        const propRes = await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/property/MolecularFormula,MolecularWeight,IUPACName/JSON`);
+        const propData = await propRes.json();
+        const props = propData?.PropertyTable?.Properties?.[0] || {};
+
+        // Show popup with formula + structure image only
+        showCompoundPopup({
+          title: el.name,
+          formula: props.MolecularFormula || el.sym,
+          weight: props.MolecularWeight,
+          iupac: props.IUPACName || "—",
+          img: `https://pubchem.ncbi.nlm.nih.gov/image/imgsrv.fcgi?cid=${cid}&t=l`
+        });
+      } catch (err) {
+        // graceful fallback
+        showCompoundPopup({
+          title: el.name,
+          formula: el.sym,
+          weight: el.mass,
+          iupac: "Elemental form",
+          img: null
+        });
+      }
     }
+
+    function showCompoundPopup({ title, formula, weight, iupac, img }) {
+      document.getElementById("modalTitle").textContent = title;
+      document.getElementById("modalFormula").textContent = formula;
+      document.getElementById("modalBuild").textContent =
+        `Molecular weight ≈ ${weight} · ${iupac}`;
+
+      const imgEl = document.getElementById("modalImage");
+      if (img) {
+        imgEl.src = img;
+        imgEl.style.display = "block";
+      } else {
+        imgEl.style.display = "none";
+      }
+
+      document.getElementById("compoundModal").classList.add("open");
+    }
+
+    document.getElementById("closeModal").onclick = () => {
+      document.getElementById("compoundModal").classList.remove("open");
+    };
+
+    document.getElementById("compoundModal").addEventListener("click", (e) => {
+      if (e.target.id === "compoundModal") {
+        document.getElementById("compoundModal").classList.remove("open");
+      }
+    });
+
+    window.addEventListener("DOMContentLoaded", () => {
+      localStorage.removeItem("searchLogs");
+      document.getElementById("keywordList").innerHTML = "";
+      const preload = preloadWords[Math.floor(Math.random() * preloadWords.length)];
+      setKeyword(preload);
+      initAlchemicSystem();
+    });
   </script>
 </body>
 </html>
