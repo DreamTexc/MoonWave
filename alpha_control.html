@@ -1,232 +1,453 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alpha Math Wizard</title>
-    <style>
-        /* Background atomic layer */
-        #backgroundLayer {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('https://keystagewiki.com/images/thumb/a/ab/Ne-20_WK.PNG/400px-Ne-20_WK.PNG');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center top;
-            opacity: 0.15;
-            z-index: 0;
-            pointer-events: none;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alpha Math Wizard</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --border: #2d3a4f;
+      --text: #e6edf3;
+      --muted: #8b9cb3;
+      --accent: #00d4aa;
+      --accent-dim: #00a88a;
+      --glow: rgba(0, 212, 170, 0.25);
+    }
 
-        /* Main content container */
-        #mainContent {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-family: Arial, sans-serif;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        .section {
-            width: 80%;
-            max-width: 800px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
 
-        .overlay-img {
-            width: 100%;
-            max-width: 300px;
-            opacity: 0.7;
-        }
+    /* Background atomic layer */
+    #backgroundLayer {
+      position: fixed;
+      inset: 0;
+      background-image: url('https://keystagewiki.com/images/thumb/a/ab/Ne-20_WK.PNG/400px-Ne-20_WK.PNG');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center top;
+      opacity: 0.12;
+      z-index: 0;
+      pointer-events: none;
+      filter: hue-rotate(160deg) brightness(1.2);
+    }
 
-        #collectorPanel {
-            padding: 10px;
-            background-color: #f9f9f9;
-            border: 2px solid #ccc;
-        }
+    #mainContent {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1.25rem 4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
+    }
 
-        #lizard-right {
-            position: absolute;
-            top: 50%;
-            right: 0;
-            transform: translateY(-50%);
-            max-width: 250px;
-            opacity: 0.9;
-            z-index: 2;
-            transition: all 0.3s ease-in-out;
-        }
+    h1 {
+      text-align: center;
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, var(--accent), #7ee8fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
 
-        #searchBox, #numberInput {
-            width: 80%;
-            padding: 8px;
-            font-size: 16px;
-            margin-top: 10px;
-        }
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+    }
 
-        #searchButton, button {
-            padding: 8px 12px;
-            font-size: 16px;
-            margin-top: 5px;
-            cursor: pointer;
-        }
-    </style>
+    .section h2,
+    .section h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--accent);
+    }
+
+    /* Lizard overlays */
+    .lizard-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .overlay-img {
+      width: 100%;
+      max-width: 220px;
+      border-radius: 12px;
+      opacity: 0.85;
+      transition: transform 0.35s ease, opacity 0.35s ease, filter 0.35s ease;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .overlay-img:hover {
+      opacity: 1;
+      transform: scale(1.03);
+    }
+
+    #lizard-right {
+      position: fixed;
+      top: 50%;
+      right: 1.5rem;
+      transform: translateY(-50%);
+      max-width: 180px;
+      z-index: 10;
+      opacity: 0.9;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  filter 0.35s ease,
+                  opacity 0.35s ease;
+      border-radius: 12px;
+      box-shadow: 0 0 30px var(--glow);
+    }
+
+    /* Lizard poses */
+    #lizard-right.lizard-idle {
+      transform: translateY(-50%) scale(1);
+      filter: none;
+    }
+
+    #lizard-right.lizard-alert {
+      transform: translateY(-50%) scale(1.12);
+      filter: drop-shadow(0 0 12px var(--accent));
+    }
+
+    #lizard-right.lizard-tilt {
+      transform: translateY(-50%) rotate(-12deg) scale(1.05);
+      filter: hue-rotate(40deg);
+    }
+
+    /* Form controls */
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--glow);
+    }
+
+    button {
+      margin-top: 0.75rem;
+      padding: 0.7rem 1.4rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dim));
+      color: #0a0f14;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px var(--glow);
+      filter: brightness(1.08);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    /* Collector */
+    #collectorPanel {
+      background: linear-gradient(160deg, #1a2332 0%, #15202b 100%);
+    }
+
+    #collectorPanel img {
+      display: block;
+      margin: 0 auto 1rem;
+      width: 120px;
+      border-radius: 10px;
+    }
+
+    #keywordList {
+      list-style: none;
+      max-height: 180px;
+      overflow-y: auto;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    #keywordList li {
+      padding: 0.4rem 0.6rem;
+      border-bottom: 1px solid var(--border);
+      font-family: ui-monospace, monospace;
+    }
+
+    #keywordList li:last-child {
+      border-bottom: none;
+    }
+
+    #result {
+      margin-top: 1rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--accent);
+      min-height: 1.5em;
+    }
+
+    /* Responsive */
+    @media (max-width: 700px) {
+      #lizard-right {
+        position: static;
+        transform: none;
+        display: block;
+        margin: 1rem auto 0;
+        max-width: 160px;
+      }
+
+      #lizard-right.lizard-idle,
+      #lizard-right.lizard-alert,
+      #lizard-right.lizard-tilt {
+        transform: none;
+      }
+
+      #lizard-right.lizard-alert {
+        transform: scale(1.1);
+      }
+
+      #lizard-right.lizard-tilt {
+        transform: rotate(-10deg) scale(1.05);
+      }
+    }
+
+    /* Scrollbar */
+    #keywordList::-webkit-scrollbar {
+      width: 6px;
+    }
+    #keywordList::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+    #keywordList::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+    }
+  </style>
 </head>
 <body>
+  <div id="backgroundLayer"></div>
+
+  <div id="mainContent">
     <h1>Alpha Control for Dots with Visible Lizards</h1>
 
-    <!-- Lizard Images -->
+    <!-- Visual Lizard Overlay -->
     <div class="section">
-        <h2>Visual Lizard Overlay</h2>
-        <img class="overlay-img" src="https://th.bing.com/th/id/R.7033cac703e4237dff3e46f11f0078c5?rik=WTKoP1HVgdjXvw&riu=http%3a%2f%2fs4.favim.com%2forig%2f150211%2fgif-lizard-Favim.com-2469514.gif&ehk=s2EwnJYK%2bn%2fv2gM%2fbPl9TP7RNp22EE18OEapR9zlVh0%3d&risl=&pid=ImgRaw&r=0" alt="Lizard GIF 1">
-        <img class="overlay-img" src="https://th.bing.com/th/id/R.7033cac703e4237dff3e46f11f0078c5?rik=WTKoP1HVgdjXvw&riu=http%3a%2f%2fs4.favim.com%2forig%2f150211%2fgif-lizard-Favim.com-2469514.gif&ehk=s2EwnJYK%2bn%2fv2gM%2fbPl9TP7RNp22EE18OEapR9zlVh0%3d&risl=&pid=ImgRaw&r=0" alt="Lizard GIF 2">
-    </div>
-    <img class="overlay-img" id="lizard-right" src="https://thumbs.dreamstime.com/b/colorful-lizard-perched-tree-next-to-plant-vivid-red-green-hues-colorful-lizard-perched-tree-next-to-plant-vivid-318406389.jpg" alt="ECKO">
-    <div id="backgroundLayer"></div>
-
-    <!-- Search Box -->
-    <div class="section">
-        <h2>Search Bing Images</h2>
-        <input type="text" id="searchBox" placeholder="Type or select a keyword...">
-        <button id="searchButton">Search</button>
+      <h2>Visual Lizard Overlay</h2>
+      <div class="lizard-row">
+        <img class="overlay-img"
+             src="https://th.bing.com/th/id/R.7033cac703e4237dff3e46f11f0078c5?rik=WTKoP1HVgdjXvw&riu=http%3a%2f%2fs4.favim.com%2forig%2f150211%2fgif-lizard-Favim.com-2469514.gif&ehk=s2EwnJYK%2bn%2fv2gM%2fbPl9TP7RNp22EE18OEapR9zlVh0%3d&risl=&pid=ImgRaw&r=0"
+             alt="Animated lizard 1">
+        <img class="overlay-img"
+             src="https://th.bing.com/th/id/R.7033cac703e4237dff3e46f11f0078c5?rik=WTKoP1HVgdjXvw&riu=http%3a%2f%2fs4.favim.com%2forig%2f150211%2fgif-lizard-Favim.com-2469514.gif&ehk=s2EwnJYK%2bn%2fv2gM%2fbPl9TP7RNp22EE18OEapR9zlVh0%3d&risl=&pid=ImgRaw&r=0"
+             alt="Animated lizard 2">
+      </div>
     </div>
 
-    <!-- Collector Panel -->
+    <!-- Fixed right lizard -->
+    <img id="lizard-right"
+         class="overlay-img lizard-idle"
+         src="https://thumbs.dreamstime.com/b/colorful-lizard-perched-tree-next-to-plant-vivid-red-green-hues-colorful-lizard-perched-tree-next-to-plant-vivid-318406389.jpg"
+         alt="ECKO the colorful lizard">
+
+    <!-- Search -->
+    <div class="section">
+      <h2>Search Bing Images</h2>
+      <input type="text" id="searchBox" placeholder="Type a keyword or wait for preload…" autocomplete="off">
+      <button id="searchButton" type="button">Search Images</button>
+    </div>
+
+    <!-- Collector -->
     <div class="section" id="collectorPanel">
-        <h3>Collector Panel</h3>
-        <img src="https://www.bing.com/th/id/OGC.639ecef65ef9e35ec637290670bb931d?pid=1.7&rurl=https%3a%2f%2fi.pinimg.com%2foriginals%2fc1%2f7c%2fcf%2fc17ccf3660873f7b133d505c38ed0d3c.gif&ehk=6LwT1GJ%2fbhMNwT7ciitYhXKweOzg59yVaCrlO0zn3j0%3d" 
-             alt="Collector Panel GIF" style="width: 150px;">
-        <p>Tracked Keywords:</p>
-        <ul id="keywordList"></ul>
+      <h3>Collector Panel</h3>
+      <img src="https://www.bing.com/th/id/OGC.639ecef65ef9e35ec637290670bb931d?pid=1.7&rurl=https%3a%2f%2fi.pinimg.com%2foriginals%2fc1%2f7c%2fcf%2fc17ccf3660873f7b133d505c38ed0d3c.gif&ehk=6LwT1GJ%2fbhMNwT7ciitYhXKweOzg59yVaCrlO0zn3j0%3d"
+           alt="Collector animation">
+      <p style="margin-bottom: 0.5rem; color: var(--muted); font-size: 0.9rem;">Tracked Keywords:</p>
+      <ul id="keywordList"></ul>
     </div>
 
-    <!-- Decimal Place Tracker -->
+    <!-- Decimal tracker -->
     <div class="section">
-        <h2>Enter a Number to Get Decimal Places:</h2>
-        <form id="returnBoxForm">
-            <label for="numberInput">Enter a number:</label>
-            <input type="number" id="numberInput" required>
-            <button type="submit">Check Decimal Places</button>
-        </form>
-        <p id="result"></p>
+      <h2>Decimal Place Tracker</h2>
+      <form id="returnBoxForm">
+        <label for="numberInput" style="display:block; margin-bottom:0.4rem; color:var(--muted); font-size:0.9rem;">
+          Enter a number:
+        </label>
+        <input type="number" id="numberInput" step="any" required placeholder="e.g. 3.14159">
+        <button type="submit">Check Decimal Places</button>
+      </form>
+      <p id="result"></p>
     </div>
+  </div>
 
-<script>
+  <script>
     const shadowWords = ["absolute", "value", "function", "centroid", "dura"];
     const preloadWords = ["lizard", "forest", "pixel", "abstract", "neon", "geometry", "vivid"];
 
     function countDecimalPlaces(number) {
-        if (!Number.isFinite(number)) return 0;
-        const decimalPart = number.toString().split('.')[1];
-        return decimalPart ? decimalPart.length : 0;
+      if (!Number.isFinite(number)) return 0;
+      const str = number.toString();
+      if (!str.includes(".")) return 0;
+      return str.split(".")[1].replace(/0+$/, "").length || 0; // trim trailing zeros for nicer feel
     }
 
-    document.getElementById("returnBoxForm").addEventListener("submit", function(event) {
-        event.preventDefault();
-        const numberInput = parseFloat(document.getElementById("numberInput").value);
-        const decimalCount = countDecimalPlaces(numberInput);
-        document.getElementById("result").textContent = `Decimal places: ${decimalCount}`;
+    document.getElementById("returnBoxForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const value = parseFloat(document.getElementById("numberInput").value);
+      const count = countDecimalPlaces(value);
+      document.getElementById("result").textContent =
+        Number.isFinite(value) ? `Decimal places: ${count}` : "Please enter a valid number";
     });
 
     function logKeyword(keyword) {
-        const timestamp = new Date().toLocaleTimeString();
-        const entry = `${keyword} @ ${timestamp}`;
+      const timestamp = new Date().toLocaleTimeString();
+      const entry = `${keyword}  ·  ${timestamp}`;
 
-        let logs = JSON.parse(localStorage.getItem("searchLogs")) || [];
-        logs.push(entry);
-        localStorage.setItem("searchLogs", JSON.stringify(logs));
+      let logs = JSON.parse(localStorage.getItem("searchLogs") || "[]");
+      logs.push(entry);
+      // keep last 50
+      if (logs.length > 50) logs = logs.slice(-50);
+      localStorage.setItem("searchLogs", JSON.stringify(logs));
 
-        const listItem = document.createElement("li");
-        listItem.textContent = entry;
-        document.getElementById("keywordList").appendChild(listItem);
+      const li = document.createElement("li");
+      li.textContent = entry;
+      const list = document.getElementById("keywordList");
+      list.prepend(li); // newest first
     }
 
-    function setKeyword(baseKeyword) {
-        const randomShadow = shadowWords[Math.floor(Math.random() * shadowWords.length)];
-        const fullKeyword = `${baseKeyword} ${randomShadow}`;
-        document.getElementById("searchBox").value = fullKeyword;
-        logKeyword(fullKeyword);
+    function setKeyword(base) {
+      const shadow = shadowWords[Math.floor(Math.random() * shadowWords.length)];
+      const full = `${base} ${shadow}`;
+      document.getElementById("searchBox").value = full;
+      logKeyword(full);
     }
 
     function redirectToBing(keyword) {
-        const searchUrl = `https://www.bing.com/images/search?q=${encodeURIComponent(keyword)}`;
-        window.open(searchUrl, "_blank");
+      const url = `https://www.bing.com/images/search?q=${encodeURIComponent(keyword)}`;
+      window.open(url, "_blank", "noopener,noreferrer");
     }
 
-    document.getElementById("searchButton").addEventListener("click", function () {
-        const keyword = document.getElementById("searchBox").value.trim();
-        if (keyword !== "") {
-            logKeyword(keyword);
-            redirectToBing(keyword);
-        } else {
-            alert("Please enter a keyword before searching.");
-        }
+    document.getElementById("searchButton").addEventListener("click", () => {
+      const keyword = document.getElementById("searchBox").value.trim();
+      if (!keyword) {
+        alert("Please enter a keyword before searching.");
+        return;
+      }
+      logKeyword(keyword);
+      redirectToBing(keyword);
     });
 
-function handleLizardAction(tag) {
-    const lizard = document.getElementById("lizard-right");
-    if (!lizard) return;
+    // Allow Enter key in search box
+    document.getElementById("searchBox").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") document.getElementById("searchButton").click();
+    });
 
-    lizard.className = "overlay-img"; // reset
+    function handleLizardAction(tag) {
+      const lizard = document.getElementById("lizard-right");
+      if (!lizard) return;
 
-    switch (tag) {
+      // Reset classes
+      lizard.classList.remove("lizard-idle", "lizard-alert", "lizard-tilt");
+
+      switch (tag) {
         case "LIZARD_POSE_IDLE":
-            lizard.classList.add("lizard-idle");
-            break;
+          lizard.classList.add("lizard-idle");
+          break;
         case "LIZARD_POSE_ALERT":
-            lizard.classList.add("lizard-alert");
-            break;
+          lizard.classList.add("lizard-alert");
+          break;
         case "LIZARD_POSE_TILT":
-            lizard.classList.add("lizard-tilt");
-            break;
+          lizard.classList.add("lizard-tilt");
+          break;
         case "LIZARD_SPEAK_INIT":
-            alert("Lizard says: Analyzing input stream...");
-            break;
+          alert("Lizard says: Analyzing input stream…");
+          lizard.classList.add("lizard-alert");
+          setTimeout(() => {
+            lizard.classList.remove("lizard-alert");
+            lizard.classList.add("lizard-idle");
+          }, 1800);
+          break;
         default:
-            console.warn("Unhandled tag:", tag);
+          console.warn("Unhandled tag:", tag);
+      }
     }
-}
 
-    window.onload = function () {
-        const preload = preloadWords[Math.floor(Math.random() * preloadWords.length)];
-        setKeyword(preload);
+    // ODM-style mapping using modern e.code
+    const odmTags = {
+      "Digit1": "LIZARD_POSE_IDLE",
+      "Digit2": "LIZARD_POSE_ALERT",
+      "Digit3": "LIZARD_POSE_TILT",
+      "KeyA": "KEY_ANALYSIS_TRIGGER",
+      "KeyS": "REFUTE_DECIMAL_STREAM",
+      "KeyL": "LIZARD_SPEAK_INIT",
+      "Escape": "SYSTEM_OVERRIDE"
     };
 
-    document.addEventListener("keydown", (e) => {
-    const hexCode = "0x" + e.keyCode.toString(16).padStart(2, "0");
-    const result = refuteODM(hexCode);
-    console.log("ODM Result:", result);
-
-    if (result.status === "accepted") {
-        handleLizardAction(result.action);
-    }
-});
-    const odmTags = {
-    "0x01": "LIZARD_POSE_IDLE",
-    "0x02": "LIZARD_POSE_ALERT",
-    "0x03": "LIZARD_POSE_TILT",
-    "0x10": "KEY_ANALYSIS_TRIGGER",
-    "0x20": "REFUTE_DECIMAL_STREAM",
-    "0x30": "LIZARD_SPEAK_INIT",
-    "0xFF": "SYSTEM_OVERRIDE"
-};
-
-function refuteODM(code) {
-    const tag = odmTags[code];
-    if (!tag) {
-        return { status: "refuted", reason: "Unknown tag" };
-    }
-    if (tag === "SYSTEM_OVERRIDE") {
+    function refuteODM(code) {
+      const tag = odmTags[code];
+      if (!tag) return { status: "refuted", reason: "Unknown tag" };
+      if (tag === "SYSTEM_OVERRIDE") {
         return { status: "refuted", reason: "System override active" };
+      }
+      return { status: "accepted", action: tag };
     }
-    return { status: "accepted", action: tag };
-}
-</script>
-</body>
-</html>
+
+    document.addEventListener("keydown", (e) => {
+      // Ignore when typing in inputs
+      if (e.target.matches("input, textarea")) return;
+
+      const result = refuteODM(e.code);
+      console.log("ODM Result:", result);
+
+      if (result.status === "accepted") {
+        handleLizardAction(result.action);
+      }
+    });
+
+    // Restore previous logs + preload
+    window.addEventListener("DOMContentLoaded", () => {
+      const saved = JSON.parse(localStorage.getItem("searchLogs") || "[]");
+      const list = document.getElementById("keywordList");
+      saved.reverse().forEach(entry => {
+        const li = document.createElement("li");
+        li.textContent = entry;
+        list.appendChild(li);
+      });
+
+      const preload = preloadWords[Math.floor(Math.random() * preloadWords.length)];
+      setKeyword(preload);
+    });
+  </script>
 </body>
 </html>
