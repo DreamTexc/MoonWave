@@ -24,10 +24,7 @@
         }
         #backgroundLayer {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background-color: #000000;
             background-image: url('https://keystagewiki.com/images/thumb/a/ab/Ne-20_WK.PNG/400px-Ne-20_WK.PNG');
             background-size: cover;
@@ -161,6 +158,49 @@
         @media (max-width: 800px) {
             #lizard-right { max-width: 90px; top: auto; bottom: 8px; right: 8px; transform: none; }
         }
+        .gif-stage { position: relative; display: inline-block; max-width: 220px; }
+        .gif-stage img.overlay-img { display: block; width: 100%; }
+        .syt-layer {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            mix-blend-mode: screen;
+            opacity: 0.55;
+            --hue: 180;
+            --dx: 0px;
+            --dy: 0px;
+            --rot: 0deg;
+            --scale: 1.05;
+        }
+        .syt-layer img {
+            width: 140%;
+            height: 140%;
+            object-fit: cover;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(var(--rot)) scale(var(--scale));
+            filter: hue-rotate(var(--hue)) saturate(2.2) contrast(1.35) brightness(1.25);
+            animation: iridesce 4.5s linear infinite;
+            transition: transform 0.45s ease, filter 0.45s ease;
+        }
+        @keyframes iridesce {
+            0% { filter: hue-rotate(var(--hue)) saturate(2.2) contrast(1.35) brightness(1.2); }
+            50% { filter: hue-rotate(calc(var(--hue) + 80deg)) saturate(2.6) contrast(1.45) brightness(1.35); }
+            100% { filter: hue-rotate(var(--hue)) saturate(2.2) contrast(1.35) brightness(1.2); }
+        }
+        .syt-layer.on { opacity: 0.92; }
+        .syt-layer.made { opacity: 1; box-shadow: inset 0 0 18px rgba(255,255,255,0.35); }
+        .style-div {
+            margin-top: 6px;
+            border: 1px dashed #ffffff;
+            padding: 4px 8px;
+            font-size: 11px;
+            font-family: ui-monospace, monospace;
+            color: #fff;
+        }
+        #btnMake { margin-top: 6px; }
     </style>
 </head>
 <body>
@@ -174,18 +214,29 @@
     <div class="wrap">
         <div class="panel">
             <h2>Periodic Table — click to craft chain</h2>
-            <p class="hint">Click = add to chain. Shift-click = set parent. Alt-click = open that element’s wiki. Double-click a bead or tap ECKO to research the parent.</p>
+            <p class="hint">Click = add to chain. Shift-click = set parent. Alt-click = wiki. Hover or pick two atoms to iridesce syt.png on GIF 1. Press 2 for two-mode. Make locks it.</p>
             <div id="ptable" class="ptable"></div>
         </div>
 
         <div class="panel">
             <h2>Lizard Archivists · custom wiki dens</h2>
-            <p class="hint">The original overlays are back. They watch the chain and fetch wiki pages for whatever you craft.</p>
             <div class="lizard-row">
-                <img class="overlay-img" id="lizardGif1" alt="Lizard GIF 1"
-                     src="https://th.bing.com/th/id/R.7033cac703e4237dff3e46f11f0078c5?rik=WTKoP1HVgdjXvw&riu=http%3a%2f%2fs4.favim.com%2forig%2f150211%2fgif-lizard-Favim.com-2469514.gif&ehk=s2EwnJYK%2bn%2fv2gM%2fbPl9TP7RNp22EE18OEapR9zlVh0%3d&risl=&pid=ImgRaw&r=0">
-                <img class="overlay-img" id="lizardGif2" alt="Lizard GIF 2"
-                     src="https://th.bing.com/th/id/R.7033cac703e4237dff3e46f11f0078c5?rik=WTKoP1HVgdjXvw&riu=http%3a%2f%2fs4.favim.com%2forig%2f150211%2fgif-lizard-Favim.com-2469514.gif&ehk=s2EwnJYK%2bn%2fv2gM%2fbPl9TP7RNp22EE18OEapR9zlVh0%3d&risl=&pid=ImgRaw&r=0">
+                <div class="gif-stage" id="gif1Stage">
+                    <img class="overlay-img" id="lizardGif1" alt="Lizard GIF 1"
+                         src="https://th.bing.com/th/id/R.7033cac703e4237dff3e46f11f0078c5?rik=WTKoP1HVgdjXvw&riu=http%3a%2f%2fs4.favim.com%2forig%2f150211%2fgif-lizard-Favim.com-2469514.gif&ehk=s2EwnJYK%2bn%2fv2gM%2fbPl9TP7RNp22EE18OEapR9zlVh0%3d&risl=&pid=ImgRaw&r=0">
+                    <div class="syt-layer" id="sytLayer">
+                        <img id="sytImg" alt="syt lines and dots"
+                             src="https://raw.githubusercontent.com/DreamTexc/MoonWave/main/syt.png">
+                    </div>
+                    <button id="btnMake" type="button">Make</button>
+                </div>
+                <div class="gif-stage" id="gif2Stage">
+                    <img class="overlay-img" id="lizardGif2" alt="Lizard GIF 2"
+                         src="https://th.bing.com/th/id/R.7033cac703e4237dff3e46f11f0078c5?rik=WTKoP1HVgdjXvw&riu=http%3a%2f%2fs4.favim.com%2forig%2f150211%2fgif-lizard-Favim.com-2469514.gif&ehk=s2EwnJYK%2bn%2fv2gM%2fbPl9TP7RNp22EE18OEapR9zlVh0%3d&risl=&pid=ImgRaw&r=0">
+                    <div class="style-div" id="efcDecision" data-efc="0">
+                        EFC decision: waiting · child of GIF 2
+                    </div>
+                </div>
             </div>
             <p id="lizardSpeak">Lizard says: idle — waiting for a nucleus to archive.</p>
             <div class="wiki-links" id="wikiLinks"></div>
@@ -209,7 +260,7 @@
             </div>
             <div class="panel">
                 <h2>Mathematical Matrix Box</h2>
-                <p class="hint">Signal matrix derived from atomic numbers of the chain (padded / folded to 3×3). Parent class seeds the (1,1) term.</p>
+                <p class="hint">Signal matrix derived from atomic numbers of the chain (padded / folded to 3×3).</p>
                 <div id="matrixBox" class="matrix" style="grid-template-columns: repeat(3, auto);"></div>
                 <p id="matrixNote" class="hint"></p>
             </div>
@@ -217,7 +268,6 @@
 
         <div class="panel">
             <h2>Blip Path — backbone trajectory</h2>
-            <p class="hint">Animated blip travels the designed polymer backbone path. Path mutates with chain length and parent class.</p>
             <svg id="blipSvg" viewBox="0 0 800 140" preserveAspectRatio="xMidYMid meet">
                 <defs>
                     <linearGradient id="g1" x1="0" x2="1">
@@ -236,38 +286,25 @@
 
         <div class="panel">
             <h2>Three Polymer Synthesis Shapes</h2>
-            <p class="hint">Outline geometries the crafted molecule would present: linear (step-growth), branched (graft), and cross-linked network.</p>
             <div class="poly-row">
-                <div class="poly-card">
-                    <h4>1 · Linear chain</h4>
-                    <svg viewBox="0 0 200 80" id="svgLinear"></svg>
-                </div>
-                <div class="poly-card">
-                    <h4>2 · Branched / graft</h4>
-                    <svg viewBox="0 0 200 80" id="svgBranch"></svg>
-                </div>
-                <div class="poly-card">
-                    <h4>3 · Cross-linked network</h4>
-                    <svg viewBox="0 0 200 80" id="svgNet"></svg>
-                </div>
+                <div class="poly-card"><h4>1 · Linear chain</h4><svg viewBox="0 0 200 80" id="svgLinear"></svg></div>
+                <div class="poly-card"><h4>2 · Branched / graft</h4><svg viewBox="0 0 200 80" id="svgBranch"></svg></div>
+                <div class="poly-card"><h4>3 · Cross-linked network</h4><svg viewBox="0 0 200 80" id="svgNet"></svg></div>
             </div>
         </div>
 
         <div class="grid-2">
             <div class="panel">
                 <h2>Elementary Calculus</h2>
-                <p class="hint">Sample rate / concentration model f(t) = a t² + b t + c seeded by chain stats. Derivative = instantaneous growth; integral = accumulated yield.</p>
                 <p class="calc-out" id="fExpr"></p>
                 <p class="calc-out" id="dfExpr"></p>
                 <p class="calc-out" id="intExpr"></p>
             </div>
             <div class="panel">
                 <h2>Advanced Browser Search</h2>
-                <p class="hint">Builds an introductory query matching polymer synthesis + selected elements + structure outline. Opens Bing Images.</p>
                 <input type="text" id="searchBox" placeholder="Query will auto-compose from the chain…">
                 <button id="searchButton">Search images</button>
                 <button id="composeBtn" class="ghost">Recompose query</button>
-                <p>Tracked queries:</p>
                 <ul id="keywordList"></ul>
             </div>
         </div>
@@ -337,17 +374,12 @@ const ELEMENTS = [
   {z:100,s:"Fm",n:"Fermium",g:0,p:9,c:"f-ac"},{z:101,s:"Md",n:"Mendelevium",g:0,p:9,c:"f-ac"},
   {z:102,s:"No",n:"Nobelium",g:0,p:9,c:"f-ac"},{z:103,s:"Lr",n:"Lawrencium",g:0,p:9,c:"f-ac"}
 ];
-
 const BY_Z = Object.fromEntries(ELEMENTS.map(e => [e.z, e]));
 
 class AlphaModule {
-    constructor(name = "AlphaModule") {
-        this.name = name;
-        this.created = Date.now();
-    }
+    constructor(name = "AlphaModule") { this.name = name; this.created = Date.now(); }
     signal() { return this.name; }
 }
-
 class PolymerChain extends AlphaModule {
     constructor(parentEl) {
         super("PolymerChain");
@@ -365,11 +397,8 @@ class PolymerChain extends AlphaModule {
         return Object.entries(counts).map(([k,v]) => k + (v>1?v:"")).join("");
     }
     zs() { return [this.parent.z, ...this.units.map(u => u.z)]; }
-    signal() {
-        return { parent: this.parent.s, n: this.units.length, formula: this.formula() };
-    }
+    signal() { return { parent: this.parent.s, n: this.units.length, formula: this.formula() }; }
 }
-
 const chain = new PolymerChain(BY_Z[6]);
 
 function renderTable() {
@@ -383,23 +412,18 @@ function renderTable() {
         d.innerHTML = `<span class="z">${e.z}</span><span class="sym">${e.s}</span>`;
         d.title = `${e.n} (Z=${e.z})`;
         d.addEventListener("click", ev => {
-            if (ev.altKey) {
-                handleLizardAction("LIZARD_POSE_TILT");
-                openWiki(wikiUrl(e));
-                return;
-            }
+            if (ev.altKey) { handleLizardAction("LIZARD_POSE_TILT"); openWiki(wikiUrl(e)); return; }
             if (ev.shiftKey) {
                 chain.parent = e;
                 document.getElementById("parentLabel").textContent = `(parent: ${e.s})`;
-            } else {
-                chain.append(e);
-            }
+            } else chain.append(e);
             refreshAll();
+            realignSyt("select");
         });
+        d.addEventListener("mouseenter", () => realignSyt("hover", e));
         return d;
     };
     const blank = () => { const d = document.createElement("div"); d.className = "el blank"; return d; };
-
     root.appendChild(place(1));
     for (let i=0;i<16;i++) root.appendChild(blank());
     root.appendChild(place(2));
@@ -415,14 +439,11 @@ function renderTable() {
     for (let z=72;z<=86;z++) root.appendChild(place(z));
     root.appendChild(place(87)); root.appendChild(place(88)); root.appendChild(place(89));
     for (let z=104;z<=118;z++) root.appendChild(place(z));
-
     const la = document.createElement("div");
-    la.className = "frow";
-    la.style.gridColumn = "1 / -1";
+    la.className = "frow"; la.style.gridColumn = "1 / -1";
     for (let i=0;i<3;i++) { const b=document.createElement("div"); b.className="el blank"; la.appendChild(b); }
     for (let z=58;z<=71;z++) la.appendChild(place(z));
     root.appendChild(la);
-
     const ac = document.createElement("div");
     ac.className = "frow";
     for (let i=0;i<3;i++) { const b=document.createElement("div"); b.className="el blank"; ac.appendChild(b); }
@@ -436,7 +457,6 @@ function foldMatrix(vals) {
     for (let i=0;i<9;i++) m[i] = Math.round((m[i] + (i===0?vals[0]||6:0)) % 997);
     return m;
 }
-
 function renderMatrix() {
     const box = document.getElementById("matrixBox");
     const m = foldMatrix(chain.zs());
@@ -444,7 +464,6 @@ function renderMatrix() {
     const detApprox = m[0]*(m[4]*m[8]-m[5]*m[7]) - m[1]*(m[3]*m[8]-m[5]*m[6]) + m[2]*(m[3]*m[7]-m[4]*m[6]);
     document.getElementById("matrixNote").textContent = `det≈ ${detApprox}  ·  parent seeds (1,1)`;
 }
-
 function updatePath() {
     const n = Math.max(3, chain.units.length + 2);
     const w = 800, h = 140;
@@ -459,7 +478,6 @@ function updatePath() {
     }
     document.getElementById("polyPath").setAttribute("d", d);
 }
-
 function atomDot(svg, x, y, label, r=6) {
     const c = document.createElementNS("http://www.w3.org/2000/svg","circle");
     c.setAttribute("cx",x); c.setAttribute("cy",y); c.setAttribute("r",r);
@@ -481,32 +499,20 @@ function line(svg,x1,y1,x2,y2) {
 function drawPolymers() {
     const units = chain.units.length ? chain.units : [chain.parent, BY_Z[1], chain.parent];
     const lab = (i) => units[i % units.length].s;
-
-    const lin = document.getElementById("svgLinear");
-    lin.innerHTML = "";
-    const n = 6;
-    for (let i=0;i<n;i++) {
-        const x = 18 + i*30;
-        if (i) line(lin, x-30, 40, x, 40);
-        atomDot(lin, x, 40, lab(i));
-    }
-
-    const br = document.getElementById("svgBranch");
-    br.innerHTML = "";
+    const lin = document.getElementById("svgLinear"); lin.innerHTML = "";
+    for (let i=0;i<6;i++) { const x = 18 + i*30; if (i) line(lin, x-30, 40, x, 40); atomDot(lin, x, 40, lab(i)); }
+    const br = document.getElementById("svgBranch"); br.innerHTML = "";
     const bx = [20,50,80,110,140,170];
     bx.forEach((x,i)=>{ if(i) line(br,bx[i-1],50,x,50); atomDot(br,x,50,lab(i)); });
     line(br,80,50,80,22); atomDot(br,80,18,lab(1),5);
     line(br,140,50,155,22); atomDot(br,160,18,lab(2),5);
     line(br,50,50,40,22); atomDot(br,36,18,lab(3),5);
-
-    const net = document.getElementById("svgNet");
-    net.innerHTML = "";
+    const net = document.getElementById("svgNet"); net.innerHTML = "";
     const nodes = [[30,20],[80,18],[140,22],[185,30],[40,55],[95,50],[155,58],[25,75],[90,78],[150,72]];
     const edges = [[0,1],[1,2],[2,3],[0,4],[1,5],[2,6],[3,6],[4,5],[5,6],[4,7],[5,8],[6,9],[7,8],[8,9]];
     edges.forEach(([a,b]) => line(net, nodes[a][0],nodes[a][1], nodes[b][0],nodes[b][1]));
     nodes.forEach((p,i) => atomDot(net, p[0], p[1], lab(i), 5));
 }
-
 function renderCalc() {
     const zs = chain.zs();
     const a = ((zs.reduce((s,v)=>s+v,0) % 9) + 1) / 4;
@@ -517,7 +523,6 @@ function renderCalc() {
     document.getElementById("dfExpr").innerHTML = `f′(t) = ${ (2*a).toFixed(2) } t ${bS}`;
     document.getElementById("intExpr").innerHTML = `∫ f(t) dt = ${(a/3).toFixed(2)} t³ ${b>=0?"+":"−"} ${(Math.abs(b)/2).toFixed(2)} t² + ${c} t + C`;
 }
-
 function renderChain() {
     const el = document.getElementById("chainDisplay");
     const parts = [chain.parent, ...chain.units];
@@ -528,7 +533,6 @@ function renderChain() {
         d.classList.toggle("sel", parts.some(p => String(p.z) === d.dataset.z));
     });
 }
-
 function composeQuery() {
     const form = chain.formula();
     const names = [...new Set([chain.parent.n, ...chain.units.map(u=>u.n)])].slice(0,6).join(" ");
@@ -536,7 +540,6 @@ function composeQuery() {
     document.getElementById("searchBox").value = q;
     return q;
 }
-
 function logKeyword(keyword) {
     const timestamp = new Date().toLocaleTimeString();
     const entry = `${keyword.slice(0,80)}… @ ${timestamp}`;
@@ -549,11 +552,62 @@ function logKeyword(keyword) {
     document.getElementById("keywordList").prepend(li);
 }
 
+let hoverEl = null;
+let sytMade = false;
+function twoChemicals(hover) {
+    const parts = [chain.parent, ...chain.units];
+    if (hover) return [parts[0], hover];
+    if (parts.length >= 2) return [parts[0], parts[1]];
+    return [parts[0], parts[0]];
+}
+function efcCount(a, b) {
+    const parts = [chain.parent, ...chain.units];
+    const nC = parts.filter(e => e.s === "C").length + ((hoverEl && hoverEl.s === "C") ? 1 : 0);
+    const bonds = Math.max(0, Math.max(parts.length, 2) - 1);
+    const valence = nC * 4;
+    const used = Math.min(valence, bonds * 2);
+    const zDiff = Math.abs((a && a.z || 0) - (b && b.z || 0));
+    return Math.max(0, valence - used + (zDiff % 4));
+}
+function realignSyt(reason, hover) {
+    if (hover) hoverEl = hover;
+    const pair = twoChemicals(hoverEl);
+    const a = pair[0], b = pair[1];
+    const diff = Math.abs(a.z - b.z);
+    const efc = efcCount(a, b);
+    const hue = (diff * 17 + efc * 41) % 360;
+    const dx = ((efc % 7) * 6) - 18;
+    const dy = ((diff % 9) * 4) - 16;
+    const rot = ((efc * 8 + diff) % 28) - 14;
+    const scale = 1.02 + (efc % 5) * 0.04;
+    const decision = document.getElementById("efcDecision");
+    const layer = document.getElementById("sytLayer");
+    if (!decision || !layer) return;
+    decision.dataset.efc = String(efc);
+    decision.dataset.diff = String(diff);
+    decision.textContent = `EFC ${efc} · ΔZ ${diff} · ${a.s}/${b.s} · ${reason}`;
+    layer.style.setProperty("--hue", hue + "deg");
+    layer.style.setProperty("--dx", dx + "px");
+    layer.style.setProperty("--dy", dy + "px");
+    layer.style.setProperty("--rot", rot + "deg");
+    layer.style.setProperty("--scale", String(scale));
+    const twoMode = reason === "two" || chain.units.length >= 1;
+    layer.classList.toggle("on", twoMode || reason === "hover" || reason === "make");
+    if (sytMade) layer.classList.add("made");
+}
+function makeSytAction() {
+    sytMade = true;
+    realignSyt("make");
+    handleLizardAction("LIZARD_POSE_ALERT");
+    const speak = document.getElementById("lizardSpeak");
+    const d = document.getElementById("efcDecision");
+    if (speak && d) speak.textContent = "Lizard says: MAKE — iridescent syt locked. " + d.textContent;
+}
+
 function wikiUrl(el) {
     return "https://en.wikipedia.org/wiki/" + encodeURIComponent(el.n.replace(/ /g, "_"));
 }
 function openWiki(url) { window.open(url, "_blank"); }
-
 function renderWikiLinks() {
     const box = document.getElementById("wikiLinks");
     const seen = new Map();
@@ -565,11 +619,9 @@ function renderWikiLinks() {
         { href: "https://keystagewiki.com/index.php/Neon", label: "KeyStage Neon" },
         { href: "https://en.wikipedia.org/wiki/Neon-20", label: "Neon-20" }
     ];
-    const atoms = [...seen.values()].map(e =>
-        `<a href="${wikiUrl(e)}" target="_blank" rel="noopener" title="${e.n}">${e.s} · ${e.n}</a>`
-    );
-    const more = extras.map(x => `<a href="${x.href}" target="_blank" rel="noopener">${x.label}</a>`);
-    box.innerHTML = atoms.join("") + more.join("");
+    box.innerHTML = [...seen.values()].map(e =>
+        `<a href="${wikiUrl(e)}" target="_blank" rel="noopener">${e.s} · ${e.n}</a>`
+    ).join("") + extras.map(x => `<a href="${x.href}" target="_blank" rel="noopener">${x.label}</a>`).join("");
 }
 
 const odmTags = {
@@ -609,14 +661,10 @@ function handleLizardAction(tag) {
 }
 
 function refreshAll() {
-    renderChain();
-    renderMatrix();
-    updatePath();
-    drawPolymers();
-    renderCalc();
-    composeQuery();
-    renderWikiLinks();
+    renderChain(); renderMatrix(); updatePath(); drawPolymers(); renderCalc();
+    composeQuery(); renderWikiLinks();
     handleLizardAction(chain.units.length ? "LIZARD_POSE_ALERT" : "LIZARD_POSE_IDLE");
+    realignSyt(chain.units.length >= 1 ? "two" : "idle");
 }
 
 document.getElementById("btnClear").onclick = () => { chain.clear(); refreshAll(); };
@@ -633,7 +681,6 @@ document.getElementById("searchButton").onclick = () => {
     logKeyword(q);
     window.open(`https://www.bing.com/images/search?q=${encodeURIComponent(q)}`, "_blank");
 };
-
 document.getElementById("lizard-right").addEventListener("click", () => {
     handleLizardAction("LIZARD_SPEAK_INIT");
     openWiki(wikiUrl(chain.parent));
@@ -648,14 +695,14 @@ document.getElementById("lizardGif2").addEventListener("click", () => {
 document.getElementById("btnWikiParent").onclick = () => openWiki(wikiUrl(chain.parent));
 document.getElementById("btnWikiPolymer").onclick = () => openWiki("https://en.wikipedia.org/wiki/Polymerization");
 document.getElementById("btnWikiNeon").onclick = () => openWiki("https://keystagewiki.com/index.php/Neon");
-
 document.addEventListener("keydown", (e) => {
     const hexCode = "0x" + e.keyCode.toString(16).padStart(2, "0");
     const mapped = { Digit1: "0x01", Digit2: "0x02", Digit3: "0x03", KeyL: "0x30", KeyW: "0x10" };
-    const code = mapped[e.code] || hexCode;
-    const result = refuteODM(code);
+    const result = refuteODM(mapped[e.code] || hexCode);
     if (result.status === "accepted") handleLizardAction(result.action);
+    if (e.code === "Digit2") realignSyt("two");
 });
+document.getElementById("btnMake").onclick = makeSytAction;
 
 renderTable();
 refreshAll();
