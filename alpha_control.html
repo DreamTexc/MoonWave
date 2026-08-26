@@ -14,11 +14,7 @@
       --glow: rgba(255, 255, 255, 0.15);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
@@ -29,7 +25,6 @@
       overflow-x: hidden;
     }
 
-    /* Only the background keeps color */
     #backgroundLayer {
       position: fixed;
       inset: 0;
@@ -71,15 +66,13 @@
       box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
     }
 
-    .section h2,
-    .section h3 {
+    .section h2, .section h3 {
       font-size: 1.15rem;
       font-weight: 600;
       margin-bottom: 1rem;
       color: #ffffff;
     }
 
-    /* All images forced to grayscale */
     .lizard-row {
       display: flex;
       flex-wrap: wrap;
@@ -112,34 +105,20 @@
       z-index: 10;
       opacity: 0.95;
       transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-                  filter 0.35s ease,
-                  opacity 0.35s ease;
+                  filter 0.35s ease, opacity 0.35s ease;
       border-radius: 12px;
       box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
       filter: grayscale(100%);
     }
 
-    /* Lizard poses (still grayscale) */
-    #lizard-right.lizard-idle {
-      transform: translateY(-50%) scale(1);
-      filter: grayscale(100%);
-    }
+    #lizard-right.lizard-idle { transform: translateY(-50%) scale(1); filter: grayscale(100%); }
+    #lizard-right.lizard-alert { transform: translateY(-50%) scale(1.12); filter: grayscale(100%) drop-shadow(0 0 14px rgba(255, 255, 255, 0.45)); }
+    #lizard-right.lizard-tilt { transform: translateY(-50%) rotate(-12deg) scale(1.05); filter: grayscale(100%); }
 
-    #lizard-right.lizard-alert {
-      transform: translateY(-50%) scale(1.12);
-      filter: grayscale(100%) drop-shadow(0 0 14px rgba(255, 255, 255, 0.45));
-    }
-
-    #lizard-right.lizard-tilt {
-      transform: translateY(-50%) rotate(-12deg) scale(1.05);
-      filter: grayscale(100%);
-    }
-
-    /* ===== Periodic Table links near the lizard's eye ===== */
     #periodic-links {
       position: fixed;
       top: 42%;
-      right: 13.5rem;          /* sits just left of the lizard */
+      right: 13.5rem;
       transform: translateY(-50%);
       z-index: 12;
       display: flex;
@@ -167,9 +146,7 @@
       transform: translateX(-3px);
     }
 
-    /* Form controls */
-    input[type="text"],
-    input[type="number"] {
+    input[type="text"], input[type="number"] {
       width: 100%;
       padding: 0.75rem 1rem;
       font-size: 1rem;
@@ -205,11 +182,8 @@
       filter: brightness(1.08);
     }
 
-    button:active {
-      transform: translateY(0);
-    }
+    button:active { transform: translateY(0); }
 
-    /* Collector */
     #collectorPanel {
       background: linear-gradient(160deg, #141414 0%, #0f0f0f 100%);
     }
@@ -236,9 +210,7 @@
       font-family: ui-monospace, monospace;
     }
 
-    #keywordList li:last-child {
-      border-bottom: none;
-    }
+    #keywordList li:last-child { border-bottom: none; }
 
     #result {
       margin-top: 1rem;
@@ -248,7 +220,119 @@
       min-height: 1.5em;
     }
 
-    /* Responsive */
+    /* ===== Alchemic System ===== */
+    #alchemicBanner {
+      overflow: hidden;
+      white-space: nowrap;
+      background: #0d0d0d;
+      border: 1px solid #333;
+      border-radius: 10px;
+      padding: 0.6rem 0;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+
+    #alchemicTrack {
+      display: inline-flex;
+      gap: 1.5rem;
+      animation: bannerCycle 35s linear infinite;
+    }
+
+    #alchemicTrack.paused { animation-play-state: paused; }
+
+    @keyframes bannerCycle {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .elem-chip {
+      display: inline-block;
+      padding: 0.35rem 0.9rem;
+      background: #1a1a1a;
+      border: 1px solid #444;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+    }
+
+    .elem-chip:hover,
+    .elem-chip.selected {
+      background: #fff;
+      color: #000;
+      border-color: #fff;
+    }
+
+    #alchemicControls {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    #alchemicControls button {
+      margin-top: 0;
+      padding: 0.45rem 1rem;
+      font-size: 0.85rem;
+    }
+
+    #flowLog {
+      background: #0a0a0a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-family: ui-monospace, monospace;
+      font-size: 0.82rem;
+      color: #ccc;
+      max-height: 140px;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+    }
+
+    #flowLog div { margin-bottom: 0.25rem; }
+    #flowLog .ok { color: #fff; }
+    #flowLog .diff { color: #aaa; }
+
+    #xprChart {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      height: 140px;
+      padding: 0.5rem;
+      background: #0a0a0a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      margin-top: 0.5rem;
+    }
+
+    .xpr-bar {
+      flex: 1;
+      background: linear-gradient(to top, #444, #ddd);
+      border-radius: 4px 4px 0 0;
+      min-width: 18px;
+      transition: height 0.6s cubic-bezier(0.34, 1.2, 0.64, 1);
+      position: relative;
+    }
+
+    .xpr-bar span {
+      position: absolute;
+      bottom: -1.4rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.7rem;
+      color: #888;
+      white-space: nowrap;
+    }
+
+    .xpr-label {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #aaa;
+      margin-top: 1.8rem;
+    }
+
     @media (max-width: 700px) {
       #lizard-right {
         position: static;
@@ -257,20 +341,11 @@
         margin: 1rem auto 0;
         max-width: 160px;
       }
-
       #lizard-right.lizard-idle,
       #lizard-right.lizard-alert,
-      #lizard-right.lizard-tilt {
-        transform: none;
-      }
-
-      #lizard-right.lizard-alert {
-        transform: scale(1.1);
-      }
-
-      #lizard-right.lizard-tilt {
-        transform: rotate(-10deg) scale(1.05);
-      }
+      #lizard-right.lizard-tilt { transform: none; }
+      #lizard-right.lizard-alert { transform: scale(1.1); }
+      #lizard-right.lizard-tilt { transform: rotate(-10deg) scale(1.05); }
 
       #periodic-links {
         position: static;
@@ -281,17 +356,9 @@
       }
     }
 
-    /* Scrollbar */
-    #keywordList::-webkit-scrollbar {
-      width: 6px;
-    }
-    #keywordList::-webkit-scrollbar-track {
-      background: #0a0a0a;
-    }
-    #keywordList::-webkit-scrollbar-thumb {
-      background: #333;
-      border-radius: 3px;
-    }
+    #keywordList::-webkit-scrollbar { width: 6px; }
+    #keywordList::-webkit-scrollbar-track { background: #0a0a0a; }
+    #keywordList::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
   </style>
 </head>
 <body>
@@ -314,19 +381,41 @@
     </div>
 
     <!-- Fixed right lizard -->
-    <img id="lizard-right"
-         class="overlay-img lizard-idle"
+    <img id="lizard-right" class="overlay-img lizard-idle"
          src="https://thumbs.dreamstime.com/b/colorful-lizard-perched-tree-next-to-plant-vivid-red-green-hues-colorful-lizard-perched-tree-next-to-plant-vivid-318406389.jpg"
          alt="ECKO the colorful lizard">
 
-    <!-- Two-line Periodic Table links (near the lizard's eye) -->
+    <!-- Periodic Table links near the eye -->
     <div id="periodic-links">
-      <a href="https://en.wikipedia.org/wiki/Periodic_table" target="_blank" rel="noopener noreferrer">
-        元素周期表
-      </a>
-      <a href="https://zh.wikipedia.org/wiki/%E5%85%83%E7%B4%A0%E5%91%A8%E6%9C%9F%E8%A1%A8" target="_blank" rel="noopener noreferrer">
-        元素周期表
-      </a>
+      <a href="https://en.wikipedia.org/wiki/Periodic_table" target="_blank" rel="noopener noreferrer">元素周期表</a>
+      <a href="https://zh.wikipedia.org/wiki/%E5%85%83%E7%B4%A0%E5%91%A8%E6%9C%9F%E8%A1%A8" target="_blank" rel="noopener noreferrer">元素周期表</a>
+    </div>
+
+    <!-- ===== NEW: Alchemic Flow System ===== -->
+    <div class="section">
+      <h2>Alchemic Flow System · XPR Resistance</h2>
+      <p style="color:var(--muted); font-size:0.9rem; margin-bottom:0.75rem;">
+        Controlled banner cycle · Select an element to trigger API-style incall & weight-differential chart
+      </p>
+
+      <!-- Cycling banner list -->
+      <div id="alchemicBanner">
+        <div id="alchemicTrack"></div>
+      </div>
+
+      <div id="alchemicControls">
+        <button type="button" id="pauseBanner">Pause Cycle</button>
+        <button type="button" id="resumeBanner">Resume Cycle</button>
+      </div>
+
+      <!-- Simulated API flow log -->
+      <div id="flowLog">
+        <div>Waiting for element selection…</div>
+      </div>
+
+      <!-- XPR Up/Down Resistance Chart -->
+      <div class="xpr-label">XPR Resistance Chart (atomic-weight differentials)</div>
+      <div id="xprChart"></div>
     </div>
 
     <!-- Search -->
@@ -360,6 +449,7 @@
   </div>
 
   <script>
+    /* ---------- existing code (keywords, lizards, etc.) ---------- */
     const shadowWords = ["absolute", "value", "function", "centroid", "dura"];
     const preloadWords = ["lizard", "forest", "pixel", "abstract", "neon", "geometry", "vivid"];
 
@@ -381,16 +471,13 @@
     function logKeyword(keyword) {
       const timestamp = new Date().toLocaleTimeString();
       const entry = `${keyword}  ·  ${timestamp}`;
-
       let logs = JSON.parse(localStorage.getItem("searchLogs") || "[]");
       logs.push(entry);
       if (logs.length > 50) logs = logs.slice(-50);
       localStorage.setItem("searchLogs", JSON.stringify(logs));
-
       const li = document.createElement("li");
       li.textContent = entry;
-      const list = document.getElementById("keywordList");
-      list.prepend(li);
+      document.getElementById("keywordList").prepend(li);
     }
 
     function setKeyword(base) {
@@ -407,10 +494,7 @@
 
     document.getElementById("searchButton").addEventListener("click", () => {
       const keyword = document.getElementById("searchBox").value.trim();
-      if (!keyword) {
-        alert("Please enter a keyword before searching.");
-        return;
-      }
+      if (!keyword) { alert("Please enter a keyword before searching."); return; }
       logKeyword(keyword);
       redirectToBing(keyword);
     });
@@ -422,19 +506,11 @@
     function handleLizardAction(tag) {
       const lizard = document.getElementById("lizard-right");
       if (!lizard) return;
-
       lizard.classList.remove("lizard-idle", "lizard-alert", "lizard-tilt");
-
       switch (tag) {
-        case "LIZARD_POSE_IDLE":
-          lizard.classList.add("lizard-idle");
-          break;
-        case "LIZARD_POSE_ALERT":
-          lizard.classList.add("lizard-alert");
-          break;
-        case "LIZARD_POSE_TILT":
-          lizard.classList.add("lizard-tilt");
-          break;
+        case "LIZARD_POSE_IDLE": lizard.classList.add("lizard-idle"); break;
+        case "LIZARD_POSE_ALERT": lizard.classList.add("lizard-alert"); break;
+        case "LIZARD_POSE_TILT": lizard.classList.add("lizard-tilt"); break;
         case "LIZARD_SPEAK_INIT":
           alert("Lizard says: Analyzing input stream…");
           lizard.classList.add("lizard-alert");
@@ -443,8 +519,7 @@
             lizard.classList.add("lizard-idle");
           }, 1800);
           break;
-        default:
-          console.warn("Unhandled tag:", tag);
+        default: console.warn("Unhandled tag:", tag);
       }
     }
 
@@ -461,31 +536,152 @@
     function refuteODM(code) {
       const tag = odmTags[code];
       if (!tag) return { status: "refuted", reason: "Unknown tag" };
-      if (tag === "SYSTEM_OVERRIDE") {
-        return { status: "refuted", reason: "System override active" };
-      }
+      if (tag === "SYSTEM_OVERRIDE") return { status: "refuted", reason: "System override active" };
       return { status: "accepted", action: tag };
     }
 
     document.addEventListener("keydown", (e) => {
       if (e.target.matches("input, textarea")) return;
-
       const result = refuteODM(e.code);
-      console.log("ODM Result:", result);
-
-      if (result.status === "accepted") {
-        handleLizardAction(result.action);
-      }
+      if (result.status === "accepted") handleLizardAction(result.action);
     });
 
-    // Reset tracked keywords on every page refresh
     window.addEventListener("DOMContentLoaded", () => {
       localStorage.removeItem("searchLogs");
       document.getElementById("keywordList").innerHTML = "";
-
       const preload = preloadWords[Math.floor(Math.random() * preloadWords.length)];
       setKeyword(preload);
+
+      /* ---------- Alchemic System init ---------- */
+      initAlchemicSystem();
     });
+
+    /* ============================================================
+       ALCHEMIC FLOW SYSTEM
+       ============================================================ */
+    const elements = [
+      { sym: "H",  name: "Hydrogen",  mass: 1.008 },
+      { sym: "He", name: "Helium",    mass: 4.003 },
+      { sym: "Li", name: "Lithium",   mass: 6.941 },
+      { sym: "Be", name: "Beryllium", mass: 9.012 },
+      { sym: "B",  name: "Boron",     mass: 10.81 },
+      { sym: "C",  name: "Carbon",    mass: 12.01 },
+      { sym: "N",  name: "Nitrogen",  mass: 14.01 },
+      { sym: "O",  name: "Oxygen",    mass: 16.00 },
+      { sym: "F",  name: "Fluorine",  mass: 19.00 },
+      { sym: "Ne", name: "Neon",      mass: 20.18 },
+      { sym: "Na", name: "Sodium",    mass: 22.99 },
+      { sym: "Mg", name: "Magnesium", mass: 24.31 },
+      { sym: "Al", name: "Aluminium", mass: 26.98 },
+      { sym: "Si", name: "Silicon",   mass: 28.09 },
+      { sym: "P",  name: "Phosphorus",mass: 30.97 },
+      { sym: "S",  name: "Sulfur",    mass: 32.07 },
+      { sym: "Cl", name: "Chlorine",  mass: 35.45 },
+      { sym: "Ar", name: "Argon",     mass: 39.95 },
+      { sym: "K",  name: "Potassium", mass: 39.10 },
+      { sym: "Ca", name: "Calcium",   mass: 40.08 }
+    ];
+
+    function initAlchemicSystem() {
+      const track = document.getElementById("alchemicTrack");
+      // Duplicate list for seamless infinite scroll
+      const doubled = [...elements, ...elements];
+      doubled.forEach(el => {
+        const chip = document.createElement("span");
+        chip.className = "elem-chip";
+        chip.textContent = `${el.sym} · ${el.mass}`;
+        chip.dataset.sym = el.sym;
+        chip.addEventListener("click", () => selectElement(el));
+        track.appendChild(chip);
+      });
+
+      document.getElementById("pauseBanner").onclick = () => {
+        track.classList.add("paused");
+      };
+      document.getElementById("resumeBanner").onclick = () => {
+        track.classList.remove("paused");
+      };
+    }
+
+    function selectElement(el) {
+      // Highlight
+      document.querySelectorAll(".elem-chip").forEach(c => c.classList.remove("selected"));
+      document.querySelectorAll(`.elem-chip[data-sym="${el.sym}"]`).forEach(c => c.classList.add("selected"));
+
+      // Simulated API incall flow
+      const log = document.getElementById("flowLog");
+      log.innerHTML = "";
+      const steps = [
+        `→ INCALL  /alchemic/v1/select  { element: "${el.sym}" }`,
+        `← 200 OK  payload received`,
+        `→ RESOLVE mass = ${el.mass}`,
+        `→ COMPUTE differentials vs neighbours…`
+      ];
+
+      let i = 0;
+      function nextStep() {
+        if (i < steps.length) {
+          const div = document.createElement("div");
+          div.className = "ok";
+          div.textContent = steps[i];
+          log.appendChild(div);
+          log.scrollTop = log.scrollHeight;
+          i++;
+          setTimeout(nextStep, 280);
+        } else {
+          // Calculate differentials
+          const idx = elements.findIndex(e => e.sym === el.sym);
+          const prev = elements[idx - 1] || elements[elements.length - 1];
+          const next = elements[idx + 1] || elements[0];
+
+          const dPrev = +(el.mass - prev.mass).toFixed(3);
+          const dNext = +(next.mass - el.mass).toFixed(3);
+
+          const diff1 = document.createElement("div");
+          diff1.className = "diff";
+          diff1.textContent = `Δ prev (${prev.sym}): ${dPrev > 0 ? "+" : ""}${dPrev}`;
+          log.appendChild(diff1);
+
+          const diff2 = document.createElement("div");
+          diff2.className = "diff";
+          diff2.textContent = `Δ next (${next.sym}): ${dNext > 0 ? "+" : ""}${dNext}`;
+          log.appendChild(diff2);
+
+          // Build XPR resistance chart
+          buildXprChart(el, prev, next, dPrev, dNext);
+        }
+      }
+      nextStep();
+    }
+
+    function buildXprChart(el, prev, next, dPrev, dNext) {
+      const chart = document.getElementById("xprChart");
+      chart.innerHTML = "";
+
+      // Normalise for visual height (base 40–120 px)
+      const values = [
+        { label: prev.sym, val: Math.abs(dPrev) },
+        { label: el.sym,   val: el.mass * 0.8 },          // centre reference
+        { label: next.sym, val: Math.abs(dNext) },
+        { label: "XPR↑",   val: Math.max(0, dNext) * 4 },
+        { label: "XPR↓",   val: Math.max(0, -dPrev) * 4 }
+      ];
+
+      const max = Math.max(...values.map(v => v.val), 1);
+
+      values.forEach(v => {
+        const bar = document.createElement("div");
+        bar.className = "xpr-bar";
+        const h = 30 + (v.val / max) * 100;
+        bar.style.height = "0px";
+        bar.innerHTML = `<span>${v.label}</span>`;
+        chart.appendChild(bar);
+        // animate
+        requestAnimationFrame(() => {
+          bar.style.height = h + "px";
+        });
+      });
+    }
   </script>
 </body>
 </html>
