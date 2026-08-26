@@ -18,13 +18,27 @@
         body {
             margin: 0;
             font-family: "Segoe UI", system-ui, sans-serif;
-            background:
-                radial-gradient(ellipse at 20% 0%, rgba(80, 40, 140, 0.55), transparent 50%),
-                radial-gradient(ellipse at 90% 80%, rgba(20, 80, 140, 0.4), transparent 45%),
-                linear-gradient(180deg, #1a1030 0%, #0a0614 100%);
+            background: #000000;
             color: var(--text);
             line-height: 1.45;
         }
+        #backgroundLayer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            background-image: url('https://keystagewiki.com/images/thumb/a/ab/Ne-20_WK.PNG/400px-Ne-20_WK.PNG');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
+            opacity: 0.22;
+            filter: grayscale(1) contrast(1.15);
+            z-index: 0;
+            pointer-events: none;
+        }
+        h1, .sub { position: relative; z-index: 1; }
         h1, h2, h3 { margin: 0 0 0.6rem; color: #ffffff; }
         h1 {
             text-align: center;
@@ -34,7 +48,7 @@
             color: #ffffff;
         }
         .sub { text-align: center; color: #c8c8c8; margin-bottom: 1.2rem; font-size: 0.95rem; }
-        .wrap { max-width: 1280px; margin: 0 auto; padding: 0 16px 48px; }
+        .wrap { max-width: 1280px; margin: 0 auto; padding: 0 16px 48px; position: relative; z-index: 1; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
         .panel {
@@ -44,7 +58,6 @@
             padding: 16px;
             margin-bottom: 16px;
         }
-        /* Periodic table */
         .ptable {
             display: grid;
             grid-template-columns: repeat(18, minmax(0, 1fr));
@@ -65,7 +78,6 @@
         .el.sel { outline: 2px solid #ffffff; filter: brightness(1.25); }
         .el .z { display: block; font-size: 8px; opacity: 0.75; }
         .el .sym { display: block; font-weight: 700; font-size: 12px; }
-        /* element examples keep color */
         .s { background: #c0392b; color: #fff5f5; }
         .p-non { background: #8e44ad; color: #f5e9ff; }
         .p-met { background: #16a085; color: #e8fff8; }
@@ -75,7 +87,6 @@
         .noble { background: #00838f; color: #e6ffff; }
         .blank { visibility: hidden; pointer-events: none; }
         .frow { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(18, 1fr); gap: 3px; margin-top: 6px; }
-        /* Chain */
         #chainDisplay {
             min-height: 48px;
             display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
@@ -99,7 +110,6 @@
             border: 1px solid #ffffff; background: #000000; color: #ffffff;
             font-size: 15px;
         }
-        /* Matrix */
         .matrix {
             display: inline-grid; gap: 4px; font-family: ui-monospace, monospace;
             padding: 8px 16px; border-left: 3px solid #ffffff;
@@ -107,21 +117,19 @@
             background: #000000; color: #ffffff;
         }
         .matrix span { min-width: 42px; text-align: center; padding: 4px; }
-        /* Blip path */
         #blipSvg { width: 100%; height: 140px; background: #000000; border-radius: 8px; }
-        /* Polymers */
         .poly-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         @media (max-width: 700px) { .poly-row { grid-template-columns: 1fr; } }
         .poly-card { background: #000000; border: 1px solid #ffffff; border-radius: 8px; padding: 8px; text-align: center; }
         .poly-card svg { width: 100%; height: 110px; }
         .poly-card h4 { margin: 0 0 6px; font-size: 13px; color: #ffffff; }
-        /* Calc */
         .calc-out { font-family: ui-monospace, Georgia, serif; font-size: 1.05rem; color: #ffffff; }
         #keywordList { max-height: 120px; overflow: auto; padding-left: 18px; color: #c0c0c0; }
         .hint { font-size: 12px; color: #b8b8b8; }
     </style>
 </head>
 <body>
+    <div id="backgroundLayer"></div>
     <h1>Alpha Control — Advanced Molecular Module Crafter</h1>
     <p class="sub">Parent class · polymer chain · matrix signal · blip path · elementary calculus · all 118 elements</p>
 
@@ -210,7 +218,6 @@
     </div>
 
 <script>
-/* ========== Element data: all 118 ========== */
 const ELEMENTS = [
   {z:1,s:"H",n:"Hydrogen",g:1,p:1,c:"p-non"},{z:2,s:"He",n:"Helium",g:18,p:1,c:"noble"},
   {z:3,s:"Li",n:"Lithium",g:1,p:2,c:"s"},{z:4,s:"Be",n:"Beryllium",g:2,p:2,c:"s"},
@@ -259,7 +266,6 @@ const ELEMENTS = [
   {z:114,s:"Fl",n:"Flerovium",g:14,p:7,c:"p-met"},{z:115,s:"Mc",n:"Moscovium",g:15,p:7,c:"p-met"},
   {z:116,s:"Lv",n:"Livermorium",g:16,p:7,c:"p-met"},{z:117,s:"Ts",n:"Tennessine",g:17,p:7,c:"p-non"},
   {z:118,s:"Og",n:"Oganesson",g:18,p:7,c:"noble"},
-  /* f-block */
   {z:58,s:"Ce",n:"Cerium",g:0,p:8,c:"f-la"},{z:59,s:"Pr",n:"Praseodymium",g:0,p:8,c:"f-la"},
   {z:60,s:"Nd",n:"Neodymium",g:0,p:8,c:"f-la"},{z:61,s:"Pm",n:"Promethium",g:0,p:8,c:"f-la"},
   {z:62,s:"Sm",n:"Samarium",g:0,p:8,c:"f-la"},{z:63,s:"Eu",n:"Europium",g:0,p:8,c:"f-la"},
@@ -278,7 +284,6 @@ const ELEMENTS = [
 
 const BY_Z = Object.fromEntries(ELEMENTS.map(e => [e.z, e]));
 
-/* ========== Parent / child module classes ========== */
 class AlphaModule {
     constructor(name = "AlphaModule") {
         this.name = name;
@@ -311,7 +316,6 @@ class PolymerChain extends AlphaModule {
 
 const chain = new PolymerChain(BY_Z[6]);
 
-/* ========== Render periodic table ========== */
 function renderTable() {
     const root = document.getElementById("ptable");
     root.innerHTML = "";
@@ -335,34 +339,25 @@ function renderTable() {
     };
     const blank = () => { const d = document.createElement("div"); d.className = "el blank"; return d; };
 
-    // Period 1
     root.appendChild(place(1));
     for (let i=0;i<16;i++) root.appendChild(blank());
     root.appendChild(place(2));
-    // Period 2
     root.appendChild(place(3)); root.appendChild(place(4));
     for (let i=0;i<10;i++) root.appendChild(blank());
     for (let z=5;z<=10;z++) root.appendChild(place(z));
-    // Period 3
     root.appendChild(place(11)); root.appendChild(place(12));
     for (let i=0;i<10;i++) root.appendChild(blank());
     for (let z=13;z<=18;z++) root.appendChild(place(z));
-    // Period 4
     for (let z=19;z<=36;z++) root.appendChild(place(z));
-    // Period 5
     for (let z=37;z<=54;z++) root.appendChild(place(z));
-    // Period 6 (La placeholder then Hf-Rn)
     root.appendChild(place(55)); root.appendChild(place(56)); root.appendChild(place(57));
     for (let z=72;z<=86;z++) root.appendChild(place(z));
-    // Period 7
     root.appendChild(place(87)); root.appendChild(place(88)); root.appendChild(place(89));
     for (let z=104;z<=118;z++) root.appendChild(place(z));
 
-    // Lanthanides row
     const la = document.createElement("div");
     la.className = "frow";
     la.style.gridColumn = "1 / -1";
-    // spacer to align under group 4-ish
     for (let i=0;i<3;i++) { const b=document.createElement("div"); b.className="el blank"; la.appendChild(b); }
     for (let z=58;z<=71;z++) la.appendChild(place(z));
     root.appendChild(la);
@@ -374,11 +369,9 @@ function renderTable() {
     root.appendChild(ac);
 }
 
-/* ========== Matrix ========== */
 function foldMatrix(vals) {
     const m = Array(9).fill(0);
     vals.forEach((v,i) => { m[i % 9] += v; });
-    // mix
     for (let i=0;i<9;i++) m[i] = Math.round((m[i] + (i===0?vals[0]||6:0)) % 997);
     return m;
 }
@@ -391,7 +384,6 @@ function renderMatrix() {
     document.getElementById("matrixNote").textContent = `det≈ ${detApprox}  ·  parent seeds (1,1)`;
 }
 
-/* ========== Blip path ========== */
 function updatePath() {
     const n = Math.max(3, chain.units.length + 2);
     const w = 800, h = 140;
@@ -407,7 +399,6 @@ function updatePath() {
     document.getElementById("polyPath").setAttribute("d", d);
 }
 
-/* ========== Polymer SVGs ========== */
 function atomDot(svg, x, y, label, r=6) {
     const c = document.createElementNS("http://www.w3.org/2000/svg","circle");
     c.setAttribute("cx",x); c.setAttribute("cy",y); c.setAttribute("r",r);
@@ -455,7 +446,6 @@ function drawPolymers() {
     nodes.forEach((p,i) => atomDot(net, p[0], p[1], lab(i), 5));
 }
 
-/* ========== Calculus ========== */
 function renderCalc() {
     const zs = chain.zs();
     const a = ((zs.reduce((s,v)=>s+v,0) % 9) + 1) / 4;
@@ -467,7 +457,6 @@ function renderCalc() {
     document.getElementById("intExpr").innerHTML = `∫ f(t) dt = ${(a/3).toFixed(2)} t³ ${b>=0?"+":"−"} ${(Math.abs(b)/2).toFixed(2)} t² + ${c} t + C`;
 }
 
-/* ========== Chain UI + search ========== */
 function renderChain() {
     const el = document.getElementById("chainDisplay");
     const parts = [chain.parent, ...chain.units];
@@ -525,7 +514,6 @@ document.getElementById("searchButton").onclick = () => {
 
 renderTable();
 refreshAll();
-// restore logs
 (JSON.parse(localStorage.getItem("mwCraftLogs") || "[]")).reverse().forEach(e => {
     const li = document.createElement("li"); li.textContent = e;
     document.getElementById("keywordList").appendChild(li);
