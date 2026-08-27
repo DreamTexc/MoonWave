@@ -24,7 +24,10 @@
         }
         #backgroundLayer {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background-color: #000000;
             background-image: url('https://keystagewiki.com/images/thumb/a/ab/Ne-20_WK.PNG/400px-Ne-20_WK.PNG');
             background-size: cover;
@@ -158,7 +161,11 @@
         @media (max-width: 800px) {
             #lizard-right { max-width: 90px; top: auto; bottom: 8px; right: 8px; transform: none; }
         }
-        .gif-stage { position: relative; display: inline-block; max-width: 220px; }
+        .gif-stage {
+            position: relative;
+            display: inline-block;
+            max-width: 220px;
+        }
         .gif-stage img.overlay-img { display: block; width: 100%; }
         .syt-layer {
             position: absolute;
@@ -172,6 +179,8 @@
             --dy: 0px;
             --rot: 0deg;
             --scale: 1.05;
+            clip-path: url(#lizardClip);
+            -webkit-clip-path: url(#lizardClip);
         }
         .syt-layer img {
             width: 140%;
@@ -201,6 +210,46 @@
             color: #fff;
         }
         #btnMake { margin-top: 6px; }
+        .ptable, .ptable .el {
+            cursor: url("https://raw.githubusercontent.com/DreamTexc/MoonWave/main/lizard.png") 12 12, url("https://raw.githubusercontent.com/DreamTexc/MoonWave/main/lizard.png"), pointer;
+        }
+        .el.sel .sym::after {
+            content: "";
+            display: block;
+            width: 12px;
+            height: 12px;
+            margin: 1px auto 0;
+            background: url("https://raw.githubusercontent.com/DreamTexc/MoonWave/main/lizard.png") center / contain no-repeat;
+        }
+        .lizard-trace {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: calc(100% - 36px);
+            pointer-events: none;
+            z-index: 2;
+        }
+        .lizard-trace .trace-path {
+            fill: none;
+            stroke: #ffffff;
+            stroke-width: 1.6;
+            stroke-linejoin: round;
+            stroke-linecap: round;
+            stroke-dasharray: 420;
+            stroke-dashoffset: 420;
+            animation: traceDraw 2.4s ease forwards;
+        }
+        .gif-stage.hovering .trace-path,
+        .syt-layer.on + .lizard-trace .trace-path,
+        #gif1Stage.traced .trace-path {
+            stroke-dashoffset: 0;
+            animation: tracePulse 1.8s ease-in-out infinite;
+        }
+        @keyframes traceDraw { to { stroke-dashoffset: 0; } }
+        @keyframes tracePulse {
+            0%,100% { opacity: 0.85; stroke-width: 1.6; }
+            50% { opacity: 1; stroke-width: 2.2; }
+        }
     </style>
 </head>
 <body>
@@ -214,7 +263,7 @@
     <div class="wrap">
         <div class="panel">
             <h2>Periodic Table — click to craft chain</h2>
-            <p class="hint">Click = add to chain. Shift-click = set parent. Alt-click = wiki. Hover or pick two atoms to iridesce syt.png on GIF 1. Press 2 for two-mode. Make locks it.</p>
+            <p class="hint">Iguana cursor on the table only. Click = add. Shift-click = parent. Alt-click = wiki. Hover/2-select traces the lizard on GIF 1.</p>
             <div id="ptable" class="ptable"></div>
         </div>
 
@@ -228,6 +277,14 @@
                         <img id="sytImg" alt="syt lines and dots"
                              src="https://raw.githubusercontent.com/DreamTexc/MoonWave/main/syt.png">
                     </div>
+                    <svg class="lizard-trace" id="lizardTrace" viewBox="0 0 200 160" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                        <defs>
+                            <clipPath id="lizardClip" clipPathUnits="objectBoundingBox">
+                                <path transform="scale(0.005, 0.00625)" d="M22 108 C28 86 48 72 78 74 C102 76 124 84 146 78 C160 74 172 62 180 48 C186 38 194 30 198 26 L196 40 C188 52 180 66 172 80 C164 96 150 108 128 114 C108 120 88 122 68 124 C52 126 38 132 30 144 C26 134 22 120 22 108 Z M78 124 C72 132 66 142 70 150 C78 146 86 136 90 126 Z M118 118 C116 130 122 142 132 148 C134 136 130 124 124 116 Z M168 70 C174 64 186 58 192 52 C186 66 176 76 166 80 Z"/>
+                            </clipPath>
+                        </defs>
+                        <path class="trace-path" id="lizardOutline" d="M22 108 C28 86 48 72 78 74 C102 76 124 84 146 78 C160 74 172 62 180 48 C186 38 194 30 198 26 L196 40 C188 52 180 66 172 80 C164 96 150 108 128 114 C108 120 88 122 68 124 C52 126 38 132 30 144 C26 134 22 120 22 108 Z M78 124 C72 132 66 142 70 150 C78 146 86 136 90 126 Z M118 118 C116 130 122 142 132 148 C134 136 130 124 124 116 Z M168 70 C174 64 186 58 192 52 C186 66 176 76 166 80 Z"/>
+                    </svg>
                     <button id="btnMake" type="button">Make</button>
                 </div>
                 <div class="gif-stage" id="gif2Stage">
@@ -260,7 +317,6 @@
             </div>
             <div class="panel">
                 <h2>Mathematical Matrix Box</h2>
-                <p class="hint">Signal matrix derived from atomic numbers of the chain (padded / folded to 3×3).</p>
                 <div id="matrixBox" class="matrix" style="grid-template-columns: repeat(3, auto);"></div>
                 <p id="matrixNote" class="hint"></p>
             </div>
@@ -444,8 +500,7 @@ function renderTable() {
     for (let i=0;i<3;i++) { const b=document.createElement("div"); b.className="el blank"; la.appendChild(b); }
     for (let z=58;z<=71;z++) la.appendChild(place(z));
     root.appendChild(la);
-    const ac = document.createElement("div");
-    ac.className = "frow";
+    const ac = document.createElement("div"); ac.className = "frow";
     for (let i=0;i<3;i++) { const b=document.createElement("div"); b.className="el blank"; ac.appendChild(b); }
     for (let z=90;z<=103;z++) ac.appendChild(place(z));
     root.appendChild(ac);
@@ -509,8 +564,8 @@ function drawPolymers() {
     line(br,50,50,40,22); atomDot(br,36,18,lab(3),5);
     const net = document.getElementById("svgNet"); net.innerHTML = "";
     const nodes = [[30,20],[80,18],[140,22],[185,30],[40,55],[95,50],[155,58],[25,75],[90,78],[150,72]];
-    const edges = [[0,1],[1,2],[2,3],[0,4],[1,5],[2,6],[3,6],[4,5],[5,6],[4,7],[5,8],[6,9],[7,8],[8,9]];
-    edges.forEach(([a,b]) => line(net, nodes[a][0],nodes[a][1], nodes[b][0],nodes[b][1]));
+    [[0,1],[1,2],[2,3],[0,4],[1,5],[2,6],[3,6],[4,5],[5,6],[4,7],[5,8],[6,9],[7,8],[8,9]]
+        .forEach(([a,b]) => line(net, nodes[a][0],nodes[a][1], nodes[b][0],nodes[b][1]));
     nodes.forEach((p,i) => atomDot(net, p[0], p[1], lab(i), 5));
 }
 function renderCalc() {
@@ -594,6 +649,17 @@ function realignSyt(reason, hover) {
     const twoMode = reason === "two" || chain.units.length >= 1;
     layer.classList.toggle("on", twoMode || reason === "hover" || reason === "make");
     if (sytMade) layer.classList.add("made");
+    const stage = document.getElementById("gif1Stage");
+    if (stage) {
+        stage.classList.toggle("hovering", reason === "hover");
+        stage.classList.toggle("traced", twoMode || reason === "make" || reason === "hover");
+    }
+    const outline = document.getElementById("lizardOutline");
+    if (outline && (reason === "hover" || reason === "two" || reason === "select")) {
+        outline.style.strokeDashoffset = "420";
+        void outline.getBoundingClientRect();
+        outline.style.strokeDashoffset = "0";
+    }
 }
 function makeSytAction() {
     sytMade = true;
@@ -603,7 +669,6 @@ function makeSytAction() {
     const d = document.getElementById("efcDecision");
     if (speak && d) speak.textContent = "Lizard says: MAKE — iridescent syt locked. " + d.textContent;
 }
-
 function wikiUrl(el) {
     return "https://en.wikipedia.org/wiki/" + encodeURIComponent(el.n.replace(/ /g, "_"));
 }
@@ -659,7 +724,6 @@ function handleLizardAction(tag) {
     if (speak) speak.textContent = line;
     if (tag === "KEY_ANALYSIS_TRIGGER") openWiki(wikiUrl(chain.parent));
 }
-
 function refreshAll() {
     renderChain(); renderMatrix(); updatePath(); drawPolymers(); renderCalc();
     composeQuery(); renderWikiLinks();
@@ -703,7 +767,6 @@ document.addEventListener("keydown", (e) => {
     if (e.code === "Digit2") realignSyt("two");
 });
 document.getElementById("btnMake").onclick = makeSytAction;
-
 renderTable();
 refreshAll();
 (JSON.parse(localStorage.getItem("mwCraftLogs") || "[]")).reverse().forEach(e => {
