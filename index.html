@@ -1,14 +1,200 @@
-<title>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>My Page</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MoonWave — Approach</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='20' viewBox='0 0 48 20'><g fill='none' stroke='%23ffffff' stroke-width='2'><circle cx='12' cy='10' r='7'/><circle cx='36' cy='10' r='7'/><path d='M19 10 H29'/></g></svg>") 24 10, crosshair;
+    }
+    #world {
+      position: fixed;
+      inset: 0;
+      background: #000 url("https://raw.githubusercontent.com/DreamTexc/MoonWave/main/lux.png") center / cover no-repeat;
+      transform-origin: 50% 68%;
+      will-change: transform;
+    }
+    #vignette {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(ellipse at 50% 62%, transparent 28%, rgba(0,0,0,0.45) 100%);
+      z-index: 2;
+    }
+    #glasses {
+      position: fixed;
+      left: 50%;
+      top: 46%;
+      width: 220px;
+      height: 90px;
+      transform: translate(-50%, -50%) scale(0.55);
+      z-index: 4;
+      pointer-events: none;
+      opacity: 0.92;
+      filter: drop-shadow(0 8px 18px rgba(0,0,0,0.6));
+    }
+    #tableMark {
+      position: fixed;
+      left: 50%;
+      top: 72%;
+      width: 38vw;
+      max-width: 420px;
+      height: 10px;
+      transform: translateX(-50%);
+      border-bottom: 1px solid rgba(255,255,255,0.35);
+      z-index: 3;
+      pointer-events: none;
+      opacity: 0.35;
+    }
+    #hud {
+      position: fixed;
+      left: 16px;
+      bottom: 16px;
+      z-index: 6;
+      color: #fff;
+      font: 13px/1.4 ui-monospace, monospace;
+      text-shadow: 0 1px 4px #000;
+    }
+    #start {
+      position: fixed;
+      inset: 0;
+      z-index: 8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      font: 18px/1.4 "Segoe UI", system-ui, sans-serif;
+      cursor: inherit;
+    }
+    #start button {
+      background: #fff;
+      color: #000;
+      border: 0;
+      padding: 12px 22px;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: inherit;
+    }
+    body.walking #start { display: none; }
+    body.stopped #glasses { opacity: 1; }
+  </style>
 </head>
 <body>
+  <div id="world"></div>
+  <div id="vignette"></div>
+  <div id="tableMark"></div>
+  <svg id="glasses" viewBox="0 0 220 90" aria-hidden="true">
+    <g fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round">
+      <ellipse cx="62" cy="48" rx="42" ry="28"/>
+      <ellipse cx="158" cy="48" rx="42" ry="28"/>
+      <path d="M104 48 H116"/>
+      <path d="M20 44 Q8 36 4 28"/>
+      <path d="M200 44 Q212 36 216 28"/>
+    </g>
+  </svg>
+  <div id="hud">idle — click to walk in</div>
+  <div id="start">
+    <button id="begin">Begin approach</button>
+  </div>
 
-<p></p>
-<p></p>
-<p></p>
+<script>
+const DURATION = 5000;
+const world = document.getElementById("world");
+const glasses = document.getElementById("glasses");
+const hud = document.getElementById("hud");
+let started = false;
+let stopped = false;
+let t0 = 0;
+let raf = 0;
+let footTimer = 0;
+let audioCtx = null;
 
+function easeInOut(t) {
+  return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+}
+
+function applyWalk(p) {
+  const e = easeInOut(Math.min(1, Math.max(0, p)));
+  const scale = 1 + e * 1.35;
+  const bob = Math.sin(e * Math.PI * 10) * (1 - e) * 8;
+  world.style.transform = `translateY(${bob}px) scale(${scale.toFixed(4)})`;
+  const gScale = 0.55 + e * 1.15;
+  const gY = 46 - e * 18;
+  glasses.style.top = gY + "%";
+  glasses.style.transform = `translate(-50%, -50%) scale(${gScale.toFixed(3)})`;
+}
+
+function footstep() {
+  if (!audioCtx) return;
+  const t = audioCtx.currentTime;
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  const f = audioCtx.createBiquadFilter();
+  o.type = "sine";
+  o.frequency.setValueAtTime(90, t);
+  o.frequency.exponentialRampToValueAtTime(42, t + 0.12);
+  f.type = "lowpass";
+  f.frequency.value = 240;
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(0.28, t + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
+  o.connect(f); f.connect(g); g.connect(audioCtx.destination);
+  o.start(t); o.stop(t + 0.2);
+}
+
+function startFootsteps() {
+  footTimer = setInterval(() => {
+    if (stopped) { clearInterval(footTimer); return; }
+    footstep();
+    setTimeout(footstep, 70);
+  }, 430);
+}
+
+function tick(now) {
+  if (stopped) return;
+  const p = (now - t0) / DURATION;
+  applyWalk(p);
+  hud.textContent = "walking · " + Math.min(5, (p * 5)).toFixed(1) + "s";
+  if (p >= 1) { stopWalk(); return; }
+  raf = requestAnimationFrame(tick);
+}
+
+function stopWalk() {
+  stopped = true;
+  window.WALK_STOPPED = true;
+  cancelAnimationFrame(raf);
+  clearInterval(footTimer);
+  applyWalk(1);
+  hud.textContent = "stopped at table · waiting for next command";
+  document.body.classList.add("stopped");
+}
+
+function begin() {
+  if (started) return;
+  started = true;
+  document.body.classList.add("walking");
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  t0 = performance.now();
+  startFootsteps();
+  raf = requestAnimationFrame(tick);
+}
+
+document.getElementById("begin").onclick = begin;
+
+window.addEventListener("wheel", (e) => {
+  if (!started || stopped) return;
+  e.preventDefault();
+  t0 -= e.deltaY * 2;
+  if (performance.now() - t0 >= DURATION) stopWalk();
+}, { passive: false });
+
+window.stopApproach = stopWalk;
+</script>
 </body>
 </html>
