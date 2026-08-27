@@ -82,7 +82,6 @@
       cursor: inherit;
     }
     body.walking #start { display: none; }
-    body.stopped #glasses { opacity: 1; }
   </style>
 </head>
 <body>
@@ -108,63 +107,67 @@ const DURATION = 5000;
 const world = document.getElementById("world");
 const glasses = document.getElementById("glasses");
 const hud = document.getElementById("hud");
-let started = false;
-let stopped = false;
-let t0 = 0;
-let raf = 0;
-let footTimer = 0;
-let audioCtx = null;
+let started = false, stopped = false, t0 = 0, raf = 0, footTimer = 0;
+let audioCtx = null, master = null, noiseBuf = null, step = 0;
 
 function easeInOut(t) {
   return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
 }
-
 function applyWalk(p) {
   const e = easeInOut(Math.min(1, Math.max(0, p)));
-  const scale = 1 + e * 1.35;
-  const bob = Math.sin(e * Math.PI * 10) * (1 - e) * 8;
-  world.style.transform = `translateY(${bob}px) scale(${scale.toFixed(4)})`;
-  const gScale = 0.55 + e * 1.15;
-  const gY = 46 - e * 18;
-  glasses.style.top = gY + "%";
-  glasses.style.transform = `translate(-50%, -50%) scale(${gScale.toFixed(3)})`;
+  world.style.transform = `translateY(${Math.sin(e * Math.PI * 10) * (1 - e) * 8}px) scale(${(1 + e * 1.35).toFixed(4)})`;
+  glasses.style.top = (46 - e * 18) + "%";
+  glasses.style.transform = `translate(-50%, -50%) scale(${(0.55 + e * 1.15).toFixed(3)})`;
 }
-
+function makeNoiseBuffer() {
+  const len = audioCtx.sampleRate * 0.35;
+  const buf = audioCtx.createBuffer(1, len, audioCtx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+  return buf;
+}
 function footstep() {
-  if (!audioCtx) return;
+  if (!audioCtx || !master) return;
   const t = audioCtx.currentTime;
-  const o = audioCtx.createOscillator();
+  const heel = step++ % 2 === 0;
+  const src = audioCtx.createBufferSource();
+  src.buffer = noiseBuf;
+  const bp = audioCtx.createBiquadFilter();
+  bp.type = "bandpass";
+  bp.frequency.value = heel ? 180 : 320;
+  bp.Q.value = heel ? 0.7 : 1.2;
+  const lp = audioCtx.createBiquadFilter();
+  lp.type = "lowpass";
+  lp.frequency.value = heel ? 420 : 900;
   const g = audioCtx.createGain();
-  const f = audioCtx.createBiquadFilter();
-  o.type = "sine";
-  o.frequency.setValueAtTime(90, t);
-  o.frequency.exponentialRampToValueAtTime(42, t + 0.12);
-  f.type = "lowpass";
-  f.frequency.value = 240;
   g.gain.setValueAtTime(0.0001, t);
-  g.gain.exponentialRampToValueAtTime(0.28, t + 0.02);
-  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
-  o.connect(f); f.connect(g); g.connect(audioCtx.destination);
-  o.start(t); o.stop(t + 0.2);
+  g.gain.exponentialRampToValueAtTime(heel ? 1.2 : 0.75, t + 0.012);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + (heel ? 0.22 : 0.14));
+  src.connect(bp); bp.connect(lp); lp.connect(g); g.connect(master);
+  src.start(t); src.stop(t + 0.3);
+  const osc = audioCtx.createOscillator();
+  const og = audioCtx.createGain();
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(heel ? 70 : 95, t);
+  osc.frequency.exponentialRampToValueAtTime(38, t + 0.16);
+  og.gain.setValueAtTime(0.0001, t);
+  og.gain.exponentialRampToValueAtTime(heel ? 0.55 : 0.32, t + 0.01);
+  og.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
+  osc.connect(og); og.connect(master);
+  osc.start(t); osc.stop(t + 0.2);
 }
-
 function startFootsteps() {
-  footTimer = setInterval(() => {
-    if (stopped) { clearInterval(footTimer); return; }
-    footstep();
-    setTimeout(footstep, 70);
-  }, 430);
+  footstep();
+  footTimer = setInterval(() => { if (!stopped) footstep(); }, 380);
 }
-
 function tick(now) {
   if (stopped) return;
   const p = (now - t0) / DURATION;
   applyWalk(p);
-  hud.textContent = "walking · " + Math.min(5, (p * 5)).toFixed(1) + "s";
+  hud.textContent = "walking · " + Math.min(5, p * 5).toFixed(1) + "s";
   if (p >= 1) { stopWalk(); return; }
   raf = requestAnimationFrame(tick);
 }
-
 function stopWalk() {
   stopped = true;
   window.WALK_STOPPED = true;
@@ -172,28 +175,28 @@ function stopWalk() {
   clearInterval(footTimer);
   applyWalk(1);
   hud.textContent = "stopped at table · waiting for next command";
-  document.body.classList.add("stopped");
 }
-
 function begin() {
   if (started) return;
   started = true;
   document.body.classList.add("walking");
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === "suspended") audioCtx.resume();
+  master = audioCtx.createGain();
+  master.gain.value = 0.9;
+  master.connect(audioCtx.destination);
+  noiseBuf = makeNoiseBuffer();
   t0 = performance.now();
   startFootsteps();
   raf = requestAnimationFrame(tick);
 }
-
 document.getElementById("begin").onclick = begin;
-
 window.addEventListener("wheel", (e) => {
   if (!started || stopped) return;
   e.preventDefault();
   t0 -= e.deltaY * 2;
   if (performance.now() - t0 >= DURATION) stopWalk();
 }, { passive: false });
-
 window.stopApproach = stopWalk;
 </script>
 </body>
