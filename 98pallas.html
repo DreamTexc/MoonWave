@@ -34,17 +34,9 @@
             margin-top: 10px;
         }
 
-        /* Popup beside canvas */
-        #planetSidePopup {
-            display: none;
-            position: absolute;
-            left: 820px;
-            top: 50px;
-            width: 260px;
-            background: white;
-            border: 2px solid black;
-            padding: 10px;
-            z-index: 9999;
+        #eteTextBoxContainer {
+            display:none;
+            width:220px;
         }
     </style>
 </head>
@@ -113,10 +105,21 @@
 
     <hr>
 
-    <!-- ETE Preview -->
+    <!-- ETE Preview + Text Box -->
     <section>
         <h2>ETE Planet Binding Preview</h2>
-        <img id="ETE" src="" alt="Bound Planet Preview">
+
+        <div style="display:flex; gap:20px; align-items:flex-start;">
+            <!-- Planet preview -->
+            <img id="ETE" src="" alt="Bound Planet Preview">
+
+            <!-- Text box beside preview -->
+            <div id="eteTextBoxContainer">
+                <label id="eteTextLabel">Enter data:</label><br>
+                <input type="text" id="eteTextInput" style="width:200px;"><br><br>
+                <button id="eteTextSubmit">Submit</button>
+            </div>
+        </div>
     </section>
 
     <hr>
@@ -127,66 +130,7 @@
         <canvas id="rocketCanvas" width="800" height="600"></canvas>
     </section>
 
-    <!-- Popup beside canvas -->
-    <div id="planetSidePopup">
-        <h3 id="sidePopupTitle"></h3>
-        <img id="sidePopupImage" src="" style="width:240px; border:1px solid #ccc;">
-        <br><br>
-        <label>Enter Data:</label>
-        <input type="text" id="sidePopupInput" style="width:240px;">
-        <button id="sidePopupSubmit">Submit</button>
-    </div>
-
     <script>
-        /**************************************
-         * IMAGE MODIFIER
-         **************************************/
-        document.getElementById("modifierForm").addEventListener("submit", async (event) => {
-            event.preventDefault();
-
-            const formData = new FormData(event.target);
-
-            try {
-                const response = await fetch("http://127.0.0.1:5000/modify_image", {
-                    method: "POST",
-                    body: formData
-                });
-
-                const blob = await response.blob();
-                document.getElementById("modifiedImage").src = URL.createObjectURL(blob);
-
-            } catch (err) {
-                console.error("Modifier Error:", err);
-            }
-        });
-
-        /**************************************
-         * MISSION LOG
-         **************************************/
-        document.getElementById("missionForm").addEventListener("submit", async (event) => {
-            event.preventDefault();
-
-            const missionData = {
-                missionName: missionName.value,
-                modelAddress: modelAddress.value,
-                serverLog: serverLog.value
-            };
-
-            try {
-                const response = await fetch("/addMissionLog", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(missionData)
-                });
-
-                const data = await response.json();
-                responseMessage.textContent = `Success: ${data.message}, Log ID: ${data.logId}`;
-
-            } catch (err) {
-                responseMessage.textContent = `Error: ${err.message}`;
-            }
-        });
-
         /**************************************
          * PLANET SOURCES
          **************************************/
@@ -209,35 +153,32 @@
 
         const etePreview = document.getElementById("ETE");
 
+        /**************************************
+         * ETE Selection Handler
+         **************************************/
         document.getElementById("image_select").addEventListener("change", () => {
             const selected = document.getElementById("image_select").value;
             const planetIndex = eteBinding[selected];
 
-            // Update ETE preview
+            // Update ETE preview image
             etePreview.src = planetSources[planetIndex];
 
-            // Show popup beside canvas
-            openSidePopup(selected, planetIndex);
+            // Show text box beside preview
+            const box = document.getElementById("eteTextBoxContainer");
+            const label = document.getElementById("eteTextLabel");
+
+            box.style.display = "block";
+            label.textContent = `Enter data for ${selected}:`;
         });
 
         /**************************************
-         * SIDE POPUP LOGIC
+         * ETE Text Submit Handler
          **************************************/
-        function openSidePopup(letter, planetIndex) {
-            const popup = document.getElementById("planetSidePopup");
+        document.getElementById("eteTextSubmit").addEventListener("click", () => {
+            const selected = document.getElementById("image_select").value;
+            const text = document.getElementById("eteTextInput").value;
 
-            document.getElementById("sidePopupTitle").textContent =
-                `Planet assigned to ${letter}`;
-
-            document.getElementById("sidePopupImage").src =
-                planetSources[planetIndex];
-
-            popup.style.display = "block";
-        }
-
-        document.getElementById("sidePopupSubmit").addEventListener("click", () => {
-            const text = document.getElementById("sidePopupInput").value;
-            console.log("User entered:", text);
+            console.log(`Text for ${selected}:`, text);
         });
 
         /**************************************
