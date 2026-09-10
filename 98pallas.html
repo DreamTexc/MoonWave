@@ -111,6 +111,14 @@
         </form>
 
         <div id="responseMessage"></div>
+
+        <!-- CALLBACK OPTIONS APPEAR HERE -->
+        <div id="missionCallbackOptions" style="display:none; margin-top:20px;">
+            <h3>Choose a planet topic:</h3>
+            <ul id="planetOptionsList" style="line-height:1.8;">
+                <!-- Dynamic Wikipedia links appear here -->
+            </ul>
+        </div>
     </section>
 
     <hr>
@@ -190,6 +198,75 @@
 
             console.log(`Text for ${selected}:`, text);
         });
+
+        /**************************************
+         * MISSION LOG SUBMIT + CALLBACK
+         **************************************/
+        document.getElementById("missionForm").addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const missionName = document.getElementById("missionName").value;
+            const modelAddress = document.getElementById("modelAddress").value;
+            const serverLog = document.getElementById("serverLog").value;
+
+            const missionData = { missionName, modelAddress, serverLog };
+
+            try {
+                const response = await fetch("/addMissionLog", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(missionData)
+                });
+
+                const data = await response.json();
+                responseMessage.textContent = `Success: ${data.message}, Log ID: ${data.logId}`;
+
+                // 🔥 CALLBACK FUNCTION ACTIVATES HERE
+                missionNameCallback();
+
+            } catch (err) {
+                responseMessage.textContent = `Error: ${err.message}`;
+            }
+        });
+
+        /**************************************
+         * CALLBACK FUNCTION (BB ONLY)
+         **************************************/
+        function missionNameCallback() {
+            const selectedETE = document.getElementById("image_select").value;
+
+            // Only activate callback for BB
+            if (selectedETE !== "BB") {
+                document.getElementById("missionCallbackOptions").style.display = "none";
+                return;
+            }
+
+            const userText = document.getElementById("eteTextInput").value;
+
+            // Build inline Wikipedia options
+            const options = [
+                { name: "Mars", url: "https://en.wikipedia.org/wiki/Mars" },
+                { name: "Pluto", url: "https://en.wikipedia.org/wiki/Pluto" },
+                { name: "Jupiter", url: "https://en.wikipedia.org/wiki/Jupiter" },
+                { name: "Saturn", url: "https://en.wikipedia.org/wiki/Saturn" },
+                { name: "Venus", url: "https://en.wikipedia.org/wiki/Venus" }
+            ];
+
+            const list = document.getElementById("planetOptionsList");
+            list.innerHTML = ""; // Clear previous options
+
+            options.forEach(opt => {
+                const li = document.createElement("li");
+                li.innerHTML = `<a href="${opt.url}" target="_blank">${opt.name}</a>`;
+                list.appendChild(li);
+            });
+
+            // Show the options block
+            document.getElementById("missionCallbackOptions").style.display = "block";
+
+            console.log("Mission Name Callback Triggered for BB");
+            console.log("User entered:", userText);
+        }
 
         /**************************************
          * CANVAS SYSTEM — FIXED QUADRANTS
