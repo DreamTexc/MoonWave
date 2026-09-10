@@ -149,7 +149,7 @@
         });
 
         /**************************************
-         * CANVAS SYSTEM
+         * CANVAS SYSTEM — FIXED QUADRANTS
          **************************************/
         const canvas = document.getElementById("rocketCanvas");
         const ctx = canvas.getContext("2d");
@@ -160,23 +160,31 @@
         rocketImg.src = "https://github.com/AlienWare51/MoonWave/raw/main/rocket.png";
         lizardImg.src = "https://github.com/AlienWare51/MoonWave/raw/main/lizard.png";
 
-        const planetImages = [
+        const planetSources = [
             "https://4kwallpapers.com/images/wallpapers/planet-earth-orbit-outer-space-cosmos-1920x1200-8769.jpg",
             "https://th.bing.com/th/id/OIP.aBxMsTDueJ0OEYpqcoZb7wHaEK?w=326&h=183&c=7&r=0&o=5&dpr=1.5&pid=1.7",
             "https://th.bing.com/th/id/OIP.fI3DWs_H0Z6Man0THeWe6wHaEK?rs=1&pid=ImgDetMain",
             "https://th.bing.com/th/id/OIP.0nwjv9AEh1uLPs4RHKQu3QHaHa?rs=1&pid=ImgDetMain"
         ];
 
+        const planets = [];
         let planetIndex = 0;
 
-        function drawRocketAndLizard(rx, ry, rw, rh) {
-            ctx.drawImage(rocketImg, rx, ry, rw, rh);
-            ctx.globalAlpha = 0.5;
-            ctx.drawImage(lizardImg, rx, ry, rw, rh);
-            ctx.globalAlpha = 1.0;
+        function preloadPlanets(callback) {
+            let loaded = 0;
+
+            planetSources.forEach((src, i) => {
+                const img = new Image();
+                img.src = src;
+                img.onload = () => {
+                    planets[i] = img;
+                    loaded++;
+                    if (loaded === planetSources.length) callback();
+                };
+            });
         }
 
-        function drawPlanets() {
+        function drawPlanetsFixed() {
             const halfW = canvas.width / 2;
             const halfH = canvas.height / 2;
 
@@ -188,18 +196,24 @@
             ];
 
             quadrants.forEach((q, i) => {
-                const img = new Image();
-                img.src = planetImages[(planetIndex + i) % planetImages.length];
-                img.onload = () => ctx.drawImage(img, q.x, q.y, q.w, q.h);
+                const img = planets[(planetIndex + i) % planets.length];
+                ctx.drawImage(img, q.x, q.y, q.w, q.h);
             });
 
-            planetIndex = (planetIndex + 1) % planetImages.length;
+            planetIndex = (planetIndex + 1) % planets.length;
+        }
+
+        function drawRocketAndLizard(rx, ry, rw, rh) {
+            ctx.drawImage(rocketImg, rx, ry, rw, rh);
+            ctx.globalAlpha = 0.5;
+            ctx.drawImage(lizardImg, rx, ry, rw, rh);
+            ctx.globalAlpha = 1.0;
         }
 
         function renderFrame() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            drawPlanets();
+            drawPlanetsFixed();
 
             const rocketSize = parseFloat(document.getElementById("rocketSize").value);
             const rw = rocketImg.width * rocketSize;
@@ -210,12 +224,14 @@
             drawRocketAndLizard(rx, ry, rw, rh);
         }
 
-        rocketImg.onload = () => {
-            lizardImg.onload = () => {
-                setInterval(renderFrame, 1000);
-                renderFrame();
+        preloadPlanets(() => {
+            rocketImg.onload = () => {
+                lizardImg.onload = () => {
+                    setInterval(renderFrame, 1000);
+                    renderFrame();
+                };
             };
-        };
+        });
     </script>
 
 </body>
