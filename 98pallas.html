@@ -112,12 +112,12 @@
 
         <div id="responseMessage"></div>
 
-        <!-- CALLBACK OPTIONS APPEAR HERE -->
-        <div id="missionCallbackOptions" style="display:none; margin-top:20px;">
-            <h3>Choose a planet topic:</h3>
-            <ul id="planetOptionsList" style="line-height:1.8;">
-                <!-- Dynamic Wikipedia links appear here -->
-            </ul>
+        <!-- DROPDOWN APPEARS HERE FOR BB -->
+        <div id="missionDropdownContainer" style="display:none; margin-top:20px;">
+            <label><strong>Select a planet topic:</strong></label><br>
+            <select id="missionPlanetDropdown" style="width:250px;">
+                <!-- Dynamic options inserted here -->
+            </select>
         </div>
     </section>
 
@@ -178,10 +178,8 @@
             const selected = document.getElementById("image_select").value;
             const planetIndex = eteBinding[selected];
 
-            // Update ETE preview image
             etePreview.src = planetSources[planetIndex];
 
-            // Show full-size text box beside preview
             const box = document.getElementById("eteTextBoxContainer");
             const label = document.getElementById("eteTextLabel");
 
@@ -221,7 +219,7 @@
                 const data = await response.json();
                 responseMessage.textContent = `Success: ${data.message}, Log ID: ${data.logId}`;
 
-                // 🔥 CALLBACK FUNCTION ACTIVATES HERE
+                // 🔥 Trigger BB-only dropdown callback
                 missionNameCallback();
 
             } catch (err) {
@@ -237,13 +235,19 @@
 
             // Only activate callback for BB
             if (selectedETE !== "BB") {
-                document.getElementById("missionCallbackOptions").style.display = "none";
+                document.getElementById("missionDropdownContainer").style.display = "none";
                 return;
             }
 
             const userText = document.getElementById("eteTextInput").value;
 
-            // Build inline Wikipedia options
+            // Only show dropdown if user typed something
+            if (!userText.trim()) {
+                document.getElementById("missionDropdownContainer").style.display = "none";
+                return;
+            }
+
+            // Build dropdown options
             const options = [
                 { name: "Mars", url: "https://en.wikipedia.org/wiki/Mars" },
                 { name: "Pluto", url: "https://en.wikipedia.org/wiki/Pluto" },
@@ -252,21 +256,30 @@
                 { name: "Venus", url: "https://en.wikipedia.org/wiki/Venus" }
             ];
 
-            const list = document.getElementById("planetOptionsList");
-            list.innerHTML = ""; // Clear previous options
+            const dropdown = document.getElementById("missionPlanetDropdown");
+            dropdown.innerHTML = ""; // Clear previous options
 
             options.forEach(opt => {
-                const li = document.createElement("li");
-                li.innerHTML = `<a href="${opt.url}" target="_blank">${opt.name}</a>`;
-                list.appendChild(li);
+                const option = document.createElement("option");
+                option.value = opt.url;
+                option.textContent = opt.name;
+                dropdown.appendChild(option);
             });
 
-            // Show the options block
-            document.getElementById("missionCallbackOptions").style.display = "block";
+            // Show dropdown
+            document.getElementById("missionDropdownContainer").style.display = "block";
 
-            console.log("Mission Name Callback Triggered for BB");
-            console.log("User entered:", userText);
+            console.log("Dropdown activated for BB");
+            console.log("User typed:", userText);
         }
+
+        /**************************************
+         * OPEN WIKIPEDIA WHEN DROPDOWN SELECTED
+         **************************************/
+        document.getElementById("missionPlanetDropdown").addEventListener("change", () => {
+            const url = document.getElementById("missionPlanetDropdown").value;
+            window.open(url, "_blank");
+        });
 
         /**************************************
          * CANVAS SYSTEM — FIXED QUADRANTS
