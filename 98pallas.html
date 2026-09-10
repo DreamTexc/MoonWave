@@ -4,61 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SPEC.DEPO01 — Enhanced</title>
-
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
         }
-
         .image-preview img {
             width: 150px;
             margin-right: 10px;
         }
-
         #rocketCanvas {
             border: 1px solid black;
             display: block;
             margin-top: 20px;
         }
-
         #modifiedImage {
             width: 200px;
             margin-top: 10px;
             border: 1px solid #ccc;
         }
-
         #ETE {
             width: 200px;
             height: 200px;
+            object-fit: cover;
             border: 1px solid #ccc;
         }
-
         #eteTextBoxContainer {
-            display:none;
-            width:200px;
-            height:200px;
-            border:1px solid #ccc;
-            padding:10px;
-            box-sizing:border-box;
+            display: none;
+            width: 200px;
+            height: 200px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            box-sizing: border-box;
         }
-
         #eteTextInput {
-            width:100%;
-            height:140px;
-            resize:none;
+            width: 100%;
+            height: 140px;
+            resize: none;
         }
     </style>
 </head>
-
 <body>
-
     <h1>LIZARD ROMULUS — Enhanced System</h1>
 
-    <!-- Modifier Form -->
     <section>
         <h2>Image Modifier</h2>
-
         <form id="modifierForm">
             <label>ETE:</label>
             <select id="image_select" name="image_select" required>
@@ -67,91 +57,62 @@
                 <option value="CC">CC</option>
                 <option value="DD">DD</option>
             </select>
-
             <div class="image-preview">
-                <img id="image1" src="path/to/your/image1.jpg" alt="Preview 1">
-                <img id="image2" src="path/to/your/image2.jpg" alt="Preview 2">
+                <img id="image1" alt="Preview 1">
+                <img id="image2" alt="Preview 2">
             </div>
-
             <label>Brightness:</label>
             <input type="number" id="brightness" name="brightness" step="0.1" value="1.0">
-
             <label>Contrast:</label>
             <input type="number" id="contrast" name="contrast" step="0.1" value="1.0">
-
             <label>Rotation (degrees):</label>
             <input type="number" id="rotation" name="rotation" step="1" value="0">
-
             <label>Rocket Size:</label>
             <input type="number" id="rocketSize" name="rocketSize" step="0.1" value="1.0">
-
             <button type="submit">HIBERNATION</button>
         </form>
-
         <img id="modifiedImage" alt="Modified Output">
     </section>
-
     <hr>
 
-    <!-- Mission Log -->
     <section>
         <h2>MISSION LOG</h2>
-
         <form id="missionForm">
             <label>Mission Name:</label>
             <input type="text" id="missionName" required>
-
             <label>Model Address:</label>
             <input type="text" id="modelAddress" required>
-
             <label>Server Log:</label>
             <input type="text" id="serverLog" required>
-
             <button type="submit">Submit Mission Log</button>
         </form>
-
         <div id="responseMessage"></div>
-
-        <!-- DROPDOWN APPEARS HERE FOR BB -->
         <div id="missionDropdownContainer" style="display:none; margin-top:20px;">
             <label><strong>Select a planet topic:</strong></label><br>
-            <select id="missionPlanetDropdown" style="width:250px;">
-                <!-- Dynamic options inserted here -->
-            </select>
+            <select id="missionPlanetDropdown" style="width:250px;"></select>
         </div>
     </section>
-
     <hr>
 
-    <!-- ETE Preview + Text Box -->
     <section>
         <h2>ETE Planet Binding Preview</h2>
-
         <div style="display:flex; gap:20px; align-items:flex-start;">
-            <!-- Planet preview -->
             <img id="ETE" src="" alt="Bound Planet Preview">
-
-            <!-- Full-size text box beside preview -->
             <div id="eteTextBoxContainer">
                 <label id="eteTextLabel" style="font-weight:bold;">Enter data:</label><br>
                 <textarea id="eteTextInput"></textarea>
-                <button id="eteTextSubmit" style="margin-top:10px; width:100%;">Submit</button>
+                <button type="button" id="eteTextSubmit" style="margin-top:10px; width:100%;">Submit</button>
             </div>
         </div>
     </section>
-
     <hr>
 
-    <!-- Canvas -->
     <section>
         <h2>IGNITION SEQUENCE</h2>
         <canvas id="rocketCanvas" width="800" height="600"></canvas>
     </section>
 
     <script>
-        /**************************************
-         * PLANET SOURCES
-         **************************************/
         const planetSources = [
             "https://4kwallpapers.com/images/wallpapers/planet-earth-orbit-outer-space-cosmos-1920x1200-8769.jpg",
             "https://th.bing.com/th/id/OIP.aBxMsTDueJ0OEYpqcoZb7wHaEK?w=326&h=183&c=7&r=0&o=5&dpr=1.5&pid=1.7",
@@ -159,55 +120,95 @@
             "https://th.bing.com/th/id/OIP.0nwjv9AEh1uLPs4RHKQu3QHaHa?rs=1&pid=ImgDetMain"
         ];
 
-        /**************************************
-         * ETE → Planet Binding System
-         **************************************/
-        const eteBinding = {
-            AA: 0,
-            BB: 1,
-            CC: 2,
-            DD: 3
-        };
+        const ROCKET_SRC = "https://raw.githubusercontent.com/AlienWare51/MoonWave/main/rocket.png";
+        const LIZARD_SRC = "https://raw.githubusercontent.com/AlienWare51/MoonWave/main/lizard.png";
+
+        const eteBinding = { AA: 0, BB: 1, CC: 2, DD: 3 };
 
         const etePreview = document.getElementById("ETE");
+        const modifiedImage = document.getElementById("modifiedImage");
+        const responseMessage = document.getElementById("responseMessage");
+        const imageSelect = document.getElementById("image_select");
+        const canvas = document.getElementById("rocketCanvas");
+        const ctx = canvas.getContext("2d");
 
-        /**************************************
-         * ETE Selection Handler
-         **************************************/
-        document.getElementById("image_select").addEventListener("change", () => {
-            const selected = document.getElementById("image_select").value;
-            const planetIndex = eteBinding[selected];
+        let rocketImg = new Image();
+        let lizardImg = new Image();
+        const planets = [];
 
+        function loadImage(src) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = () => reject(new Error("Failed to load " + src));
+                img.src = src;
+                if (img.complete && img.naturalWidth > 0) resolve(img);
+            });
+        }
+
+        function selectedPlanetIndex() {
+            return eteBinding[imageSelect.value] ?? 0;
+        }
+
+        function applyModifierPreview() {
+            const src = planetSources[selectedPlanetIndex()];
+            const brightness = parseFloat(document.getElementById("brightness").value) || 1;
+            const contrast = parseFloat(document.getElementById("contrast").value) || 1;
+            const rotation = parseFloat(document.getElementById("rotation").value) || 0;
+
+            modifiedImage.src = src;
+            modifiedImage.style.filter = `brightness(${brightness}) contrast(${contrast})`;
+            modifiedImage.style.transform = `rotate(${rotation}deg)`;
+        }
+
+        function updateEtePreview() {
+            const selected = imageSelect.value;
+            const planetIndex = selectedPlanetIndex();
             etePreview.src = planetSources[planetIndex];
+
+            document.getElementById("image1").src = planetSources[planetIndex];
+            document.getElementById("image2").src = planetSources[(planetIndex + 1) % planetSources.length];
 
             const box = document.getElementById("eteTextBoxContainer");
             const label = document.getElementById("eteTextLabel");
-
             box.style.display = "block";
             label.textContent = `Enter data for ${selected}:`;
-        });
 
-        /**************************************
-         * ETE Text Submit Handler
-         **************************************/
+            applyModifierPreview();
+            missionNameCallback();
+        }
+
+        imageSelect.addEventListener("change", updateEtePreview);
+
         document.getElementById("eteTextSubmit").addEventListener("click", () => {
-            const selected = document.getElementById("image_select").value;
+            const selected = imageSelect.value;
             const text = document.getElementById("eteTextInput").value;
-
             console.log(`Text for ${selected}:`, text);
+            missionNameCallback();
         });
 
-        /**************************************
-         * MISSION LOG SUBMIT + CALLBACK
-         **************************************/
+        document.getElementById("modifierForm").addEventListener("submit", (event) => {
+            event.preventDefault();
+            applyModifierPreview();
+            renderFrame();
+        });
+
+        ["brightness", "contrast", "rotation", "rocketSize"].forEach((id) => {
+            document.getElementById(id).addEventListener("input", () => {
+                applyModifierPreview();
+                renderFrame();
+            });
+        });
+
         document.getElementById("missionForm").addEventListener("submit", async (event) => {
             event.preventDefault();
+            const missionData = {
+                missionName: document.getElementById("missionName").value,
+                modelAddress: document.getElementById("modelAddress").value,
+                serverLog: document.getElementById("serverLog").value
+            };
 
-            const missionName = document.getElementById("missionName").value;
-            const modelAddress = document.getElementById("modelAddress").value;
-            const serverLog = document.getElementById("serverLog").value;
-
-            const missionData = { missionName, modelAddress, serverLog };
+            missionNameCallback();
 
             try {
                 const response = await fetch("/addMissionLog", {
@@ -215,39 +216,26 @@
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(missionData)
                 });
-
+                if (!response.ok) throw new Error("HTTP " + response.status);
                 const data = await response.json();
                 responseMessage.textContent = `Success: ${data.message}, Log ID: ${data.logId}`;
-
-                // 🔥 Trigger BB-only dropdown callback
-                missionNameCallback();
-
             } catch (err) {
-                responseMessage.textContent = `Error: ${err.message}`;
+                responseMessage.textContent =
+                    `Saved locally (no /addMissionLog server): ${missionData.missionName}. ${err.message}`;
+                console.warn("Mission log server unavailable:", err);
             }
         });
 
-        /**************************************
-         * CALLBACK FUNCTION (BB ONLY)
-         **************************************/
         function missionNameCallback() {
-            const selectedETE = document.getElementById("image_select").value;
-
-            // Only activate callback for BB
-            if (selectedETE !== "BB") {
-                document.getElementById("missionDropdownContainer").style.display = "none";
-                return;
-            }
-
+            const selectedETE = imageSelect.value;
             const userText = document.getElementById("eteTextInput").value;
+            const container = document.getElementById("missionDropdownContainer");
 
-            // Only show dropdown if user typed something
-            if (!userText.trim()) {
-                document.getElementById("missionDropdownContainer").style.display = "none";
+            if (selectedETE !== "BB" || !userText.trim()) {
+                container.style.display = "none";
                 return;
             }
 
-            // Build dropdown options
             const options = [
                 { name: "Mars", url: "https://en.wikipedia.org/wiki/Mars" },
                 { name: "Pluto", url: "https://en.wikipedia.org/wiki/Pluto" },
@@ -257,108 +245,85 @@
             ];
 
             const dropdown = document.getElementById("missionPlanetDropdown");
-            dropdown.innerHTML = ""; // Clear previous options
-
-            options.forEach(opt => {
+            dropdown.innerHTML = "";
+            options.forEach((opt) => {
                 const option = document.createElement("option");
                 option.value = opt.url;
                 option.textContent = opt.name;
                 dropdown.appendChild(option);
             });
 
-            // Show dropdown
-            document.getElementById("missionDropdownContainer").style.display = "block";
-
+            container.style.display = "block";
             console.log("Dropdown activated for BB");
             console.log("User typed:", userText);
         }
 
-        /**************************************
-         * OPEN WIKIPEDIA WHEN DROPDOWN SELECTED
-         **************************************/
         document.getElementById("missionPlanetDropdown").addEventListener("change", () => {
             const url = document.getElementById("missionPlanetDropdown").value;
-            window.open(url, "_blank");
+            if (url) window.open(url, "_blank");
         });
-
-        /**************************************
-         * CANVAS SYSTEM — FIXED QUADRANTS
-         **************************************/
-        const canvas = document.getElementById("rocketCanvas");
-        const ctx = canvas.getContext("2d");
-
-        const rocketImg = new Image();
-        const lizardImg = new Image();
-
-        rocketImg.src = "https://github.com/AlienWare51/MoonWave/raw/main/rocket.png";
-        lizardImg.src = "https://github.com/AlienWare51/MoonWave/raw/main/lizard.png";
-
-        const planets = [];
-
-        function preloadPlanets(callback) {
-            let loaded = 0;
-
-            planetSources.forEach((src, i) => {
-                const img = new Image();
-                img.src = src;
-                img.onload = () => {
-                    planets[i] = img;
-                    loaded++;
-                    if (loaded === planetSources.length) callback();
-                };
-            });
-        }
 
         function drawPlanetsFixed() {
             const halfW = canvas.width / 2;
             const halfH = canvas.height / 2;
-
             const quadrants = [
                 { x: 0, y: 0, w: halfW, h: halfH },
                 { x: halfW, y: 0, w: halfW, h: halfH },
                 { x: 0, y: halfH, w: halfW, h: halfH },
                 { x: halfW, y: halfH, w: halfW, h: halfH }
             ];
-
             const letters = Object.keys(eteBinding);
-
             quadrants.forEach((q, i) => {
-                const planetIndex = eteBinding[letters[i]];
-                const img = planets[planetIndex];
-                ctx.drawImage(img, q.x, q.y, q.w, q.h);
+                const img = planets[eteBinding[letters[i]]];
+                if (img) ctx.drawImage(img, q.x, q.y, q.w, q.h);
             });
         }
 
-        function drawRocketAndLizard(rx, ry, rw, rh) {
-            ctx.drawImage(rocketImg, rx, ry, rw, rh);
+        function drawRocketAndLizard(rx, ry, rw, rh, rotationDeg) {
+            ctx.save();
+            ctx.translate(rx + rw / 2, ry + rh / 2);
+            ctx.rotate(rotationDeg * Math.PI / 180);
+            ctx.drawImage(rocketImg, -rw / 2, -rh / 2, rw, rh);
             ctx.globalAlpha = 0.5;
-            ctx.drawImage(lizardImg, rx, ry, rw, rh);
-            ctx.globalAlpha = 1.0;
+            ctx.drawImage(lizardImg, -rw / 2, -rh / 2, rw, rh);
+            ctx.restore();
         }
 
         function renderFrame() {
+            if (!ctx) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-
             drawPlanetsFixed();
 
-            const rocketSize = parseFloat(document.getElementById("rocketSize").value);
-            const rw = rocketImg.width * rocketSize;
-            const rh = rocketImg.height * rocketSize;
+            if (!rocketImg.naturalWidth || !lizardImg.naturalWidth) return;
+
+            const rocketSize = parseFloat(document.getElementById("rocketSize").value) || 1;
+            const rotation = parseFloat(document.getElementById("rotation").value) || 0;
+            const rw = Math.max(8, rocketImg.naturalWidth * rocketSize);
+            const rh = Math.max(8, rocketImg.naturalHeight * rocketSize);
             const rx = canvas.width / 2 - rw / 2;
             const ry = canvas.height / 2 - rh / 2;
-
-            drawRocketAndLizard(rx, ry, rw, rh);
+            drawRocketAndLizard(rx, ry, rw, rh, rotation);
         }
 
-        preloadPlanets(() => {
-            rocketImg.onload = () => {
-                lizardImg.onload = () => {
-                    setInterval(renderFrame, 1000);
-                    renderFrame();
-                };
-            };
+        Promise.all([
+            ...planetSources.map((src) => loadImage(src).catch((err) => {
+                console.warn(err.message);
+                return null;
+            })),
+            loadImage(ROCKET_SRC),
+            loadImage(LIZARD_SRC)
+        ]).then((loaded) => {
+            const planetImgs = loaded.slice(0, planetSources.length);
+            rocketImg = loaded[loaded.length - 2];
+            lizardImg = loaded[loaded.length - 1];
+            planetImgs.forEach((img, i) => { planets[i] = img; });
+            updateEtePreview();
+            renderFrame();
+            setInterval(renderFrame, 250);
+        }).catch((err) => {
+            console.error(err);
+            responseMessage.textContent = "Asset load error: " + err.message;
         });
     </script>
-
 </body>
 </html>
