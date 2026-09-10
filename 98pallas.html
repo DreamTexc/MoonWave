@@ -33,6 +33,19 @@
             border: 1px solid #ccc;
             margin-top: 10px;
         }
+
+        /* Popup beside canvas */
+        #planetSidePopup {
+            display: none;
+            position: absolute;
+            left: 820px;
+            top: 50px;
+            width: 260px;
+            background: white;
+            border: 2px solid black;
+            padding: 10px;
+            z-index: 9999;
+        }
     </style>
 </head>
 
@@ -114,6 +127,16 @@
         <canvas id="rocketCanvas" width="800" height="600"></canvas>
     </section>
 
+    <!-- Popup beside canvas -->
+    <div id="planetSidePopup">
+        <h3 id="sidePopupTitle"></h3>
+        <img id="sidePopupImage" src="" style="width:240px; border:1px solid #ccc;">
+        <br><br>
+        <label>Enter Data:</label>
+        <input type="text" id="sidePopupInput" style="width:240px;">
+        <button id="sidePopupSubmit">Submit</button>
+    </div>
+
     <script>
         /**************************************
          * IMAGE MODIFIER
@@ -189,7 +212,32 @@
         document.getElementById("image_select").addEventListener("change", () => {
             const selected = document.getElementById("image_select").value;
             const planetIndex = eteBinding[selected];
+
+            // Update ETE preview
             etePreview.src = planetSources[planetIndex];
+
+            // Show popup beside canvas
+            openSidePopup(selected, planetIndex);
+        });
+
+        /**************************************
+         * SIDE POPUP LOGIC
+         **************************************/
+        function openSidePopup(letter, planetIndex) {
+            const popup = document.getElementById("planetSidePopup");
+
+            document.getElementById("sidePopupTitle").textContent =
+                `Planet assigned to ${letter}`;
+
+            document.getElementById("sidePopupImage").src =
+                planetSources[planetIndex];
+
+            popup.style.display = "block";
+        }
+
+        document.getElementById("sidePopupSubmit").addEventListener("click", () => {
+            const text = document.getElementById("sidePopupInput").value;
+            console.log("User entered:", text);
         });
 
         /**************************************
@@ -205,7 +253,6 @@
         lizardImg.src = "https://github.com/AlienWare51/MoonWave/raw/main/lizard.png";
 
         const planets = [];
-        let planetIndex = 0;
 
         function preloadPlanets(callback) {
             let loaded = 0;
