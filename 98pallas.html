@@ -27,6 +27,12 @@
             margin-top: 10px;
             border: 1px solid #ccc;
         }
+
+        #ETE {
+            width: 200px;
+            border: 1px solid #ccc;
+            margin-top: 10px;
+        }
     </style>
 </head>
 
@@ -41,8 +47,10 @@
         <form id="modifierForm">
             <label>ETE:</label>
             <select id="image_select" name="image_select" required>
-                <option value="1">AA</option>
-                <option value="2">BB</option>
+                <option value="AA">AA</option>
+                <option value="BB">BB</option>
+                <option value="CC">CC</option>
+                <option value="DD">DD</option>
             </select>
 
             <div class="image-preview">
@@ -88,6 +96,14 @@
         </form>
 
         <div id="responseMessage"></div>
+    </section>
+
+    <hr>
+
+    <!-- ETE Preview -->
+    <section>
+        <h2>ETE Planet Binding Preview</h2>
+        <img id="ETE" src="" alt="Bound Planet Preview">
     </section>
 
     <hr>
@@ -149,6 +165,34 @@
         });
 
         /**************************************
+         * PLANET SOURCES
+         **************************************/
+        const planetSources = [
+            "https://4kwallpapers.com/images/wallpapers/planet-earth-orbit-outer-space-cosmos-1920x1200-8769.jpg",
+            "https://th.bing.com/th/id/OIP.aBxMsTDueJ0OEYpqcoZb7wHaEK?w=326&h=183&c=7&r=0&o=5&dpr=1.5&pid=1.7",
+            "https://th.bing.com/th/id/OIP.fI3DWs_H0Z6Man0THeWe6wHaEK?rs=1&pid=ImgDetMain",
+            "https://th.bing.com/th/id/OIP.0nwjv9AEh1uLPs4RHKQu3QHaHa?rs=1&pid=ImgDetMain"
+        ];
+
+        /**************************************
+         * ETE → Planet Binding System
+         **************************************/
+        const eteBinding = {
+            AA: 0,
+            BB: 1,
+            CC: 2,
+            DD: 3
+        };
+
+        const etePreview = document.getElementById("ETE");
+
+        document.getElementById("image_select").addEventListener("change", () => {
+            const selected = document.getElementById("image_select").value;
+            const planetIndex = eteBinding[selected];
+            etePreview.src = planetSources[planetIndex];
+        });
+
+        /**************************************
          * CANVAS SYSTEM — FIXED QUADRANTS
          **************************************/
         const canvas = document.getElementById("rocketCanvas");
@@ -159,13 +203,6 @@
 
         rocketImg.src = "https://github.com/AlienWare51/MoonWave/raw/main/rocket.png";
         lizardImg.src = "https://github.com/AlienWare51/MoonWave/raw/main/lizard.png";
-
-        const planetSources = [
-            "https://4kwallpapers.com/images/wallpapers/planet-earth-orbit-outer-space-cosmos-1920x1200-8769.jpg",
-            "https://th.bing.com/th/id/OIP.aBxMsTDueJ0OEYpqcoZb7wHaEK?w=326&h=183&c=7&r=0&o=5&dpr=1.5&pid=1.7",
-            "https://th.bing.com/th/id/OIP.fI3DWs_H0Z6Man0THeWe6wHaEK?rs=1&pid=ImgDetMain",
-            "https://th.bing.com/th/id/OIP.0nwjv9AEh1uLPs4RHKQu3QHaHa?rs=1&pid=ImgDetMain"
-        ];
 
         const planets = [];
         let planetIndex = 0;
@@ -195,12 +232,13 @@
                 { x: halfW, y: halfH, w: halfW, h: halfH }
             ];
 
+            const letters = Object.keys(eteBinding);
+
             quadrants.forEach((q, i) => {
-                const img = planets[(planetIndex + i) % planets.length];
+                const planetIndex = eteBinding[letters[i]];
+                const img = planets[planetIndex];
                 ctx.drawImage(img, q.x, q.y, q.w, q.h);
             });
-
-            planetIndex = (planetIndex + 1) % planets.length;
         }
 
         function drawRocketAndLizard(rx, ry, rw, rh) {
