@@ -24,7 +24,7 @@
         #bottomWorlds .world span { position: absolute; left: 8px; bottom: 8px; color: #fff; background: rgba(0,0,0,0.55); padding: 2px 8px; font-size: 14px; }
         #worldOverlay { display: none; position: fixed; inset: 0; z-index: 9999; background: #000; overflow: hidden; }
         #worldOverlayImg { width: 100%; height: 100%; object-fit: cover; transform-origin: center center; }
-        #worldDialog { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; color: #111; min-width: 320px; max-width: 90vw; padding: 20px 24px; border-radius: 8px; box-shadow: 0 12px 40px rgba(0,0,0,0.45); z-index: 3; }
+        #worldDialog { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; color: #111; min-width: 320px; max-width: 90vw; padding: 20px 24px; border-radius: 8px; box-shadow: 0 12px 40px rgba(0,0,0,0.45); z-index: 5; }
         #worldDialog h2 { margin: 0 0 12px; font-size: 18px; }
         #worldDialog button { display: block; width: 100%; margin: 6px 0; padding: 8px; cursor: pointer; }
         #sitGate {
@@ -39,6 +39,12 @@
             transform: translate(-50%, -50%);
         }
         #sitGate.gateway { animation: freefallGimbal 5.6s cubic-bezier(0.16, 0.72, 0.18, 1) forwards; }
+        #sitGate.blast {
+            transition: top 1.15s cubic-bezier(0.22, 0.08, 0.25, 1),
+                        left 1.15s cubic-bezier(0.22, 0.08, 0.25, 1),
+                        transform 1.15s cubic-bezier(0.18, 0.7, 0.2, 1),
+                        opacity 1.15s ease;
+        }
         #sitGlow {
             position: absolute;
             inset: -18%;
@@ -57,37 +63,33 @@
             filter: contrast(1.05) saturate(1.15);
         }
         #sitGate.settled #sitCapsule { mix-blend-mode: normal; }
+        .zxcv-mark {
+            display: none;
+            position: absolute;
+            z-index: 4;
+            width: 48px;
+            height: 48px;
+            line-height: 48px;
+            text-align: center;
+            font: 700 22px Arial, sans-serif;
+            color: #fff;
+            background: rgba(0,0,0,0.45);
+            border: 1px solid rgba(255,255,255,0.65);
+            border-radius: 6px;
+            cursor: pointer;
+            letter-spacing: 0.06em;
+        }
+        .zxcv-mark.show { display: block; }
+        #mark-z { top: 18px; left: 18px; }
+        #mark-x { top: 18px; right: 18px; }
+        #mark-c { bottom: 18px; left: 18px; }
+        #mark-v { bottom: 18px; right: 18px; }
         @keyframes freefallGimbal {
-            0% {
-                top: -16%;
-                width: 13vmin;
-                opacity: 0.35;
-                transform: translate(-50%, -50%) rotateX(53deg) rotateY(14deg) rotateZ(8deg) scale(0.62);
-            }
-            22% {
-                top: 18%;
-                width: 16.9vmin;
-                opacity: 0.72;
-                transform: translate(-50%, -50%) rotateX(44deg) rotateY(-11deg) rotateZ(-6deg) scale(0.78);
-            }
-            48% {
-                top: 36%;
-                width: 19.5vmin;
-                opacity: 0.9;
-                transform: translate(-50%, -50%) rotateX(30deg) rotateY(8deg) rotateZ(4deg) scale(0.92);
-            }
-            74% {
-                top: 47%;
-                width: 21.6vmin;
-                opacity: 0.97;
-                transform: translate(-50%, -50%) rotateX(20deg) rotateY(-3deg) rotateZ(-2deg) scale(1.02);
-            }
-            100% {
-                top: 50%;
-                width: 21.66vmin;
-                opacity: 1;
-                transform: translate(-50%, -50%) rotateX(16deg) rotateY(0deg) rotateZ(0deg) scale(1);
-            }
+            0% { top: -16%; width: 13vmin; opacity: 0.35; transform: translate(-50%, -50%) rotateX(53deg) rotateY(14deg) rotateZ(8deg) scale(0.62); }
+            22% { top: 18%; width: 16.9vmin; opacity: 0.72; transform: translate(-50%, -50%) rotateX(44deg) rotateY(-11deg) rotateZ(-6deg) scale(0.78); }
+            48% { top: 36%; width: 19.5vmin; opacity: 0.9; transform: translate(-50%, -50%) rotateX(30deg) rotateY(8deg) rotateZ(4deg) scale(0.92); }
+            74% { top: 47%; width: 21.6vmin; opacity: 0.97; transform: translate(-50%, -50%) rotateX(20deg) rotateY(-3deg) rotateZ(-2deg) scale(1.02); }
+            100% { top: 50%; width: 21.66vmin; opacity: 1; transform: translate(-50%, -50%) rotateX(16deg) rotateY(0deg) rotateZ(0deg) scale(1); }
         }
     </style>
 </head>
@@ -191,6 +193,10 @@
             <div id="sitGlow"></div>
             <img id="sitCapsule" alt="sit capsule" src="sit.png">
         </div>
+        <button type="button" class="zxcv-mark" id="mark-z" data-corner="z">Z</button>
+        <button type="button" class="zxcv-mark" id="mark-x" data-corner="x">X</button>
+        <button type="button" class="zxcv-mark" id="mark-c" data-corner="c">C</button>
+        <button type="button" class="zxcv-mark" id="mark-v" data-corner="v">V</button>
         <div id="worldDialog">
             <h2 id="worldDialogTitle">What would you like to do xyz</h2>
             <button type="button" data-act="explore">Explore xyz</button>
@@ -218,6 +224,12 @@
             r: { name: "Mars", src: planetSources[1] },
             b: { name: "Black", src: planetSources[2] },
             m: { name: "Moon", src: planetSources[3] }
+        };
+        const zxcvTargets = {
+            z: { top: "8%", left: "8%", rot: "-28deg" },
+            x: { top: "8%", left: "92%", rot: "28deg" },
+            c: { top: "92%", left: "8%", rot: "-38deg" },
+            v: { top: "92%", left: "92%", rot: "38deg" }
         };
 
         const etePreview = document.getElementById("ETE");
@@ -343,21 +355,15 @@
             if (url) window.open(url, "_blank");
         });
 
-        function drawPlanetsFixed() {
+        function renderFrame() {
+            if (!ctx) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             const halfW = canvas.width / 2, halfH = canvas.height / 2;
-            const quadrants = [
-                { x: 0, y: 0 }, { x: halfW, y: 0 }, { x: 0, y: halfH }, { x: halfW, y: halfH }
-            ];
+            const quadrants = [{ x: 0, y: 0 }, { x: halfW, y: 0 }, { x: 0, y: halfH }, { x: halfW, y: halfH }];
             Object.keys(eteBinding).forEach((letter, i) => {
                 const img = planets[eteBinding[letter]];
                 if (img) ctx.drawImage(img, quadrants[i].x, quadrants[i].y, halfW, halfH);
             });
-        }
-
-        function renderFrame() {
-            if (!ctx) return;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawPlanetsFixed();
             if (!rocketImg.naturalWidth || !lizardImg.naturalWidth) return;
             const rocketSize = parseFloat(document.getElementById("rocketSize").value) || 1;
             const rotation = parseFloat(document.getElementById("rotation").value) || 0;
@@ -376,16 +382,13 @@
             const fallbacks = { e: [40, 90, 150], r: [160, 70, 40], b: [20, 20, 24], m: [130, 130, 140] };
             const letter = String(keylock.value || "e").toLowerCase();
             try {
-                const img = worldOverlayImg;
-                if (!img.naturalWidth) throw new Error("no pixels");
+                if (!worldOverlayImg.naturalWidth) throw new Error("no pixels");
                 sampleCanvas.width = 24;
                 sampleCanvas.height = 24;
-                sampleCtx.drawImage(img, 0, 0, 24, 24);
+                sampleCtx.drawImage(worldOverlayImg, 0, 0, 24, 24);
                 const data = sampleCtx.getImageData(0, 0, 24, 24).data;
                 let r = 0, g = 0, b = 0, n = 0;
-                for (let i = 0; i < data.length; i += 4) {
-                    r += data[i]; g += data[i + 1]; b += data[i + 2]; n++;
-                }
+                for (let i = 0; i < data.length; i += 4) { r += data[i]; g += data[i + 1]; b += data[i + 2]; n++; }
                 return [Math.round(r / n), Math.round(g / n), Math.round(b / n)];
             } catch (err) {
                 return fallbacks[letter] || fallbacks.e;
@@ -394,19 +397,40 @@
 
         function tintSitToWorld() {
             const [r, g, b] = sampleWorldColor();
-            const rgb = `rgb(${r}, ${g}, ${b})`;
             const wash = `rgba(${r}, ${g}, ${b}, 0.42)`;
             sitGlow.style.background = `radial-gradient(circle, ${wash} 0%, rgba(${r},${g},${b},0.08) 70%, transparent 100%)`;
             sitCapsule.style.filter = `contrast(1.04) saturate(1.12) drop-shadow(0 16px 18px rgba(${r},${g},${b},0.45)) drop-shadow(0 0 14px ${wash})`;
-            sitGate.style.setProperty("--world-rgb", rgb);
+        }
+
+        function showZxcvMarks() {
+            document.querySelectorAll(".zxcv-mark").forEach((el) => el.classList.add("show"));
+        }
+
+        function hideZxcvMarks() {
+            document.querySelectorAll(".zxcv-mark").forEach((el) => el.classList.remove("show"));
+        }
+
+        function blastSitTo(letter) {
+            const dest = zxcvTargets[letter];
+            if (!dest || !sitGate.classList.contains("settled") || sitGate.classList.contains("blast")) return;
+            hideZxcvMarks();
+            sitGate.classList.add("blast");
+            sitGate.style.top = dest.top;
+            sitGate.style.left = dest.left;
+            sitGate.style.transform = `translate(-50%, -50%) rotate(${dest.rot}) scale(0.42)`;
+            sitGate.style.opacity = "0.15";
         }
 
         function resetSit() {
             if (landingTimer) { clearTimeout(landingTimer); landingTimer = null; }
-            sitGate.classList.remove("gateway", "settled");
+            hideZxcvMarks();
+            sitGate.classList.remove("gateway", "settled", "blast");
             sitGate.style.display = "none";
             sitGate.style.width = "";
             sitGate.style.top = "";
+            sitGate.style.left = "50%";
+            sitGate.style.transform = "";
+            sitGate.style.opacity = "";
         }
 
         function openWorld(letter) {
@@ -433,7 +457,7 @@
             worldDialog.style.display = "none";
             tintSitToWorld();
             sitGate.style.display = "block";
-            sitGate.classList.remove("gateway", "settled");
+            sitGate.classList.remove("gateway", "settled", "blast");
             void sitGate.offsetWidth;
             sitGate.classList.add("gateway");
 
@@ -442,9 +466,11 @@
                 sitGate.classList.remove("gateway");
                 sitGate.classList.add("settled");
                 sitGate.style.top = "50%";
+                sitGate.style.left = "50%";
                 sitGate.style.width = ((host / 6) * 1.3) + "px";
                 sitGate.style.transform = "translate(-50%, -50%) rotateX(16deg)";
                 sitCapsule.style.mixBlendMode = "normal";
+                showZxcvMarks();
             }, 5600);
         }
 
@@ -473,6 +499,12 @@
         document.addEventListener("keydown", (event) => {
             if (event.repeat) return;
             if (event.key === "Escape") { closeWorld(); return; }
+            const letter = String(event.key || "").toLowerCase();
+            if ("zxcv".includes(letter) && sitGate.classList.contains("settled") && !sitGate.classList.contains("blast")) {
+                event.preventDefault();
+                blastSitTo(letter);
+                return;
+            }
             if (event.target && (event.target.tagName === "TEXTAREA" || (event.target.tagName === "INPUT" && event.target.id !== "keylock"))) return;
             myFunction(event);
         });
@@ -484,6 +516,10 @@
                 if (event.target.closest(".erbm-key")) return;
                 openWorld(letter);
             });
+        });
+
+        document.querySelectorAll(".zxcv-mark").forEach((btn) => {
+            btn.addEventListener("click", () => blastSitTo(btn.dataset.corner));
         });
 
         document.getElementById("closeOverlay").addEventListener("click", closeWorld);
@@ -498,9 +534,7 @@
         });
 
         sitCapsule.addEventListener("error", () => {
-            if (sitCapsule.src.indexOf(SIT_SRC_FALLBACK) === -1) {
-                sitCapsule.src = SIT_SRC_FALLBACK;
-            }
+            if (sitCapsule.src.indexOf(SIT_SRC_FALLBACK) === -1) sitCapsule.src = SIT_SRC_FALLBACK;
         });
 
         Promise.all([
