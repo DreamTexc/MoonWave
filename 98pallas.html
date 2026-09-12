@@ -23,59 +23,23 @@
         #bottomWorlds .world img { width: 100%; height: 100%; object-fit: cover; display: block; }
         #bottomWorlds .world span { position: absolute; left: 8px; bottom: 8px; color: #fff; background: rgba(0,0,0,0.55); padding: 2px 8px; font-size: 14px; }
         #worldOverlay { display: none; position: fixed; inset: 0; z-index: 9999; background: #000; overflow: hidden; }
-        #worldOverlayImg { width: 100%; height: 100%; object-fit: cover; }
+        #worldOverlayImg { width: 100%; height: 100%; object-fit: cover; transform-origin: top left; transition: transform 0.9s cubic-bezier(0.22, 0.08, 0.25, 1); }
+        #worldOverlayImg.zoom-z { transform: scale(3); }
         #worldDialog { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; min-width: 320px; max-width: 90vw; padding: 20px 24px; border-radius: 8px; z-index: 6; }
         #worldDialog h2 { margin: 0 0 12px; font-size: 18px; }
         #worldDialog button { display: block; width: 100%; margin: 6px 0; padding: 8px; cursor: pointer; }
-        #sitGate {
-            display: none;
-            position: absolute;
-            left: 50%;
-            top: -20%;
-            width: 23.4vmin;
-            z-index: 3;
-            pointer-events: none;
-            transform: translate(-50%, -50%);
-        }
+        #sitGate { display: none; position: absolute; left: 50%; top: -20%; width: 23.4vmin; z-index: 3; pointer-events: none; transform: translate(-50%, -50%); }
         #sitGate.gateway { animation: freefallGimbal 5.6s cubic-bezier(0.16, 0.72, 0.18, 1) forwards; }
-        #sitGate.blast {
-            transition: top 1.15s cubic-bezier(0.22, 0.08, 0.25, 1),
-                        left 1.15s cubic-bezier(0.22, 0.08, 0.25, 1),
-                        transform 1.15s cubic-bezier(0.18, 0.7, 0.2, 1),
-                        opacity 1.15s ease;
-        }
+        #sitGate.blast { transition: top 1.15s cubic-bezier(0.22, 0.08, 0.25, 1), left 1.15s cubic-bezier(0.22, 0.08, 0.25, 1), transform 1.15s cubic-bezier(0.18, 0.7, 0.2, 1), opacity 1.15s ease; }
         #sitGlow { position: absolute; inset: -18%; border-radius: 50%; filter: blur(18px); opacity: 0.35; mix-blend-mode: screen; }
         #sitCapsule { display: block; width: 100%; height: auto; transform-origin: center 70%; mix-blend-mode: soft-light; }
         #sitGate.settled #sitCapsule { mix-blend-mode: normal; }
-        .zxcv-pad {
-            position: absolute;
-            width: 22vmin;
-            height: 22vmin;
-            z-index: 2;
-            pointer-events: none;
-            border: 1px dashed rgba(255,255,255,0.0);
-            background-size: cover;
-            background-position: center;
-        }
+        .zxcv-pad { position: absolute; width: 22vmin; height: 22vmin; z-index: 2; pointer-events: none; background-size: cover; background-position: center; }
         #pad-z { top: 0; left: 0; }
         #pad-x { top: 0; right: 0; }
         #pad-c { bottom: 0; left: 0; }
         #pad-v { bottom: 0; right: 0; }
-        .zxcv-mark {
-            display: none;
-            position: absolute;
-            z-index: 4;
-            width: 48px;
-            height: 48px;
-            line-height: 48px;
-            text-align: center;
-            font: 700 22px Arial, sans-serif;
-            color: #fff;
-            background: rgba(0,0,0,0.45);
-            border: 1px solid rgba(255,255,255,0.65);
-            border-radius: 6px;
-            cursor: pointer;
-        }
+        .zxcv-mark { display: none; position: absolute; z-index: 4; width: 48px; height: 48px; line-height: 48px; text-align: center; font: 700 22px Arial, sans-serif; color: #fff; background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.65); border-radius: 6px; cursor: pointer; }
         .zxcv-mark.show { display: block; }
         #mark-z { top: 18px; left: 18px; }
         #mark-x { top: 18px; right: 18px; }
@@ -92,7 +56,6 @@
 </head>
 <body>
     <h1>LIZARD ROMULUS — Enhanced System</h1>
-
     <section>
         <h2>Image Modifier</h2>
         <form id="modifierForm">
@@ -120,7 +83,6 @@
         <img id="modifiedImage" alt="Modified Output">
     </section>
     <hr>
-
     <section>
         <h2>MISSION LOG</h2>
         <form id="missionForm">
@@ -139,7 +101,6 @@
         </div>
     </section>
     <hr>
-
     <section>
         <h2>ETE Planet Binding Preview</h2>
         <div style="display:flex; gap:20px; align-items:flex-start;">
@@ -152,13 +113,11 @@
         </div>
     </section>
     <hr>
-
     <section>
         <h2>IGNITION SEQUENCE</h2>
         <canvas id="rocketCanvas" width="800" height="600"></canvas>
     </section>
     <hr>
-
     <section id="keylockSection">
         <h2>EARTH MARS BLACK MOON — keylock</h2>
         <p>the letters
@@ -176,7 +135,6 @@
             <div class="world" data-key="m"><img alt="Moon"><span>MOON — <span class="erbm-key" data-key="m">m</span></span></div>
         </div>
     </section>
-
     <div id="worldOverlay" aria-hidden="true">
         <img id="worldOverlayImg" alt="Selected world">
         <div class="zxcv-pad" id="pad-z" data-corner="z"></div>
@@ -199,7 +157,6 @@
             <button type="button" id="closeOverlay">Close</button>
         </div>
     </div>
-
     <script>
         const planetSources = [
             "https://4kwallpapers.com/images/wallpapers/planet-earth-orbit-outer-space-cosmos-1920x1200-8769.jpg",
@@ -211,7 +168,6 @@
         const LIZARD_SRC = "https://raw.githubusercontent.com/AlienWare51/MoonWave/main/lizard.png";
         const SIT_SRC_LOCAL = "sit.png";
         const SIT_SRC_FALLBACK = "https://raw.githubusercontent.com/AlienWare51/MoonWave/main/sit.png";
-
         const eteBinding = { AA: 0, BB: 1, CC: 2, DD: 3 };
         const worldMap = {
             e: { name: "Earth", src: planetSources[0] },
@@ -225,7 +181,6 @@
             c: { top: "90%", left: "10%", rot: "-38deg" },
             v: { top: "90%", left: "90%", rot: "38deg" }
         };
-
         const imageSelect = document.getElementById("image_select");
         const canvas = document.getElementById("rocketCanvas");
         const ctx = canvas.getContext("2d");
@@ -239,7 +194,6 @@
         const sitGate = document.getElementById("sitGate");
         const sitGlow = document.getElementById("sitGlow");
         const sitCapsule = document.getElementById("sitCapsule");
-
         let rocketImg = new Image();
         let lizardImg = new Image();
         const planets = [];
@@ -248,10 +202,7 @@
         const sampleCanvas = document.createElement("canvas");
         const sampleCtx = sampleCanvas.getContext("2d", { willReadFrequently: true });
 
-        function isWorldOpen() {
-            return worldOverlay.style.display === "block";
-        }
-
+        function isWorldOpen() { return worldOverlay.style.display === "block"; }
         function loadImage(src) {
             return new Promise((resolve, reject) => {
                 const img = new Image();
@@ -261,18 +212,13 @@
                 if (img.complete && img.naturalWidth > 0) resolve(img);
             });
         }
-
-        function selectedPlanetIndex() {
-            return eteBinding[imageSelect.value] ?? 0;
-        }
-
+        function selectedPlanetIndex() { return eteBinding[imageSelect.value] ?? 0; }
         function applyModifierPreview() {
             const src = planetSources[selectedPlanetIndex()];
             modifiedImage.src = src;
             modifiedImage.style.filter = `brightness(${document.getElementById("brightness").value}) contrast(${document.getElementById("contrast").value})`;
             modifiedImage.style.transform = `rotate(${document.getElementById("rotation").value}deg)`;
         }
-
         function updateEtePreview() {
             const i = selectedPlanetIndex();
             document.getElementById("ETE").src = planetSources[i];
@@ -283,7 +229,6 @@
             applyModifierPreview();
             missionNameCallback();
         }
-
         function missionNameCallback() {
             const box = document.getElementById("missionDropdownContainer");
             if (imageSelect.value !== "BB" || !document.getElementById("eteTextInput").value.trim()) {
@@ -300,14 +245,11 @@
             });
             box.style.display = "block";
         }
-
         function renderFrame() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             const halfW = canvas.width / 2, halfH = canvas.height / 2;
             const q = [{ x: 0, y: 0 }, { x: halfW, y: 0 }, { x: 0, y: halfH }, { x: halfW, y: halfH }];
-            Object.keys(eteBinding).forEach((k, i) => {
-                if (planets[i]) ctx.drawImage(planets[i], q[i].x, q[i].y, halfW, halfH);
-            });
+            Object.keys(eteBinding).forEach((k, i) => { if (planets[i]) ctx.drawImage(planets[i], q[i].x, q[i].y, halfW, halfH); });
             if (!rocketImg.naturalWidth || !lizardImg.naturalWidth) return;
             const size = parseFloat(document.getElementById("rocketSize").value) || 1;
             const rot = parseFloat(document.getElementById("rotation").value) || 0;
@@ -321,7 +263,6 @@
             ctx.drawImage(lizardImg, -rw / 2, -rh / 2, rw, rh);
             ctx.restore();
         }
-
         function sampleWorldColor() {
             const fallbacks = { e: [40, 90, 150], r: [160, 70, 40], b: [20, 20, 24], m: [130, 130, 140] };
             try {
@@ -335,22 +276,27 @@
                 return fallbacks[activeWorld] || fallbacks.e;
             }
         }
-
         function tintSitToWorld() {
             const [r, g, b] = sampleWorldColor();
-            const wash = `rgba(${r},${g},${b},0.42)`;
-            sitGlow.style.background = `radial-gradient(circle, ${wash}, transparent 70%)`;
+            sitGlow.style.background = `radial-gradient(circle, rgba(${r},${g},${b},0.42), transparent 70%)`;
             sitCapsule.style.filter = `contrast(1.04) saturate(1.12) drop-shadow(0 16px 18px rgba(${r},${g},${b},0.45))`;
         }
-
-        function showZxcvMarks() {
-            document.querySelectorAll(".zxcv-mark").forEach((el) => el.classList.add("show"));
+        function showZxcvMarks() { document.querySelectorAll(".zxcv-mark").forEach((el) => el.classList.add("show")); }
+        function hideZxcvMarks() { document.querySelectorAll(".zxcv-mark").forEach((el) => el.classList.remove("show")); }
+        function resetZoom() {
+            worldOverlayImg.classList.remove("zoom-z");
+            worldOverlayImg.style.transform = "";
         }
-        function hideZxcvMarks() {
-            document.querySelectorAll(".zxcv-mark").forEach((el) => el.classList.remove("show"));
+        function zoomZOnCurrentPage(event) {
+            if (event) { event.preventDefault(); event.stopPropagation(); }
+            if (!isWorldOpen() || !activeWorld) return;
+            if (!sitGate.classList.contains("settled")) return;
+            hideZxcvMarks();
+            worldOverlayImg.classList.add("zoom-z");
         }
-
-        function blastSitTo(corner) {
+        function blastSitTo(corner, event) {
+            if (event) { event.preventDefault(); event.stopPropagation(); }
+            if (corner === "z") { zoomZOnCurrentPage(event); return; }
             const dest = zxcvTargets[corner];
             if (!dest || !isWorldOpen()) return;
             if (!sitGate.classList.contains("settled") || sitGate.classList.contains("blast")) return;
@@ -360,12 +306,11 @@
             sitGate.style.left = dest.left;
             sitGate.style.transform = `translate(-50%, -50%) rotate(${dest.rot}) scale(0.42)`;
             sitGate.style.opacity = "0.2";
-            console.log("blast on page", activeWorld, "to corner", corner);
         }
-
         function resetSit() {
             if (landingTimer) { clearTimeout(landingTimer); landingTimer = null; }
             hideZxcvMarks();
+            resetZoom();
             sitGate.classList.remove("gateway", "settled", "blast");
             sitGate.style.display = "none";
             sitGate.style.width = "";
@@ -374,7 +319,6 @@
             sitGate.style.transform = "";
             sitGate.style.opacity = "";
         }
-
         function openWorld(letter) {
             const world = worldMap[letter];
             if (!world) return;
@@ -387,7 +331,6 @@
             worldOverlay.setAttribute("aria-hidden", "false");
             keylock.value = letter;
         }
-
         function closeWorld() {
             resetSit();
             activeWorld = null;
@@ -395,7 +338,6 @@
             worldOverlay.setAttribute("aria-hidden", "true");
             worldDialog.style.display = "block";
         }
-
         function startExploreFreefall() {
             if (!isWorldOpen()) return;
             worldDialog.style.display = "none";
@@ -405,7 +347,6 @@
             sitGate.classList.remove("gateway", "settled", "blast");
             void sitGate.offsetWidth;
             sitGate.classList.add("gateway");
-
             landingTimer = setTimeout(() => {
                 const host = Math.min(worldOverlay.clientWidth, worldOverlay.clientHeight);
                 sitGate.classList.remove("gateway");
@@ -418,7 +359,6 @@
                 showZxcvMarks();
             }, 5600);
         }
-
         function myFunction(event) {
             if (isWorldOpen()) return;
             let letter = "";
@@ -436,14 +376,13 @@
             if (event.preventDefault) event.preventDefault();
             openWorld(letter);
         }
-
         imageSelect.addEventListener("change", updateEtePreview);
         document.getElementById("eteTextSubmit").addEventListener("click", missionNameCallback);
         document.getElementById("modifierForm").addEventListener("submit", (e) => { e.preventDefault(); applyModifierPreview(); renderFrame(); });
         ["brightness", "contrast", "rotation", "rocketSize"].forEach((id) => {
             document.getElementById(id).addEventListener("input", () => { applyModifierPreview(); renderFrame(); });
         });
-        document.getElementById("missionForm").addEventListener("submit", async (event) => {
+        document.getElementById("missionForm").addEventListener("submit", (event) => {
             event.preventDefault();
             missionNameCallback();
             responseMessage.textContent = "Saved locally: " + document.getElementById("missionName").value;
@@ -452,28 +391,31 @@
             const url = document.getElementById("missionPlanetDropdown").value;
             if (url) window.open(url, "_blank");
         });
-
         document.addEventListener("click", (event) => {
             const span = event.target.closest(".erbm-key");
             if (span && !isWorldOpen()) myFunction({ currentTarget: span, target: span, preventDefault() {} });
         });
         keylock.addEventListener("input", myFunction);
-
         document.addEventListener("keydown", (event) => {
             if (event.repeat) return;
             if (event.key === "Escape") { closeWorld(); return; }
             const letter = String(event.key || "").toLowerCase();
             if (isWorldOpen()) {
-                if ("zxcv".includes(letter) && sitGate.classList.contains("settled")) {
+                event.stopPropagation();
+                if (letter === "z" && sitGate.classList.contains("settled")) {
                     event.preventDefault();
-                    blastSitTo(letter);
+                    zoomZOnCurrentPage(event);
+                    return;
+                }
+                if ("xcv".includes(letter) && sitGate.classList.contains("settled")) {
+                    event.preventDefault();
+                    blastSitTo(letter, event);
                 }
                 return;
             }
             if (event.target && (event.target.tagName === "TEXTAREA" || (event.target.tagName === "INPUT" && event.target.id !== "keylock"))) return;
             myFunction(event);
         });
-
         document.querySelectorAll("#bottomWorlds .world").forEach((el) => {
             el.querySelector("img").src = worldMap[el.dataset.key].src;
             el.addEventListener("click", (event) => {
@@ -481,8 +423,18 @@
                 openWorld(el.dataset.key);
             });
         });
+        document.getElementById("mark-z").addEventListener("click", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            zoomZOnCurrentPage(event);
+        });
         document.querySelectorAll(".zxcv-mark").forEach((btn) => {
-            btn.addEventListener("click", () => blastSitTo(btn.dataset.corner));
+            if (btn.dataset.corner === "z") return;
+            btn.addEventListener("click", (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                blastSitTo(btn.dataset.corner, event);
+            });
         });
         document.getElementById("closeOverlay").addEventListener("click", closeWorld);
         document.querySelectorAll("#worldDialog button[data-act]").forEach((btn) => {
@@ -494,7 +446,6 @@
         sitCapsule.addEventListener("error", () => {
             if (sitCapsule.src.indexOf(SIT_SRC_FALLBACK) === -1) sitCapsule.src = SIT_SRC_FALLBACK;
         });
-
         Promise.all([
             ...planetSources.map((src) => loadImage(src).catch(() => null)),
             loadImage(ROCKET_SRC),
