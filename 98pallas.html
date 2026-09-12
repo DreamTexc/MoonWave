@@ -27,48 +27,66 @@
         #worldDialog { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; color: #111; min-width: 320px; max-width: 90vw; padding: 20px 24px; border-radius: 8px; box-shadow: 0 12px 40px rgba(0,0,0,0.45); z-index: 3; }
         #worldDialog h2 { margin: 0 0 12px; font-size: 18px; }
         #worldDialog button { display: block; width: 100%; margin: 6px 0; padding: 8px; cursor: pointer; }
-        #sitCapsule {
+        #sitGate {
             display: none;
             position: absolute;
             left: 50%;
             top: -20%;
-            width: 18vmin;
+            width: 23.4vmin;
             height: auto;
             z-index: 2;
             pointer-events: none;
-            transform: translate(-50%, -50%) rotateX(53deg) rotateY(0deg) rotateZ(8deg);
-            filter: drop-shadow(0 18px 16px rgba(0,0,0,0.55));
+            transform: translate(-50%, -50%);
         }
-        #sitCapsule.gateway {
-            animation: freefallGimbal 5.5s cubic-bezier(0.22, 0.1, 0.18, 1) forwards;
+        #sitGate.gateway { animation: freefallGimbal 5.6s cubic-bezier(0.16, 0.72, 0.18, 1) forwards; }
+        #sitGlow {
+            position: absolute;
+            inset: -18%;
+            border-radius: 50%;
+            filter: blur(18px);
+            opacity: 0.35;
+            mix-blend-mode: screen;
+            pointer-events: none;
         }
+        #sitCapsule {
+            display: block;
+            width: 100%;
+            height: auto;
+            transform-origin: center 70%;
+            mix-blend-mode: soft-light;
+            filter: contrast(1.05) saturate(1.15);
+        }
+        #sitGate.settled #sitCapsule { mix-blend-mode: normal; }
         @keyframes freefallGimbal {
             0% {
-                top: -18%;
-                width: 10vmin;
-                transform: translate(-50%, -50%) rotateX(53deg) rotateY(12deg) rotateZ(10deg) scale(0.55);
-                filter: drop-shadow(0 40px 24px rgba(0,0,0,0.15));
+                top: -16%;
+                width: 13vmin;
+                opacity: 0.35;
+                transform: translate(-50%, -50%) rotateX(53deg) rotateY(14deg) rotateZ(8deg) scale(0.62);
             }
-            35% {
-                top: 28%;
-                width: 14vmin;
-                transform: translate(-50%, -50%) rotateX(38deg) rotateY(-16deg) rotateZ(-7deg) scale(0.78);
+            22% {
+                top: 18%;
+                width: 16.9vmin;
+                opacity: 0.72;
+                transform: translate(-50%, -50%) rotateX(44deg) rotateY(-11deg) rotateZ(-6deg) scale(0.78);
             }
-            62% {
-                top: 48%;
-                width: 16vmin;
-                transform: translate(-50%, -50%) rotateX(24deg) rotateY(9deg) rotateZ(5deg) scale(0.92);
+            48% {
+                top: 36%;
+                width: 19.5vmin;
+                opacity: 0.9;
+                transform: translate(-50%, -50%) rotateX(30deg) rotateY(8deg) rotateZ(4deg) scale(0.92);
             }
-            82% {
-                top: 50%;
-                width: 16.6vmin;
-                transform: translate(-50%, -50%) rotateX(16deg) rotateY(4deg) rotateZ(-2deg) scale(1);
+            74% {
+                top: 47%;
+                width: 21.6vmin;
+                opacity: 0.97;
+                transform: translate(-50%, -50%) rotateX(20deg) rotateY(-3deg) rotateZ(-2deg) scale(1.02);
             }
             100% {
                 top: 50%;
-                width: 16.66vmin;
+                width: 21.66vmin;
+                opacity: 1;
                 transform: translate(-50%, -50%) rotateX(16deg) rotateY(0deg) rotateZ(0deg) scale(1);
-                filter: drop-shadow(0 10px 10px rgba(0,0,0,0.45));
             }
         }
     </style>
@@ -159,30 +177,20 @@
             <span class="erbm-key" data-key="b">b</span> Black bottom left ·
             <span class="erbm-key" data-key="m">m</span> Moon bottom right
         </p>
-
         <div id="bottomWorlds">
-            <div class="world" data-key="e" id="world-e">
-                <img alt="Earth">
-                <span>EARTH — <span class="erbm-key" data-key="e">e</span></span>
-            </div>
-            <div class="world" data-key="r" id="world-r">
-                <img alt="Mars">
-                <span>MARS — <span class="erbm-key" data-key="r">r</span></span>
-            </div>
-            <div class="world" data-key="b" id="world-b">
-                <img alt="Black">
-                <span>BLACK — <span class="erbm-key" data-key="b">b</span></span>
-            </div>
-            <div class="world" data-key="m" id="world-m">
-                <img alt="Moon">
-                <span>MOON — <span class="erbm-key" data-key="m">m</span></span>
-            </div>
+            <div class="world" data-key="e" id="world-e"><img alt="Earth"><span>EARTH — <span class="erbm-key" data-key="e">e</span></span></div>
+            <div class="world" data-key="r" id="world-r"><img alt="Mars"><span>MARS — <span class="erbm-key" data-key="r">r</span></span></div>
+            <div class="world" data-key="b" id="world-b"><img alt="Black"><span>BLACK — <span class="erbm-key" data-key="b">b</span></span></div>
+            <div class="world" data-key="m" id="world-m"><img alt="Moon"><span>MOON — <span class="erbm-key" data-key="m">m</span></span></div>
         </div>
     </section>
 
     <div id="worldOverlay" aria-hidden="true">
         <img id="worldOverlayImg" alt="Selected world">
-        <img id="sitCapsule" alt="sit capsule" src="sit.png">
+        <div id="sitGate">
+            <div id="sitGlow"></div>
+            <img id="sitCapsule" alt="sit capsule" src="sit.png">
+        </div>
         <div id="worldDialog">
             <h2 id="worldDialogTitle">What would you like to do xyz</h2>
             <button type="button" data-act="explore">Explore xyz</button>
@@ -206,10 +214,10 @@
 
         const eteBinding = { AA: 0, BB: 1, CC: 2, DD: 3 };
         const worldMap = {
-            e: { name: "Earth", src: planetSources[0], corner: "top-left" },
-            r: { name: "Mars", src: planetSources[1], corner: "top-right" },
-            b: { name: "Black", src: planetSources[2], corner: "bottom-left" },
-            m: { name: "Moon", src: planetSources[3], corner: "bottom-right" }
+            e: { name: "Earth", src: planetSources[0] },
+            r: { name: "Mars", src: planetSources[1] },
+            b: { name: "Black", src: planetSources[2] },
+            m: { name: "Moon", src: planetSources[3] }
         };
 
         const etePreview = document.getElementById("ETE");
@@ -223,13 +231,16 @@
         const worldOverlayImg = document.getElementById("worldOverlayImg");
         const worldDialog = document.getElementById("worldDialog");
         const worldDialogTitle = document.getElementById("worldDialogTitle");
+        const sitGate = document.getElementById("sitGate");
+        const sitGlow = document.getElementById("sitGlow");
         const sitCapsule = document.getElementById("sitCapsule");
 
         let rocketImg = new Image();
         let lizardImg = new Image();
         const planets = [];
-        let sitReady = false;
         let landingTimer = null;
+        const sampleCanvas = document.createElement("canvas");
+        const sampleCtx = sampleCanvas.getContext("2d", { willReadFrequently: true });
 
         function loadImage(src) {
             return new Promise((resolve, reject) => {
@@ -268,10 +279,7 @@
         }
 
         imageSelect.addEventListener("change", updateEtePreview);
-        document.getElementById("eteTextSubmit").addEventListener("click", () => {
-            console.log(`Text for ${imageSelect.value}:`, document.getElementById("eteTextInput").value);
-            missionNameCallback();
-        });
+        document.getElementById("eteTextSubmit").addEventListener("click", missionNameCallback);
         document.getElementById("modifierForm").addEventListener("submit", (event) => {
             event.preventDefault();
             applyModifierPreview();
@@ -336,28 +344,14 @@
         });
 
         function drawPlanetsFixed() {
-            const halfW = canvas.width / 2;
-            const halfH = canvas.height / 2;
+            const halfW = canvas.width / 2, halfH = canvas.height / 2;
             const quadrants = [
-                { x: 0, y: 0, w: halfW, h: halfH },
-                { x: halfW, y: 0, w: halfW, h: halfH },
-                { x: 0, y: halfH, w: halfW, h: halfH },
-                { x: halfW, y: halfH, w: halfW, h: halfH }
+                { x: 0, y: 0 }, { x: halfW, y: 0 }, { x: 0, y: halfH }, { x: halfW, y: halfH }
             ];
             Object.keys(eteBinding).forEach((letter, i) => {
                 const img = planets[eteBinding[letter]];
-                if (img) ctx.drawImage(img, quadrants[i].x, quadrants[i].y, quadrants[i].w, quadrants[i].h);
+                if (img) ctx.drawImage(img, quadrants[i].x, quadrants[i].y, halfW, halfH);
             });
-        }
-
-        function drawRocketAndLizard(rx, ry, rw, rh, rotationDeg) {
-            ctx.save();
-            ctx.translate(rx + rw / 2, ry + rh / 2);
-            ctx.rotate(rotationDeg * Math.PI / 180);
-            ctx.drawImage(rocketImg, -rw / 2, -rh / 2, rw, rh);
-            ctx.globalAlpha = 0.5;
-            ctx.drawImage(lizardImg, -rw / 2, -rh / 2, rw, rh);
-            ctx.restore();
         }
 
         function renderFrame() {
@@ -369,22 +363,50 @@
             const rotation = parseFloat(document.getElementById("rotation").value) || 0;
             const rw = Math.max(8, rocketImg.naturalWidth * rocketSize);
             const rh = Math.max(8, rocketImg.naturalHeight * rocketSize);
-            drawRocketAndLizard(canvas.width / 2 - rw / 2, canvas.height / 2 - rh / 2, rw, rh, rotation);
+            ctx.save();
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.rotate(rotation * Math.PI / 180);
+            ctx.drawImage(rocketImg, -rw / 2, -rh / 2, rw, rh);
+            ctx.globalAlpha = 0.5;
+            ctx.drawImage(lizardImg, -rw / 2, -rh / 2, rw, rh);
+            ctx.restore();
         }
 
-        function isOverlayOpen() {
-            return worldOverlay.style.display === "block";
+        function sampleWorldColor() {
+            const fallbacks = { e: [40, 90, 150], r: [160, 70, 40], b: [20, 20, 24], m: [130, 130, 140] };
+            const letter = String(keylock.value || "e").toLowerCase();
+            try {
+                const img = worldOverlayImg;
+                if (!img.naturalWidth) throw new Error("no pixels");
+                sampleCanvas.width = 24;
+                sampleCanvas.height = 24;
+                sampleCtx.drawImage(img, 0, 0, 24, 24);
+                const data = sampleCtx.getImageData(0, 0, 24, 24).data;
+                let r = 0, g = 0, b = 0, n = 0;
+                for (let i = 0; i < data.length; i += 4) {
+                    r += data[i]; g += data[i + 1]; b += data[i + 2]; n++;
+                }
+                return [Math.round(r / n), Math.round(g / n), Math.round(b / n)];
+            } catch (err) {
+                return fallbacks[letter] || fallbacks.e;
+            }
+        }
+
+        function tintSitToWorld() {
+            const [r, g, b] = sampleWorldColor();
+            const rgb = `rgb(${r}, ${g}, ${b})`;
+            const wash = `rgba(${r}, ${g}, ${b}, 0.42)`;
+            sitGlow.style.background = `radial-gradient(circle, ${wash} 0%, rgba(${r},${g},${b},0.08) 70%, transparent 100%)`;
+            sitCapsule.style.filter = `contrast(1.04) saturate(1.12) drop-shadow(0 16px 18px rgba(${r},${g},${b},0.45)) drop-shadow(0 0 14px ${wash})`;
+            sitGate.style.setProperty("--world-rgb", rgb);
         }
 
         function resetSit() {
-            if (landingTimer) {
-                clearTimeout(landingTimer);
-                landingTimer = null;
-            }
-            sitCapsule.classList.remove("gateway");
-            sitCapsule.style.display = "none";
-            sitCapsule.style.width = "";
-            sitCapsule.style.top = "";
+            if (landingTimer) { clearTimeout(landingTimer); landingTimer = null; }
+            sitGate.classList.remove("gateway", "settled");
+            sitGate.style.display = "none";
+            sitGate.style.width = "";
+            sitGate.style.top = "";
         }
 
         function openWorld(letter) {
@@ -392,7 +414,6 @@
             if (!world) return;
             resetSit();
             worldOverlayImg.src = world.src;
-            worldOverlayImg.style.transform = "scale(1)";
             worldDialogTitle.textContent = `What would you like to do ${world.name}?`;
             worldDialog.style.display = "block";
             worldOverlay.style.display = "block";
@@ -408,21 +429,23 @@
         }
 
         function startExploreFreefall() {
-            if (!isOverlayOpen()) return;
+            if (worldOverlay.style.display !== "block") return;
             worldDialog.style.display = "none";
-            sitCapsule.src = sitCapsule.dataset.src || SIT_SRC_LOCAL;
-            sitCapsule.style.display = "block";
-            sitCapsule.classList.remove("gateway");
-            void sitCapsule.offsetWidth;
-            sitCapsule.classList.add("gateway");
+            tintSitToWorld();
+            sitGate.style.display = "block";
+            sitGate.classList.remove("gateway", "settled");
+            void sitGate.offsetWidth;
+            sitGate.classList.add("gateway");
 
             landingTimer = setTimeout(() => {
                 const host = Math.min(worldOverlay.clientWidth, worldOverlay.clientHeight);
-                sitCapsule.style.width = (host / 6) + "px";
-                sitCapsule.style.top = "50%";
-                sitCapsule.classList.remove("gateway");
-                sitCapsule.style.transform = "translate(-50%, -50%) rotateX(16deg) rotateY(0deg) rotateZ(0deg)";
-            }, 5500);
+                sitGate.classList.remove("gateway");
+                sitGate.classList.add("settled");
+                sitGate.style.top = "50%";
+                sitGate.style.width = ((host / 6) * 1.3) + "px";
+                sitGate.style.transform = "translate(-50%, -50%) rotateX(16deg)";
+                sitCapsule.style.mixBlendMode = "normal";
+            }, 5600);
         }
 
         function myFunction(event) {
@@ -447,15 +470,9 @@
             if (span) myFunction({ currentTarget: span, target: span, preventDefault() {} });
         });
         keylock.addEventListener("input", myFunction);
-        keylock.addEventListener("keydown", (event) => {
-            if (worldMap[String(event.key).toLowerCase()]) myFunction(event);
-        });
         document.addEventListener("keydown", (event) => {
             if (event.repeat) return;
-            if (event.key === "Escape") {
-                closeWorld();
-                return;
-            }
+            if (event.key === "Escape") { closeWorld(); return; }
             if (event.target && (event.target.tagName === "TEXTAREA" || (event.target.tagName === "INPUT" && event.target.id !== "keylock"))) return;
             myFunction(event);
         });
@@ -472,12 +489,10 @@
         document.getElementById("closeOverlay").addEventListener("click", closeWorld);
         document.querySelectorAll("#worldDialog button[data-act]").forEach((btn) => {
             btn.addEventListener("click", () => {
-                const act = btn.getAttribute("data-act");
-                if (act === "explore") {
+                if (btn.getAttribute("data-act") === "explore") {
                     startExploreFreefall();
                     return;
                 }
-                console.log(act, worldMap[keylock.value.toLowerCase()]);
                 closeWorld();
             });
         });
@@ -485,36 +500,22 @@
         sitCapsule.addEventListener("error", () => {
             if (sitCapsule.src.indexOf(SIT_SRC_FALLBACK) === -1) {
                 sitCapsule.src = SIT_SRC_FALLBACK;
-                sitCapsule.dataset.src = SIT_SRC_FALLBACK;
             }
         });
-        sitCapsule.dataset.src = SIT_SRC_LOCAL;
 
         Promise.all([
-            ...planetSources.map((src) => loadImage(src).catch((err) => {
-                console.warn(err.message);
-                return null;
-            })),
+            ...planetSources.map((src) => loadImage(src).catch(() => null)),
             loadImage(ROCKET_SRC),
             loadImage(LIZARD_SRC),
             loadImage(SIT_SRC_LOCAL).catch(() => loadImage(SIT_SRC_FALLBACK).catch(() => null))
         ]).then((loaded) => {
-            const planetImgs = loaded.slice(0, planetSources.length);
-            rocketImg = loaded[planetSources.length];
-            lizardImg = loaded[planetSources.length + 1];
-            const sitImg = loaded[planetSources.length + 2];
-            planetImgs.forEach((img, i) => { planets[i] = img; });
-            if (sitImg) {
-                sitCapsule.src = sitImg.src;
-                sitCapsule.dataset.src = sitImg.src;
-                sitReady = true;
-            }
+            loaded.slice(0, 4).forEach((img, i) => { planets[i] = img; });
+            rocketImg = loaded[4];
+            lizardImg = loaded[5];
+            if (loaded[6]) sitCapsule.src = loaded[6].src;
             updateEtePreview();
             renderFrame();
             setInterval(renderFrame, 250);
-        }).catch((err) => {
-            console.error(err);
-            responseMessage.textContent = "Asset load error: " + err.message;
         });
     </script>
 </body>
