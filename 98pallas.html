@@ -23,8 +23,8 @@
         #bottomWorlds .world img { width: 100%; height: 100%; object-fit: cover; display: block; }
         #bottomWorlds .world span { position: absolute; left: 8px; bottom: 8px; color: #fff; background: rgba(0,0,0,0.55); padding: 2px 8px; font-size: 14px; }
         #worldOverlay { display: none; position: fixed; inset: 0; z-index: 9999; background: #000; overflow: hidden; }
-        #worldOverlayImg { width: 100%; height: 100%; object-fit: cover; transform-origin: center center; }
-        #worldDialog { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; color: #111; min-width: 320px; max-width: 90vw; padding: 20px 24px; border-radius: 8px; box-shadow: 0 12px 40px rgba(0,0,0,0.45); z-index: 5; }
+        #worldOverlayImg { width: 100%; height: 100%; object-fit: cover; }
+        #worldDialog { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; min-width: 320px; max-width: 90vw; padding: 20px 24px; border-radius: 8px; z-index: 6; }
         #worldDialog h2 { margin: 0 0 12px; font-size: 18px; }
         #worldDialog button { display: block; width: 100%; margin: 6px 0; padding: 8px; cursor: pointer; }
         #sitGate {
@@ -33,8 +33,7 @@
             left: 50%;
             top: -20%;
             width: 23.4vmin;
-            height: auto;
-            z-index: 2;
+            z-index: 3;
             pointer-events: none;
             transform: translate(-50%, -50%);
         }
@@ -45,24 +44,23 @@
                         transform 1.15s cubic-bezier(0.18, 0.7, 0.2, 1),
                         opacity 1.15s ease;
         }
-        #sitGlow {
-            position: absolute;
-            inset: -18%;
-            border-radius: 50%;
-            filter: blur(18px);
-            opacity: 0.35;
-            mix-blend-mode: screen;
-            pointer-events: none;
-        }
-        #sitCapsule {
-            display: block;
-            width: 100%;
-            height: auto;
-            transform-origin: center 70%;
-            mix-blend-mode: soft-light;
-            filter: contrast(1.05) saturate(1.15);
-        }
+        #sitGlow { position: absolute; inset: -18%; border-radius: 50%; filter: blur(18px); opacity: 0.35; mix-blend-mode: screen; }
+        #sitCapsule { display: block; width: 100%; height: auto; transform-origin: center 70%; mix-blend-mode: soft-light; }
         #sitGate.settled #sitCapsule { mix-blend-mode: normal; }
+        .zxcv-pad {
+            position: absolute;
+            width: 22vmin;
+            height: 22vmin;
+            z-index: 2;
+            pointer-events: none;
+            border: 1px dashed rgba(255,255,255,0.0);
+            background-size: cover;
+            background-position: center;
+        }
+        #pad-z { top: 0; left: 0; }
+        #pad-x { top: 0; right: 0; }
+        #pad-c { bottom: 0; left: 0; }
+        #pad-v { bottom: 0; right: 0; }
         .zxcv-mark {
             display: none;
             position: absolute;
@@ -77,7 +75,6 @@
             border: 1px solid rgba(255,255,255,0.65);
             border-radius: 6px;
             cursor: pointer;
-            letter-spacing: 0.06em;
         }
         .zxcv-mark.show { display: block; }
         #mark-z { top: 18px; left: 18px; }
@@ -164,8 +161,7 @@
 
     <section id="keylockSection">
         <h2>EARTH MARS BLACK MOON — keylock</h2>
-        <p>
-            the letters
+        <p>the letters
             <span class="erbm-key" data-key="e">e</span>
             <span class="erbm-key" data-key="r">r</span>
             <span class="erbm-key" data-key="b">b</span>
@@ -173,22 +169,20 @@
         </p>
         <label for="keylock">keylock</label><br>
         <input id="keylock" name="keylock" type="text" maxlength="1" placeholder="e r b m" autocomplete="off">
-        <p>
-            <span class="erbm-key" data-key="e">e</span> Earth top left ·
-            <span class="erbm-key" data-key="r">r</span> Mars top right ·
-            <span class="erbm-key" data-key="b">b</span> Black bottom left ·
-            <span class="erbm-key" data-key="m">m</span> Moon bottom right
-        </p>
         <div id="bottomWorlds">
-            <div class="world" data-key="e" id="world-e"><img alt="Earth"><span>EARTH — <span class="erbm-key" data-key="e">e</span></span></div>
-            <div class="world" data-key="r" id="world-r"><img alt="Mars"><span>MARS — <span class="erbm-key" data-key="r">r</span></span></div>
-            <div class="world" data-key="b" id="world-b"><img alt="Black"><span>BLACK — <span class="erbm-key" data-key="b">b</span></span></div>
-            <div class="world" data-key="m" id="world-m"><img alt="Moon"><span>MOON — <span class="erbm-key" data-key="m">m</span></span></div>
+            <div class="world" data-key="e"><img alt="Earth"><span>EARTH — <span class="erbm-key" data-key="e">e</span></span></div>
+            <div class="world" data-key="r"><img alt="Mars"><span>MARS — <span class="erbm-key" data-key="r">r</span></span></div>
+            <div class="world" data-key="b"><img alt="Black"><span>BLACK — <span class="erbm-key" data-key="b">b</span></span></div>
+            <div class="world" data-key="m"><img alt="Moon"><span>MOON — <span class="erbm-key" data-key="m">m</span></span></div>
         </div>
     </section>
 
     <div id="worldOverlay" aria-hidden="true">
         <img id="worldOverlayImg" alt="Selected world">
+        <div class="zxcv-pad" id="pad-z" data-corner="z"></div>
+        <div class="zxcv-pad" id="pad-x" data-corner="x"></div>
+        <div class="zxcv-pad" id="pad-c" data-corner="c"></div>
+        <div class="zxcv-pad" id="pad-v" data-corner="v"></div>
         <div id="sitGate">
             <div id="sitGlow"></div>
             <img id="sitCapsule" alt="sit capsule" src="sit.png">
@@ -226,19 +220,18 @@
             m: { name: "Moon", src: planetSources[3] }
         };
         const zxcvTargets = {
-            z: { top: "8%", left: "8%", rot: "-28deg" },
-            x: { top: "8%", left: "92%", rot: "28deg" },
-            c: { top: "92%", left: "8%", rot: "-38deg" },
-            v: { top: "92%", left: "92%", rot: "38deg" }
+            z: { top: "10%", left: "10%", rot: "-28deg" },
+            x: { top: "10%", left: "90%", rot: "28deg" },
+            c: { top: "90%", left: "10%", rot: "-38deg" },
+            v: { top: "90%", left: "90%", rot: "38deg" }
         };
 
-        const etePreview = document.getElementById("ETE");
-        const modifiedImage = document.getElementById("modifiedImage");
-        const responseMessage = document.getElementById("responseMessage");
         const imageSelect = document.getElementById("image_select");
         const canvas = document.getElementById("rocketCanvas");
         const ctx = canvas.getContext("2d");
         const keylock = document.getElementById("keylock");
+        const responseMessage = document.getElementById("responseMessage");
+        const modifiedImage = document.getElementById("modifiedImage");
         const worldOverlay = document.getElementById("worldOverlay");
         const worldOverlayImg = document.getElementById("worldOverlayImg");
         const worldDialog = document.getElementById("worldDialog");
@@ -251,8 +244,13 @@
         let lizardImg = new Image();
         const planets = [];
         let landingTimer = null;
+        let activeWorld = null;
         const sampleCanvas = document.createElement("canvas");
         const sampleCtx = sampleCanvas.getContext("2d", { willReadFrequently: true });
+
+        function isWorldOpen() {
+            return worldOverlay.style.display === "block";
+        }
 
         function loadImage(src) {
             return new Promise((resolve, reject) => {
@@ -270,108 +268,54 @@
 
         function applyModifierPreview() {
             const src = planetSources[selectedPlanetIndex()];
-            const brightness = parseFloat(document.getElementById("brightness").value) || 1;
-            const contrast = parseFloat(document.getElementById("contrast").value) || 1;
-            const rotation = parseFloat(document.getElementById("rotation").value) || 0;
             modifiedImage.src = src;
-            modifiedImage.style.filter = `brightness(${brightness}) contrast(${contrast})`;
-            modifiedImage.style.transform = `rotate(${rotation}deg)`;
+            modifiedImage.style.filter = `brightness(${document.getElementById("brightness").value}) contrast(${document.getElementById("contrast").value})`;
+            modifiedImage.style.transform = `rotate(${document.getElementById("rotation").value}deg)`;
         }
 
         function updateEtePreview() {
-            const selected = imageSelect.value;
-            const planetIndex = selectedPlanetIndex();
-            etePreview.src = planetSources[planetIndex];
-            document.getElementById("image1").src = planetSources[planetIndex];
-            document.getElementById("image2").src = planetSources[(planetIndex + 1) % planetSources.length];
+            const i = selectedPlanetIndex();
+            document.getElementById("ETE").src = planetSources[i];
+            document.getElementById("image1").src = planetSources[i];
+            document.getElementById("image2").src = planetSources[(i + 1) % 4];
             document.getElementById("eteTextBoxContainer").style.display = "block";
-            document.getElementById("eteTextLabel").textContent = `Enter data for ${selected}:`;
+            document.getElementById("eteTextLabel").textContent = `Enter data for ${imageSelect.value}:`;
             applyModifierPreview();
             missionNameCallback();
         }
-
-        imageSelect.addEventListener("change", updateEtePreview);
-        document.getElementById("eteTextSubmit").addEventListener("click", missionNameCallback);
-        document.getElementById("modifierForm").addEventListener("submit", (event) => {
-            event.preventDefault();
-            applyModifierPreview();
-            renderFrame();
-        });
-        ["brightness", "contrast", "rotation", "rocketSize"].forEach((id) => {
-            document.getElementById(id).addEventListener("input", () => {
-                applyModifierPreview();
-                renderFrame();
-            });
-        });
-
-        document.getElementById("missionForm").addEventListener("submit", async (event) => {
-            event.preventDefault();
-            const missionData = {
-                missionName: document.getElementById("missionName").value,
-                modelAddress: document.getElementById("modelAddress").value,
-                serverLog: document.getElementById("serverLog").value
-            };
-            missionNameCallback();
-            try {
-                const response = await fetch("/addMissionLog", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(missionData)
-                });
-                if (!response.ok) throw new Error("HTTP " + response.status);
-                const data = await response.json();
-                responseMessage.textContent = `Success: ${data.message}, Log ID: ${data.logId}`;
-            } catch (err) {
-                responseMessage.textContent = `Saved locally: ${missionData.missionName}. ${err.message}`;
-            }
-        });
 
         function missionNameCallback() {
-            const container = document.getElementById("missionDropdownContainer");
+            const box = document.getElementById("missionDropdownContainer");
             if (imageSelect.value !== "BB" || !document.getElementById("eteTextInput").value.trim()) {
-                container.style.display = "none";
+                box.style.display = "none";
                 return;
             }
-            const options = [
-                { name: "Mars", url: "https://en.wikipedia.org/wiki/Mars" },
-                { name: "Pluto", url: "https://en.wikipedia.org/wiki/Pluto" },
-                { name: "Jupiter", url: "https://en.wikipedia.org/wiki/Jupiter" },
-                { name: "Saturn", url: "https://en.wikipedia.org/wiki/Saturn" },
-                { name: "Venus", url: "https://en.wikipedia.org/wiki/Venus" }
-            ];
             const dropdown = document.getElementById("missionPlanetDropdown");
             dropdown.innerHTML = "";
-            options.forEach((opt) => {
+            ["Mars", "Pluto", "Jupiter", "Saturn", "Venus"].forEach((name) => {
                 const option = document.createElement("option");
-                option.value = opt.url;
-                option.textContent = opt.name;
+                option.value = "https://en.wikipedia.org/wiki/" + name;
+                option.textContent = name;
                 dropdown.appendChild(option);
             });
-            container.style.display = "block";
+            box.style.display = "block";
         }
 
-        document.getElementById("missionPlanetDropdown").addEventListener("change", () => {
-            const url = document.getElementById("missionPlanetDropdown").value;
-            if (url) window.open(url, "_blank");
-        });
-
         function renderFrame() {
-            if (!ctx) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             const halfW = canvas.width / 2, halfH = canvas.height / 2;
-            const quadrants = [{ x: 0, y: 0 }, { x: halfW, y: 0 }, { x: 0, y: halfH }, { x: halfW, y: halfH }];
-            Object.keys(eteBinding).forEach((letter, i) => {
-                const img = planets[eteBinding[letter]];
-                if (img) ctx.drawImage(img, quadrants[i].x, quadrants[i].y, halfW, halfH);
+            const q = [{ x: 0, y: 0 }, { x: halfW, y: 0 }, { x: 0, y: halfH }, { x: halfW, y: halfH }];
+            Object.keys(eteBinding).forEach((k, i) => {
+                if (planets[i]) ctx.drawImage(planets[i], q[i].x, q[i].y, halfW, halfH);
             });
             if (!rocketImg.naturalWidth || !lizardImg.naturalWidth) return;
-            const rocketSize = parseFloat(document.getElementById("rocketSize").value) || 1;
-            const rotation = parseFloat(document.getElementById("rotation").value) || 0;
-            const rw = Math.max(8, rocketImg.naturalWidth * rocketSize);
-            const rh = Math.max(8, rocketImg.naturalHeight * rocketSize);
+            const size = parseFloat(document.getElementById("rocketSize").value) || 1;
+            const rot = parseFloat(document.getElementById("rotation").value) || 0;
+            const rw = Math.max(8, rocketImg.naturalWidth * size);
+            const rh = Math.max(8, rocketImg.naturalHeight * size);
             ctx.save();
             ctx.translate(canvas.width / 2, canvas.height / 2);
-            ctx.rotate(rotation * Math.PI / 180);
+            ctx.rotate(rot * Math.PI / 180);
             ctx.drawImage(rocketImg, -rw / 2, -rh / 2, rw, rh);
             ctx.globalAlpha = 0.5;
             ctx.drawImage(lizardImg, -rw / 2, -rh / 2, rw, rh);
@@ -380,45 +324,43 @@
 
         function sampleWorldColor() {
             const fallbacks = { e: [40, 90, 150], r: [160, 70, 40], b: [20, 20, 24], m: [130, 130, 140] };
-            const letter = String(keylock.value || "e").toLowerCase();
             try {
-                if (!worldOverlayImg.naturalWidth) throw new Error("no pixels");
-                sampleCanvas.width = 24;
-                sampleCanvas.height = 24;
+                sampleCanvas.width = 24; sampleCanvas.height = 24;
                 sampleCtx.drawImage(worldOverlayImg, 0, 0, 24, 24);
-                const data = sampleCtx.getImageData(0, 0, 24, 24).data;
+                const d = sampleCtx.getImageData(0, 0, 24, 24).data;
                 let r = 0, g = 0, b = 0, n = 0;
-                for (let i = 0; i < data.length; i += 4) { r += data[i]; g += data[i + 1]; b += data[i + 2]; n++; }
+                for (let i = 0; i < d.length; i += 4) { r += d[i]; g += d[i + 1]; b += d[i + 2]; n++; }
                 return [Math.round(r / n), Math.round(g / n), Math.round(b / n)];
             } catch (err) {
-                return fallbacks[letter] || fallbacks.e;
+                return fallbacks[activeWorld] || fallbacks.e;
             }
         }
 
         function tintSitToWorld() {
             const [r, g, b] = sampleWorldColor();
-            const wash = `rgba(${r}, ${g}, ${b}, 0.42)`;
-            sitGlow.style.background = `radial-gradient(circle, ${wash} 0%, rgba(${r},${g},${b},0.08) 70%, transparent 100%)`;
-            sitCapsule.style.filter = `contrast(1.04) saturate(1.12) drop-shadow(0 16px 18px rgba(${r},${g},${b},0.45)) drop-shadow(0 0 14px ${wash})`;
+            const wash = `rgba(${r},${g},${b},0.42)`;
+            sitGlow.style.background = `radial-gradient(circle, ${wash}, transparent 70%)`;
+            sitCapsule.style.filter = `contrast(1.04) saturate(1.12) drop-shadow(0 16px 18px rgba(${r},${g},${b},0.45))`;
         }
 
         function showZxcvMarks() {
             document.querySelectorAll(".zxcv-mark").forEach((el) => el.classList.add("show"));
         }
-
         function hideZxcvMarks() {
             document.querySelectorAll(".zxcv-mark").forEach((el) => el.classList.remove("show"));
         }
 
-        function blastSitTo(letter) {
-            const dest = zxcvTargets[letter];
-            if (!dest || !sitGate.classList.contains("settled") || sitGate.classList.contains("blast")) return;
+        function blastSitTo(corner) {
+            const dest = zxcvTargets[corner];
+            if (!dest || !isWorldOpen()) return;
+            if (!sitGate.classList.contains("settled") || sitGate.classList.contains("blast")) return;
             hideZxcvMarks();
             sitGate.classList.add("blast");
             sitGate.style.top = dest.top;
             sitGate.style.left = dest.left;
             sitGate.style.transform = `translate(-50%, -50%) rotate(${dest.rot}) scale(0.42)`;
-            sitGate.style.opacity = "0.15";
+            sitGate.style.opacity = "0.2";
+            console.log("blast on page", activeWorld, "to corner", corner);
         }
 
         function resetSit() {
@@ -436,6 +378,7 @@
         function openWorld(letter) {
             const world = worldMap[letter];
             if (!world) return;
+            activeWorld = letter;
             resetSit();
             worldOverlayImg.src = world.src;
             worldDialogTitle.textContent = `What would you like to do ${world.name}?`;
@@ -447,16 +390,18 @@
 
         function closeWorld() {
             resetSit();
+            activeWorld = null;
             worldOverlay.style.display = "none";
             worldOverlay.setAttribute("aria-hidden", "true");
             worldDialog.style.display = "block";
         }
 
         function startExploreFreefall() {
-            if (worldOverlay.style.display !== "block") return;
+            if (!isWorldOpen()) return;
             worldDialog.style.display = "none";
             tintSitToWorld();
             sitGate.style.display = "block";
+            sitGate.style.left = "50%";
             sitGate.classList.remove("gateway", "settled", "blast");
             void sitGate.offsetWidth;
             sitGate.classList.add("gateway");
@@ -475,6 +420,7 @@
         }
 
         function myFunction(event) {
+            if (isWorldOpen()) return;
             let letter = "";
             if (event.currentTarget && event.currentTarget.classList && event.currentTarget.classList.contains("erbm-key")) {
                 letter = event.currentTarget.getAttribute("data-key");
@@ -491,18 +437,37 @@
             openWorld(letter);
         }
 
+        imageSelect.addEventListener("change", updateEtePreview);
+        document.getElementById("eteTextSubmit").addEventListener("click", missionNameCallback);
+        document.getElementById("modifierForm").addEventListener("submit", (e) => { e.preventDefault(); applyModifierPreview(); renderFrame(); });
+        ["brightness", "contrast", "rotation", "rocketSize"].forEach((id) => {
+            document.getElementById(id).addEventListener("input", () => { applyModifierPreview(); renderFrame(); });
+        });
+        document.getElementById("missionForm").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            missionNameCallback();
+            responseMessage.textContent = "Saved locally: " + document.getElementById("missionName").value;
+        });
+        document.getElementById("missionPlanetDropdown").addEventListener("change", () => {
+            const url = document.getElementById("missionPlanetDropdown").value;
+            if (url) window.open(url, "_blank");
+        });
+
         document.addEventListener("click", (event) => {
             const span = event.target.closest(".erbm-key");
-            if (span) myFunction({ currentTarget: span, target: span, preventDefault() {} });
+            if (span && !isWorldOpen()) myFunction({ currentTarget: span, target: span, preventDefault() {} });
         });
         keylock.addEventListener("input", myFunction);
+
         document.addEventListener("keydown", (event) => {
             if (event.repeat) return;
             if (event.key === "Escape") { closeWorld(); return; }
             const letter = String(event.key || "").toLowerCase();
-            if ("zxcv".includes(letter) && sitGate.classList.contains("settled") && !sitGate.classList.contains("blast")) {
-                event.preventDefault();
-                blastSitTo(letter);
+            if (isWorldOpen()) {
+                if ("zxcv".includes(letter) && sitGate.classList.contains("settled")) {
+                    event.preventDefault();
+                    blastSitTo(letter);
+                }
                 return;
             }
             if (event.target && (event.target.tagName === "TEXTAREA" || (event.target.tagName === "INPUT" && event.target.id !== "keylock"))) return;
@@ -510,29 +475,22 @@
         });
 
         document.querySelectorAll("#bottomWorlds .world").forEach((el) => {
-            const letter = el.dataset.key;
-            el.querySelector("img").src = worldMap[letter].src;
+            el.querySelector("img").src = worldMap[el.dataset.key].src;
             el.addEventListener("click", (event) => {
                 if (event.target.closest(".erbm-key")) return;
-                openWorld(letter);
+                openWorld(el.dataset.key);
             });
         });
-
         document.querySelectorAll(".zxcv-mark").forEach((btn) => {
             btn.addEventListener("click", () => blastSitTo(btn.dataset.corner));
         });
-
         document.getElementById("closeOverlay").addEventListener("click", closeWorld);
         document.querySelectorAll("#worldDialog button[data-act]").forEach((btn) => {
             btn.addEventListener("click", () => {
-                if (btn.getAttribute("data-act") === "explore") {
-                    startExploreFreefall();
-                    return;
-                }
-                closeWorld();
+                if (btn.getAttribute("data-act") === "explore") startExploreFreefall();
+                else closeWorld();
             });
         });
-
         sitCapsule.addEventListener("error", () => {
             if (sitCapsule.src.indexOf(SIT_SRC_FALLBACK) === -1) sitCapsule.src = SIT_SRC_FALLBACK;
         });
