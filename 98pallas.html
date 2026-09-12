@@ -42,6 +42,84 @@
             height: 140px;
             resize: none;
         }
+        #keylockSection {
+            margin: 24px 0;
+        }
+        #keylock {
+            font-size: 22px;
+            letter-spacing: 0.35em;
+            text-transform: lowercase;
+            width: 220px;
+            padding: 8px;
+        }
+        #bottomWorlds {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 180px 180px;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        #bottomWorlds .world {
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #222;
+            cursor: pointer;
+        }
+        #bottomWorlds .world img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        #bottomWorlds .world span {
+            position: absolute;
+            left: 8px;
+            bottom: 8px;
+            color: #fff;
+            background: rgba(0,0,0,0.55);
+            padding: 2px 8px;
+            font-size: 14px;
+        }
+        #worldOverlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: #000;
+        }
+        #worldOverlay img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        #worldDialog {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            color: #111;
+            min-width: 320px;
+            max-width: 90vw;
+            padding: 20px 24px;
+            border-radius: 8px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+        }
+        #worldDialog h2 {
+            margin: 0 0 12px;
+            font-size: 18px;
+        }
+        #worldDialog button {
+            display: block;
+            width: 100%;
+            margin: 6px 0;
+            padding: 8px;
+            cursor: pointer;
+        }
+        #closeOverlay {
+            margin-top: 12px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -111,6 +189,44 @@
         <h2>IGNITION SEQUENCE</h2>
         <canvas id="rocketCanvas" width="800" height="600"></canvas>
     </section>
+    <hr>
+
+    <section id="keylockSection">
+        <h2>EARTH MARS BLACK MOON — keylock</h2>
+        <label for="keylock">the letters e r b m</label><br>
+        <input id="keylock" name="keylock" type="text" maxlength="1" placeholder="e r b m" autocomplete="off">
+        <p>e = Earth (top left) · r = Mars (top right) · b = Black (bottom left) · m = Moon (bottom right)</p>
+
+        <div id="bottomWorlds">
+            <div class="world" data-key="e" id="world-e">
+                <img alt="Earth">
+                <span>EARTH — E</span>
+            </div>
+            <div class="world" data-key="r" id="world-r">
+                <img alt="Mars">
+                <span>MARS — R</span>
+            </div>
+            <div class="world" data-key="b" id="world-b">
+                <img alt="Black">
+                <span>BLACK — B</span>
+            </div>
+            <div class="world" data-key="m" id="world-m">
+                <img alt="Moon">
+                <span>MOON — M</span>
+            </div>
+        </div>
+    </section>
+
+    <div id="worldOverlay" aria-hidden="true">
+        <img id="worldOverlayImg" alt="Selected world">
+        <div id="worldDialog">
+            <h2 id="worldDialogTitle">What would you like to do xyz</h2>
+            <button type="button" data-act="explore">Explore xyz</button>
+            <button type="button" data-act="scan">Scan xyz</button>
+            <button type="button" data-act="lock">Lock xyz</button>
+            <button type="button" id="closeOverlay">Close</button>
+        </div>
+    </div>
 
     <script>
         const planetSources = [
@@ -125,12 +241,23 @@
 
         const eteBinding = { AA: 0, BB: 1, CC: 2, DD: 3 };
 
+        const worldMap = {
+            e: { name: "Earth", src: planetSources[0], corner: "top-left" },
+            r: { name: "Mars", src: planetSources[1], corner: "top-right" },
+            b: { name: "Black", src: planetSources[2], corner: "bottom-left" },
+            m: { name: "Moon", src: planetSources[3], corner: "bottom-right" }
+        };
+
         const etePreview = document.getElementById("ETE");
         const modifiedImage = document.getElementById("modifiedImage");
         const responseMessage = document.getElementById("responseMessage");
         const imageSelect = document.getElementById("image_select");
         const canvas = document.getElementById("rocketCanvas");
         const ctx = canvas.getContext("2d");
+        const keylock = document.getElementById("keylock");
+        const worldOverlay = document.getElementById("worldOverlay");
+        const worldOverlayImg = document.getElementById("worldOverlayImg");
+        const worldDialogTitle = document.getElementById("worldDialogTitle");
 
         let rocketImg = new Image();
         let lizardImg = new Image();
@@ -155,7 +282,6 @@
             const brightness = parseFloat(document.getElementById("brightness").value) || 1;
             const contrast = parseFloat(document.getElementById("contrast").value) || 1;
             const rotation = parseFloat(document.getElementById("rotation").value) || 0;
-
             modifiedImage.src = src;
             modifiedImage.style.filter = `brightness(${brightness}) contrast(${contrast})`;
             modifiedImage.style.transform = `rotate(${rotation}deg)`;
@@ -165,15 +291,12 @@
             const selected = imageSelect.value;
             const planetIndex = selectedPlanetIndex();
             etePreview.src = planetSources[planetIndex];
-
             document.getElementById("image1").src = planetSources[planetIndex];
             document.getElementById("image2").src = planetSources[(planetIndex + 1) % planetSources.length];
-
             const box = document.getElementById("eteTextBoxContainer");
             const label = document.getElementById("eteTextLabel");
             box.style.display = "block";
             label.textContent = `Enter data for ${selected}:`;
-
             applyModifierPreview();
             missionNameCallback();
         }
@@ -207,9 +330,7 @@
                 modelAddress: document.getElementById("modelAddress").value,
                 serverLog: document.getElementById("serverLog").value
             };
-
             missionNameCallback();
-
             try {
                 const response = await fetch("/addMissionLog", {
                     method: "POST",
@@ -222,7 +343,6 @@
             } catch (err) {
                 responseMessage.textContent =
                     `Saved locally (no /addMissionLog server): ${missionData.missionName}. ${err.message}`;
-                console.warn("Mission log server unavailable:", err);
             }
         });
 
@@ -230,12 +350,10 @@
             const selectedETE = imageSelect.value;
             const userText = document.getElementById("eteTextInput").value;
             const container = document.getElementById("missionDropdownContainer");
-
             if (selectedETE !== "BB" || !userText.trim()) {
                 container.style.display = "none";
                 return;
             }
-
             const options = [
                 { name: "Mars", url: "https://en.wikipedia.org/wiki/Mars" },
                 { name: "Pluto", url: "https://en.wikipedia.org/wiki/Pluto" },
@@ -243,7 +361,6 @@
                 { name: "Saturn", url: "https://en.wikipedia.org/wiki/Saturn" },
                 { name: "Venus", url: "https://en.wikipedia.org/wiki/Venus" }
             ];
-
             const dropdown = document.getElementById("missionPlanetDropdown");
             dropdown.innerHTML = "";
             options.forEach((opt) => {
@@ -252,10 +369,7 @@
                 option.textContent = opt.name;
                 dropdown.appendChild(option);
             });
-
             container.style.display = "block";
-            console.log("Dropdown activated for BB");
-            console.log("User typed:", userText);
         }
 
         document.getElementById("missionPlanetDropdown").addEventListener("change", () => {
@@ -293,9 +407,7 @@
             if (!ctx) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawPlanetsFixed();
-
             if (!rocketImg.naturalWidth || !lizardImg.naturalWidth) return;
-
             const rocketSize = parseFloat(document.getElementById("rocketSize").value) || 1;
             const rotation = parseFloat(document.getElementById("rotation").value) || 0;
             const rw = Math.max(8, rocketImg.naturalWidth * rocketSize);
@@ -304,6 +416,61 @@
             const ry = canvas.height / 2 - rh / 2;
             drawRocketAndLizard(rx, ry, rw, rh, rotation);
         }
+
+        function openWorld(letter) {
+            const world = worldMap[letter];
+            if (!world) return;
+            worldOverlayImg.src = world.src;
+            worldDialogTitle.textContent = `What would you like to do ${world.name}?`;
+            worldOverlay.style.display = "block";
+            worldOverlay.setAttribute("aria-hidden", "false");
+            keylock.value = letter;
+        }
+
+        function closeWorld() {
+            worldOverlay.style.display = "none";
+            worldOverlay.setAttribute("aria-hidden", "true");
+        }
+
+        function myFunction(event) {
+            const source = event.target === keylock ? keylock.value : (event.key || "");
+            const letter = String(source).trim().toLowerCase().slice(-1);
+            if (!worldMap[letter]) return;
+            if (event.target && event.target.tagName === "INPUT" && event.target.id !== "keylock") return;
+            if (event.target && event.target.tagName === "TEXTAREA") return;
+            event.preventDefault();
+            openWorld(letter);
+        }
+
+        keylock.addEventListener("input", myFunction);
+        keylock.addEventListener("keydown", (event) => {
+            if (worldMap[event.key.toLowerCase()]) myFunction(event);
+        });
+        document.addEventListener("keydown", (event) => {
+            if (event.repeat) return;
+            if (event.target && (event.target.tagName === "TEXTAREA" || (event.target.tagName === "INPUT" && event.target.id !== "keylock"))) return;
+            myFunction(event);
+        });
+
+        document.querySelectorAll("#bottomWorlds .world").forEach((el) => {
+            const letter = el.dataset.key;
+            el.querySelector("img").src = worldMap[letter].src;
+            el.addEventListener("click", () => openWorld(letter));
+        });
+
+        document.getElementById("closeOverlay").addEventListener("click", closeWorld);
+        document.querySelectorAll("#worldDialog button[data-act]").forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const act = btn.getAttribute("data-act");
+                const letter = keylock.value.toLowerCase();
+                const world = worldMap[letter];
+                console.log(act, world && world.name);
+                closeWorld();
+            });
+        });
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") closeWorld();
+        });
 
         Promise.all([
             ...planetSources.map((src) => loadImage(src).catch((err) => {
