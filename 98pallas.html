@@ -5,120 +5,71 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SPEC.DEPO01 — Enhanced</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        .image-preview img {
-            width: 150px;
-            margin-right: 10px;
-        }
-        #rocketCanvas {
-            border: 1px solid black;
-            display: block;
-            margin-top: 20px;
-        }
-        #modifiedImage {
-            width: 200px;
-            margin-top: 10px;
-            border: 1px solid #ccc;
-        }
-        #ETE {
-            width: 200px;
-            height: 200px;
-            object-fit: cover;
-            border: 1px solid #ccc;
-        }
-        #eteTextBoxContainer {
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .image-preview img { width: 150px; margin-right: 10px; }
+        #rocketCanvas { border: 1px solid black; display: block; margin-top: 20px; }
+        #modifiedImage { width: 200px; margin-top: 10px; border: 1px solid #ccc; }
+        #ETE { width: 200px; height: 200px; object-fit: cover; border: 1px solid #ccc; }
+        #eteTextBoxContainer { display: none; width: 200px; height: 200px; border: 1px solid #ccc; padding: 10px; box-sizing: border-box; }
+        #eteTextInput { width: 100%; height: 140px; resize: none; }
+        #keylock { font-size: 22px; letter-spacing: 0.35em; text-transform: lowercase; width: 220px; padding: 8px; }
+        .erbm-key { display: inline-block; min-width: 1.4em; text-align: center; padding: 2px 6px; margin: 0 2px; border: 1px solid #444; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .erbm-key[data-key="e"] { background: #1b4d89; color: #fff; }
+        .erbm-key[data-key="r"] { background: #9a3412; color: #fff; }
+        .erbm-key[data-key="b"] { background: #111; color: #eee; }
+        .erbm-key[data-key="m"] { background: #4b5563; color: #fff; }
+        #bottomWorlds { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 180px 180px; gap: 8px; margin-top: 16px; }
+        #bottomWorlds .world { position: relative; overflow: hidden; border: 2px solid #222; cursor: pointer; }
+        #bottomWorlds .world img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        #bottomWorlds .world span { position: absolute; left: 8px; bottom: 8px; color: #fff; background: rgba(0,0,0,0.55); padding: 2px 8px; font-size: 14px; }
+        #worldOverlay { display: none; position: fixed; inset: 0; z-index: 9999; background: #000; overflow: hidden; }
+        #worldOverlayImg { width: 100%; height: 100%; object-fit: cover; transform-origin: center center; }
+        #worldDialog { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; color: #111; min-width: 320px; max-width: 90vw; padding: 20px 24px; border-radius: 8px; box-shadow: 0 12px 40px rgba(0,0,0,0.45); z-index: 3; }
+        #worldDialog h2 { margin: 0 0 12px; font-size: 18px; }
+        #worldDialog button { display: block; width: 100%; margin: 6px 0; padding: 8px; cursor: pointer; }
+        #sitCapsule {
             display: none;
-            width: 200px;
-            height: 200px;
-            border: 1px solid #ccc;
-            padding: 10px;
-            box-sizing: border-box;
-        }
-        #eteTextInput {
-            width: 100%;
-            height: 140px;
-            resize: none;
-        }
-        #keylockSection {
-            margin: 24px 0;
-        }
-        #keylock {
-            font-size: 22px;
-            letter-spacing: 0.35em;
-            text-transform: lowercase;
-            width: 220px;
-            padding: 8px;
-        }
-        #bottomWorlds {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 180px 180px;
-            gap: 8px;
-            margin-top: 16px;
-        }
-        #bottomWorlds .world {
-            position: relative;
-            overflow: hidden;
-            border: 2px solid #222;
-            cursor: pointer;
-        }
-        #bottomWorlds .world img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-        #bottomWorlds .world span {
             position: absolute;
-            left: 8px;
-            bottom: 8px;
-            color: #fff;
-            background: rgba(0,0,0,0.55);
-            padding: 2px 8px;
-            font-size: 14px;
-        }
-        #worldOverlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 9999;
-            background: #000;
-        }
-        #worldOverlay img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        #worldDialog {
-            position: absolute;
-            top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
-            background: #fff;
-            color: #111;
-            min-width: 320px;
-            max-width: 90vw;
-            padding: 20px 24px;
-            border-radius: 8px;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+            top: -20%;
+            width: 18vmin;
+            height: auto;
+            z-index: 2;
+            pointer-events: none;
+            transform: translate(-50%, -50%) rotateX(53deg) rotateY(0deg) rotateZ(8deg);
+            filter: drop-shadow(0 18px 16px rgba(0,0,0,0.55));
         }
-        #worldDialog h2 {
-            margin: 0 0 12px;
-            font-size: 18px;
+        #sitCapsule.gateway {
+            animation: freefallGimbal 5.5s cubic-bezier(0.22, 0.1, 0.18, 1) forwards;
         }
-        #worldDialog button {
-            display: block;
-            width: 100%;
-            margin: 6px 0;
-            padding: 8px;
-            cursor: pointer;
-        }
-        #closeOverlay {
-            margin-top: 12px;
-            font-weight: bold;
+        @keyframes freefallGimbal {
+            0% {
+                top: -18%;
+                width: 10vmin;
+                transform: translate(-50%, -50%) rotateX(53deg) rotateY(12deg) rotateZ(10deg) scale(0.55);
+                filter: drop-shadow(0 40px 24px rgba(0,0,0,0.15));
+            }
+            35% {
+                top: 28%;
+                width: 14vmin;
+                transform: translate(-50%, -50%) rotateX(38deg) rotateY(-16deg) rotateZ(-7deg) scale(0.78);
+            }
+            62% {
+                top: 48%;
+                width: 16vmin;
+                transform: translate(-50%, -50%) rotateX(24deg) rotateY(9deg) rotateZ(5deg) scale(0.92);
+            }
+            82% {
+                top: 50%;
+                width: 16.6vmin;
+                transform: translate(-50%, -50%) rotateX(16deg) rotateY(4deg) rotateZ(-2deg) scale(1);
+            }
+            100% {
+                top: 50%;
+                width: 16.66vmin;
+                transform: translate(-50%, -50%) rotateX(16deg) rotateY(0deg) rotateZ(0deg) scale(1);
+                filter: drop-shadow(0 10px 10px rgba(0,0,0,0.45));
+            }
         }
     </style>
 </head>
@@ -193,32 +144,45 @@
 
     <section id="keylockSection">
         <h2>EARTH MARS BLACK MOON — keylock</h2>
-        <label for="keylock">the letters e r b m</label><br>
+        <p>
+            the letters
+            <span class="erbm-key" data-key="e">e</span>
+            <span class="erbm-key" data-key="r">r</span>
+            <span class="erbm-key" data-key="b">b</span>
+            <span class="erbm-key" data-key="m">m</span>
+        </p>
+        <label for="keylock">keylock</label><br>
         <input id="keylock" name="keylock" type="text" maxlength="1" placeholder="e r b m" autocomplete="off">
-        <p>e = Earth (top left) · r = Mars (top right) · b = Black (bottom left) · m = Moon (bottom right)</p>
+        <p>
+            <span class="erbm-key" data-key="e">e</span> Earth top left ·
+            <span class="erbm-key" data-key="r">r</span> Mars top right ·
+            <span class="erbm-key" data-key="b">b</span> Black bottom left ·
+            <span class="erbm-key" data-key="m">m</span> Moon bottom right
+        </p>
 
         <div id="bottomWorlds">
             <div class="world" data-key="e" id="world-e">
                 <img alt="Earth">
-                <span>EARTH — E</span>
+                <span>EARTH — <span class="erbm-key" data-key="e">e</span></span>
             </div>
             <div class="world" data-key="r" id="world-r">
                 <img alt="Mars">
-                <span>MARS — R</span>
+                <span>MARS — <span class="erbm-key" data-key="r">r</span></span>
             </div>
             <div class="world" data-key="b" id="world-b">
                 <img alt="Black">
-                <span>BLACK — B</span>
+                <span>BLACK — <span class="erbm-key" data-key="b">b</span></span>
             </div>
             <div class="world" data-key="m" id="world-m">
                 <img alt="Moon">
-                <span>MOON — M</span>
+                <span>MOON — <span class="erbm-key" data-key="m">m</span></span>
             </div>
         </div>
     </section>
 
     <div id="worldOverlay" aria-hidden="true">
         <img id="worldOverlayImg" alt="Selected world">
+        <img id="sitCapsule" alt="sit capsule" src="sit.png">
         <div id="worldDialog">
             <h2 id="worldDialogTitle">What would you like to do xyz</h2>
             <button type="button" data-act="explore">Explore xyz</button>
@@ -235,12 +199,12 @@
             "https://th.bing.com/th/id/OIP.fI3DWs_H0Z6Man0THeWe6wHaEK?rs=1&pid=ImgDetMain",
             "https://th.bing.com/th/id/OIP.0nwjv9AEh1uLPs4RHKQu3QHaHa?rs=1&pid=ImgDetMain"
         ];
-
         const ROCKET_SRC = "https://raw.githubusercontent.com/AlienWare51/MoonWave/main/rocket.png";
         const LIZARD_SRC = "https://raw.githubusercontent.com/AlienWare51/MoonWave/main/lizard.png";
+        const SIT_SRC_LOCAL = "sit.png";
+        const SIT_SRC_FALLBACK = "https://raw.githubusercontent.com/AlienWare51/MoonWave/main/sit.png";
 
         const eteBinding = { AA: 0, BB: 1, CC: 2, DD: 3 };
-
         const worldMap = {
             e: { name: "Earth", src: planetSources[0], corner: "top-left" },
             r: { name: "Mars", src: planetSources[1], corner: "top-right" },
@@ -257,11 +221,15 @@
         const keylock = document.getElementById("keylock");
         const worldOverlay = document.getElementById("worldOverlay");
         const worldOverlayImg = document.getElementById("worldOverlayImg");
+        const worldDialog = document.getElementById("worldDialog");
         const worldDialogTitle = document.getElementById("worldDialogTitle");
+        const sitCapsule = document.getElementById("sitCapsule");
 
         let rocketImg = new Image();
         let lizardImg = new Image();
         const planets = [];
+        let sitReady = false;
+        let landingTimer = null;
 
         function loadImage(src) {
             return new Promise((resolve, reject) => {
@@ -293,29 +261,22 @@
             etePreview.src = planetSources[planetIndex];
             document.getElementById("image1").src = planetSources[planetIndex];
             document.getElementById("image2").src = planetSources[(planetIndex + 1) % planetSources.length];
-            const box = document.getElementById("eteTextBoxContainer");
-            const label = document.getElementById("eteTextLabel");
-            box.style.display = "block";
-            label.textContent = `Enter data for ${selected}:`;
+            document.getElementById("eteTextBoxContainer").style.display = "block";
+            document.getElementById("eteTextLabel").textContent = `Enter data for ${selected}:`;
             applyModifierPreview();
             missionNameCallback();
         }
 
         imageSelect.addEventListener("change", updateEtePreview);
-
         document.getElementById("eteTextSubmit").addEventListener("click", () => {
-            const selected = imageSelect.value;
-            const text = document.getElementById("eteTextInput").value;
-            console.log(`Text for ${selected}:`, text);
+            console.log(`Text for ${imageSelect.value}:`, document.getElementById("eteTextInput").value);
             missionNameCallback();
         });
-
         document.getElementById("modifierForm").addEventListener("submit", (event) => {
             event.preventDefault();
             applyModifierPreview();
             renderFrame();
         });
-
         ["brightness", "contrast", "rotation", "rocketSize"].forEach((id) => {
             document.getElementById(id).addEventListener("input", () => {
                 applyModifierPreview();
@@ -341,16 +302,13 @@
                 const data = await response.json();
                 responseMessage.textContent = `Success: ${data.message}, Log ID: ${data.logId}`;
             } catch (err) {
-                responseMessage.textContent =
-                    `Saved locally (no /addMissionLog server): ${missionData.missionName}. ${err.message}`;
+                responseMessage.textContent = `Saved locally: ${missionData.missionName}. ${err.message}`;
             }
         });
 
         function missionNameCallback() {
-            const selectedETE = imageSelect.value;
-            const userText = document.getElementById("eteTextInput").value;
             const container = document.getElementById("missionDropdownContainer");
-            if (selectedETE !== "BB" || !userText.trim()) {
+            if (imageSelect.value !== "BB" || !document.getElementById("eteTextInput").value.trim()) {
                 container.style.display = "none";
                 return;
             }
@@ -386,10 +344,9 @@
                 { x: 0, y: halfH, w: halfW, h: halfH },
                 { x: halfW, y: halfH, w: halfW, h: halfH }
             ];
-            const letters = Object.keys(eteBinding);
-            quadrants.forEach((q, i) => {
-                const img = planets[eteBinding[letters[i]]];
-                if (img) ctx.drawImage(img, q.x, q.y, q.w, q.h);
+            Object.keys(eteBinding).forEach((letter, i) => {
+                const img = planets[eteBinding[letter]];
+                if (img) ctx.drawImage(img, quadrants[i].x, quadrants[i].y, quadrants[i].w, quadrants[i].h);
             });
         }
 
@@ -412,42 +369,93 @@
             const rotation = parseFloat(document.getElementById("rotation").value) || 0;
             const rw = Math.max(8, rocketImg.naturalWidth * rocketSize);
             const rh = Math.max(8, rocketImg.naturalHeight * rocketSize);
-            const rx = canvas.width / 2 - rw / 2;
-            const ry = canvas.height / 2 - rh / 2;
-            drawRocketAndLizard(rx, ry, rw, rh, rotation);
+            drawRocketAndLizard(canvas.width / 2 - rw / 2, canvas.height / 2 - rh / 2, rw, rh, rotation);
+        }
+
+        function isOverlayOpen() {
+            return worldOverlay.style.display === "block";
+        }
+
+        function resetSit() {
+            if (landingTimer) {
+                clearTimeout(landingTimer);
+                landingTimer = null;
+            }
+            sitCapsule.classList.remove("gateway");
+            sitCapsule.style.display = "none";
+            sitCapsule.style.width = "";
+            sitCapsule.style.top = "";
         }
 
         function openWorld(letter) {
             const world = worldMap[letter];
             if (!world) return;
+            resetSit();
             worldOverlayImg.src = world.src;
+            worldOverlayImg.style.transform = "scale(1)";
             worldDialogTitle.textContent = `What would you like to do ${world.name}?`;
+            worldDialog.style.display = "block";
             worldOverlay.style.display = "block";
             worldOverlay.setAttribute("aria-hidden", "false");
             keylock.value = letter;
         }
 
         function closeWorld() {
+            resetSit();
             worldOverlay.style.display = "none";
             worldOverlay.setAttribute("aria-hidden", "true");
+            worldDialog.style.display = "block";
+        }
+
+        function startExploreFreefall() {
+            if (!isOverlayOpen()) return;
+            worldDialog.style.display = "none";
+            sitCapsule.src = sitCapsule.dataset.src || SIT_SRC_LOCAL;
+            sitCapsule.style.display = "block";
+            sitCapsule.classList.remove("gateway");
+            void sitCapsule.offsetWidth;
+            sitCapsule.classList.add("gateway");
+
+            landingTimer = setTimeout(() => {
+                const host = Math.min(worldOverlay.clientWidth, worldOverlay.clientHeight);
+                sitCapsule.style.width = (host / 6) + "px";
+                sitCapsule.style.top = "50%";
+                sitCapsule.classList.remove("gateway");
+                sitCapsule.style.transform = "translate(-50%, -50%) rotateX(16deg) rotateY(0deg) rotateZ(0deg)";
+            }, 5500);
         }
 
         function myFunction(event) {
-            const source = event.target === keylock ? keylock.value : (event.key || "");
-            const letter = String(source).trim().toLowerCase().slice(-1);
+            let letter = "";
+            if (event.currentTarget && event.currentTarget.classList && event.currentTarget.classList.contains("erbm-key")) {
+                letter = event.currentTarget.getAttribute("data-key");
+            } else if (event.target === keylock) {
+                letter = String(keylock.value).trim().toLowerCase().slice(-1);
+            } else {
+                letter = String(event.key || "").toLowerCase();
+            }
             if (!worldMap[letter]) return;
-            if (event.target && event.target.tagName === "INPUT" && event.target.id !== "keylock") return;
-            if (event.target && event.target.tagName === "TEXTAREA") return;
-            event.preventDefault();
+            if (event.target && event.target.id !== "keylock") {
+                if (event.target.tagName === "INPUT" || event.target.tagName === "TEXTAREA" || event.target.tagName === "SELECT") return;
+            }
+            if (event.preventDefault) event.preventDefault();
             openWorld(letter);
         }
 
+        document.addEventListener("click", (event) => {
+            const span = event.target.closest(".erbm-key");
+            if (span) myFunction({ currentTarget: span, target: span, preventDefault() {} });
+        });
         keylock.addEventListener("input", myFunction);
         keylock.addEventListener("keydown", (event) => {
-            if (worldMap[event.key.toLowerCase()]) myFunction(event);
+            if (worldMap[String(event.key).toLowerCase()]) myFunction(event);
         });
         document.addEventListener("keydown", (event) => {
             if (event.repeat) return;
+            if (event.key === "Escape") {
+                closeWorld();
+                return;
+            }
             if (event.target && (event.target.tagName === "TEXTAREA" || (event.target.tagName === "INPUT" && event.target.id !== "keylock"))) return;
             myFunction(event);
         });
@@ -455,22 +463,32 @@
         document.querySelectorAll("#bottomWorlds .world").forEach((el) => {
             const letter = el.dataset.key;
             el.querySelector("img").src = worldMap[letter].src;
-            el.addEventListener("click", () => openWorld(letter));
+            el.addEventListener("click", (event) => {
+                if (event.target.closest(".erbm-key")) return;
+                openWorld(letter);
+            });
         });
 
         document.getElementById("closeOverlay").addEventListener("click", closeWorld);
         document.querySelectorAll("#worldDialog button[data-act]").forEach((btn) => {
             btn.addEventListener("click", () => {
                 const act = btn.getAttribute("data-act");
-                const letter = keylock.value.toLowerCase();
-                const world = worldMap[letter];
-                console.log(act, world && world.name);
+                if (act === "explore") {
+                    startExploreFreefall();
+                    return;
+                }
+                console.log(act, worldMap[keylock.value.toLowerCase()]);
                 closeWorld();
             });
         });
-        document.addEventListener("keydown", (event) => {
-            if (event.key === "Escape") closeWorld();
+
+        sitCapsule.addEventListener("error", () => {
+            if (sitCapsule.src.indexOf(SIT_SRC_FALLBACK) === -1) {
+                sitCapsule.src = SIT_SRC_FALLBACK;
+                sitCapsule.dataset.src = SIT_SRC_FALLBACK;
+            }
         });
+        sitCapsule.dataset.src = SIT_SRC_LOCAL;
 
         Promise.all([
             ...planetSources.map((src) => loadImage(src).catch((err) => {
@@ -478,12 +496,19 @@
                 return null;
             })),
             loadImage(ROCKET_SRC),
-            loadImage(LIZARD_SRC)
+            loadImage(LIZARD_SRC),
+            loadImage(SIT_SRC_LOCAL).catch(() => loadImage(SIT_SRC_FALLBACK).catch(() => null))
         ]).then((loaded) => {
             const planetImgs = loaded.slice(0, planetSources.length);
-            rocketImg = loaded[loaded.length - 2];
-            lizardImg = loaded[loaded.length - 1];
+            rocketImg = loaded[planetSources.length];
+            lizardImg = loaded[planetSources.length + 1];
+            const sitImg = loaded[planetSources.length + 2];
             planetImgs.forEach((img, i) => { planets[i] = img; });
+            if (sitImg) {
+                sitCapsule.src = sitImg.src;
+                sitCapsule.dataset.src = sitImg.src;
+                sitReady = true;
+            }
             updateEtePreview();
             renderFrame();
             setInterval(renderFrame, 250);
