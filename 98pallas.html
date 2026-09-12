@@ -39,6 +39,10 @@
         #pad-x { top: 0; right: 0; }
         #pad-c { bottom: 0; left: 0; }
         #pad-v { bottom: 0; right: 0; }
+        #pinStage { display: none; position: absolute; top: 0; right: 0; width: 22vmin; height: 22vmin; z-index: 5; overflow: hidden; transform-origin: top right; }
+        #pinStage.show { display: block; }
+        #pinStage.fill { top: 0; right: 0; left: 0; bottom: 0; width: 100%; height: 100%; transition: width 0.85s cubic-bezier(0.22, 0.08, 0.25, 1), height 0.85s cubic-bezier(0.22, 0.08, 0.25, 1); }
+        #pinImage { width: 100%; height: 100%; object-fit: cover; display: block; }
         .zxcv-mark { display: none; position: absolute; z-index: 4; width: 48px; height: 48px; line-height: 48px; text-align: center; font: 700 22px Arial, sans-serif; color: #fff; background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.65); border-radius: 6px; cursor: pointer; }
         .zxcv-mark.show { display: block; }
         #mark-z { top: 18px; left: 18px; }
@@ -141,6 +145,9 @@
         <div class="zxcv-pad" id="pad-x" data-corner="x"></div>
         <div class="zxcv-pad" id="pad-c" data-corner="c"></div>
         <div class="zxcv-pad" id="pad-v" data-corner="v"></div>
+        <div id="pinStage">
+            <img id="pinImage" alt="pin" src="pin.png">
+        </div>
         <div id="sitGate">
             <div id="sitGlow"></div>
             <img id="sitCapsule" alt="sit capsule" src="sit.png">
@@ -168,6 +175,8 @@
         const LIZARD_SRC = "https://raw.githubusercontent.com/AlienWare51/MoonWave/main/lizard.png";
         const SIT_SRC_LOCAL = "sit.png";
         const SIT_SRC_FALLBACK = "https://raw.githubusercontent.com/AlienWare51/MoonWave/main/sit.png";
+        const PIN_SRC_LOCAL = "pin.png";
+        const PIN_SRC_FALLBACK = "https://raw.githubusercontent.com/AlienWare51/MoonWave/main/pin.png";
         const eteBinding = { AA: 0, BB: 1, CC: 2, DD: 3 };
         const worldMap = {
             e: { name: "Earth", src: planetSources[0] },
@@ -194,6 +203,8 @@
         const sitGate = document.getElementById("sitGate");
         const sitGlow = document.getElementById("sitGlow");
         const sitCapsule = document.getElementById("sitCapsule");
+        const pinStage = document.getElementById("pinStage");
+        const pinImage = document.getElementById("pinImage");
         let rocketImg = new Image();
         let lizardImg = new Image();
         const planets = [];
@@ -287,6 +298,27 @@
             worldOverlayImg.classList.remove("zoom-z");
             worldOverlayImg.style.transform = "";
         }
+        function resetPin() {
+            pinStage.classList.remove("show", "fill");
+            pinStage.style.display = "none";
+        }
+        function openPinFill(event) {
+            if (event) { event.preventDefault(); event.stopPropagation(); }
+            if (!isWorldOpen() || !activeWorld) return;
+            if (!sitGate.classList.contains("settled")) return;
+            hideZxcvMarks();
+            const dest = zxcvTargets.x;
+            sitGate.classList.add("blast");
+            sitGate.style.top = dest.top;
+            sitGate.style.left = dest.left;
+            sitGate.style.transform = `translate(-50%, -50%) rotate(${dest.rot}) scale(0.42)`;
+            sitGate.style.opacity = "0.2";
+            pinStage.style.display = "block";
+            pinStage.classList.add("show");
+            pinStage.classList.remove("fill");
+            void pinStage.offsetWidth;
+            requestAnimationFrame(() => pinStage.classList.add("fill"));
+        }
         function zoomZOnCurrentPage(event) {
             if (event) { event.preventDefault(); event.stopPropagation(); }
             if (!isWorldOpen() || !activeWorld) return;
@@ -297,6 +329,7 @@
         function blastSitTo(corner, event) {
             if (event) { event.preventDefault(); event.stopPropagation(); }
             if (corner === "z") { zoomZOnCurrentPage(event); return; }
+            if (corner === "x") { openPinFill(event); return; }
             const dest = zxcvTargets[corner];
             if (!dest || !isWorldOpen()) return;
             if (!sitGate.classList.contains("settled") || sitGate.classList.contains("blast")) return;
@@ -311,6 +344,7 @@
             if (landingTimer) { clearTimeout(landingTimer); landingTimer = null; }
             hideZxcvMarks();
             resetZoom();
+            resetPin();
             sitGate.classList.remove("gateway", "settled", "blast");
             sitGate.style.display = "none";
             sitGate.style.width = "";
@@ -407,7 +441,12 @@
                     zoomZOnCurrentPage(event);
                     return;
                 }
-                if ("xcv".includes(letter) && sitGate.classList.contains("settled")) {
+                if (letter === "x" && sitGate.classList.contains("settled")) {
+                    event.preventDefault();
+                    openPinFill(event);
+                    return;
+                }
+                if ("cv".includes(letter) && sitGate.classList.contains("settled")) {
                     event.preventDefault();
                     blastSitTo(letter, event);
                 }
@@ -428,8 +467,13 @@
             event.stopPropagation();
             zoomZOnCurrentPage(event);
         });
+        document.getElementById("mark-x").addEventListener("click", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            openPinFill(event);
+        });
         document.querySelectorAll(".zxcv-mark").forEach((btn) => {
-            if (btn.dataset.corner === "z") return;
+            if (btn.dataset.corner === "z" || btn.dataset.corner === "x") return;
             btn.addEventListener("click", (event) => {
                 event.preventDefault();
                 event.stopPropagation();
@@ -446,16 +490,21 @@
         sitCapsule.addEventListener("error", () => {
             if (sitCapsule.src.indexOf(SIT_SRC_FALLBACK) === -1) sitCapsule.src = SIT_SRC_FALLBACK;
         });
+        pinImage.addEventListener("error", () => {
+            if (pinImage.src.indexOf(PIN_SRC_FALLBACK) === -1) pinImage.src = PIN_SRC_FALLBACK;
+        });
         Promise.all([
             ...planetSources.map((src) => loadImage(src).catch(() => null)),
             loadImage(ROCKET_SRC),
             loadImage(LIZARD_SRC),
-            loadImage(SIT_SRC_LOCAL).catch(() => loadImage(SIT_SRC_FALLBACK).catch(() => null))
+            loadImage(SIT_SRC_LOCAL).catch(() => loadImage(SIT_SRC_FALLBACK).catch(() => null)),
+            loadImage(PIN_SRC_LOCAL).catch(() => loadImage(PIN_SRC_FALLBACK).catch(() => null))
         ]).then((loaded) => {
             loaded.slice(0, 4).forEach((img, i) => { planets[i] = img; });
             rocketImg = loaded[4];
             lizardImg = loaded[5];
             if (loaded[6]) sitCapsule.src = loaded[6].src;
+            if (loaded[7]) pinImage.src = loaded[7].src;
             updateEtePreview();
             renderFrame();
             setInterval(renderFrame, 250);
