@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SPEC.DEPO01 — Enhanced</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .image-preview img { width: 150px; margin-right: 10px; }
-        #rocketCanvas { border: 1px solid black; display: block; margin-top: 20px; }
+        body { font-family: Arial, sans-serif; margin: 20px; overflow-x: hidden; }
+        #activityRow { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
+        #activityRow > section { flex: 1 1 320px; min-width: 280px; }
         #modifiedImage { width: 200px; margin-top: 10px; border: 1px solid #ccc; }
         #ETE { width: 200px; height: 200px; object-fit: cover; border: 1px solid #ccc; }
         #eteTextBoxContainer { display: none; width: 200px; height: 200px; border: 1px solid #ccc; padding: 10px; box-sizing: border-box; }
@@ -22,6 +22,25 @@
         #bottomWorlds .world { position: relative; overflow: hidden; border: 2px solid #222; cursor: pointer; }
         #bottomWorlds .world img { width: 100%; height: 100%; object-fit: cover; display: block; }
         #bottomWorlds .world span { position: absolute; left: 8px; bottom: 8px; color: #fff; background: rgba(0,0,0,0.55); padding: 2px 8px; font-size: 14px; }
+        #weatherCard { border: 1px solid #ccc; padding: 12px; background: #f6f8fb; min-height: 160px; }
+        #weatherCard button { margin-top: 8px; padding: 6px 10px; cursor: pointer; }
+        #weatherState { width: 100%; max-width: 280px; margin: 8px 0; padding: 6px; }
+        #weatherPopup {
+            display: none;
+            position: fixed;
+            z-index: 10050;
+            left: 50%;
+            top: 20%;
+            transform: translateX(-50%);
+            width: min(360px, 92vw);
+            background: #fff;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+        }
+        #weatherPopup.show { display: block; }
+        #rocketCanvas { border: 1px solid black; display: block; margin-top: 20px; max-width: 100%; height: auto; }
         #worldOverlay { display: none; position: fixed; inset: 0; z-index: 9999; background: #000; overflow: hidden; }
         #worldOverlayImg { width: 100%; height: 100%; object-fit: cover; transform-origin: top left; transition: transform 0.9s cubic-bezier(0.22, 0.08, 0.25, 1); }
         #worldOverlayImg.zoom-z { transform: scale(3); }
@@ -34,7 +53,7 @@
         #sitGlow { position: absolute; inset: -18%; border-radius: 50%; filter: blur(18px); opacity: 0.35; mix-blend-mode: screen; }
         #sitCapsule { display: block; width: 100%; height: auto; transform-origin: center 70%; mix-blend-mode: soft-light; }
         #sitGate.settled #sitCapsule { mix-blend-mode: normal; }
-        .zxcv-pad { position: absolute; width: 22vmin; height: 22vmin; z-index: 2; pointer-events: none; background-size: cover; background-position: center; }
+        .zxcv-pad { position: absolute; width: 22vmin; height: 22vmin; z-index: 2; pointer-events: none; }
         #pad-z { top: 0; left: 0; }
         #pad-x { top: 0; right: 0; }
         #pad-c { bottom: 0; left: 0; }
@@ -60,32 +79,47 @@
 </head>
 <body>
     <h1>LIZARD ROMULUS — Enhanced System</h1>
-    <section>
-        <h2>Image Modifier</h2>
-        <form id="modifierForm">
-            <label>ETE:</label>
-            <select id="image_select" name="image_select" required>
-                <option value="AA">AA</option>
-                <option value="BB">BB</option>
-                <option value="CC">CC</option>
-                <option value="DD">DD</option>
-            </select>
-            <div class="image-preview">
-                <img id="image1" alt="Preview 1">
-                <img id="image2" alt="Preview 2">
+    <div id="activityRow">
+        <section>
+            <h2>Image Modifier</h2>
+            <form id="modifierForm">
+                <label>ETE:</label>
+                <select id="image_select" name="image_select" required>
+                    <option value="AA">AA</option>
+                    <option value="BB">BB</option>
+                    <option value="CC">CC</option>
+                    <option value="DD">DD</option>
+                </select>
+                <label>Brightness:</label>
+                <input type="number" id="brightness" name="brightness" step="0.1" value="1.0">
+                <label>Contrast:</label>
+                <input type="number" id="contrast" name="contrast" step="0.1" value="1.0">
+                <label>Rotation (degrees):</label>
+                <input type="number" id="rotation" name="rotation" step="1" value="0">
+                <label>Rocket Size:</label>
+                <input type="number" id="rocketSize" name="rocketSize" step="0.1" value="1.0">
+                <button type="submit">HIBERNATION</button>
+            </form>
+            <img id="modifiedImage" alt="Modified Output">
+        </section>
+        <section id="weatherActivity">
+            <h2>Activity — Weather</h2>
+            <div id="weatherCard">
+                <label for="weatherState">Select a U.S. state</label><br>
+                <select id="weatherState">
+                    <option value="">Choose a state…</option>
+                </select>
+                <div id="weatherSummary">No weather loaded. Pick a state to pull a rough statewide reading.</div>
+                <button type="button" id="openWeatherPopup">Open weather popup</button>
+                <button type="button" id="refreshWeather">Refresh selected state</button>
             </div>
-            <label>Brightness:</label>
-            <input type="number" id="brightness" name="brightness" step="0.1" value="1.0">
-            <label>Contrast:</label>
-            <input type="number" id="contrast" name="contrast" step="0.1" value="1.0">
-            <label>Rotation (degrees):</label>
-            <input type="number" id="rotation" name="rotation" step="1" value="0">
-            <label>Rocket Size:</label>
-            <input type="number" id="rocketSize" name="rocketSize" step="0.1" value="1.0">
-            <button type="submit">HIBERNATION</button>
-        </form>
-        <img id="modifiedImage" alt="Modified Output">
-    </section>
+        </section>
+    </div>
+    <div id="weatherPopup" role="dialog" aria-labelledby="weatherPopupTitle">
+        <h3 id="weatherPopupTitle">Weather popup</h3>
+        <div id="weatherPopupBody">Placeholder. Tell me what this box should do next.</div>
+        <button type="button" id="closeWeatherPopup">Close</button>
+    </div>
     <hr>
     <section>
         <h2>MISSION LOG</h2>
@@ -177,6 +211,59 @@
         const SIT_SRC_FALLBACK = "https://raw.githubusercontent.com/AlienWare51/MoonWave/main/sit.png";
         const PIN_SRC_LOCAL = "pin.png";
         const PIN_SRC_FALLBACK = "https://raw.githubusercontent.com/AlienWare51/MoonWave/main/pin.png";
+        const US_STATES = [
+            { name: "Alabama", lat: 32.3777, lon: -86.3000 },
+            { name: "Alaska", lat: 58.3019, lon: -134.4197 },
+            { name: "Arizona", lat: 33.4484, lon: -112.0740 },
+            { name: "Arkansas", lat: 34.7465, lon: -92.2896 },
+            { name: "California", lat: 38.5767, lon: -121.4939 },
+            { name: "Colorado", lat: 39.7392, lon: -104.9903 },
+            { name: "Connecticut", lat: 41.7640, lon: -72.6823 },
+            { name: "Delaware", lat: 39.1573, lon: -75.5194 },
+            { name: "Florida", lat: 30.4383, lon: -84.2807 },
+            { name: "Georgia", lat: 33.7490, lon: -84.3880 },
+            { name: "Hawaii", lat: 21.3073, lon: -157.8573 },
+            { name: "Idaho", lat: 43.6177, lon: -116.1996 },
+            { name: "Illinois", lat: 39.7817, lon: -89.6501 },
+            { name: "Indiana", lat: 39.7684, lon: -86.1581 },
+            { name: "Iowa", lat: 41.5911, lon: -93.6037 },
+            { name: "Kansas", lat: 39.0473, lon: -95.6752 },
+            { name: "Kentucky", lat: 38.1867, lon: -84.8753 },
+            { name: "Louisiana", lat: 30.4571, lon: -91.1874 },
+            { name: "Maine", lat: 44.3072, lon: -69.7819 },
+            { name: "Maryland", lat: 38.9784, lon: -76.4922 },
+            { name: "Massachusetts", lat: 42.3584, lon: -71.0636 },
+            { name: "Michigan", lat: 42.7335, lon: -84.5467 },
+            { name: "Minnesota", lat: 44.9550, lon: -93.1022 },
+            { name: "Mississippi", lat: 32.2988, lon: -90.1848 },
+            { name: "Missouri", lat: 38.5790, lon: -92.1730 },
+            { name: "Montana", lat: 46.5857, lon: -112.0184 },
+            { name: "Nebraska", lat: 40.8136, lon: -96.7026 },
+            { name: "Nevada", lat: 39.1638, lon: -119.7674 },
+            { name: "New Hampshire", lat: 43.2069, lon: -71.5381 },
+            { name: "New Jersey", lat: 40.2206, lon: -74.7699 },
+            { name: "New Mexico", lat: 35.6824, lon: -105.9397 },
+            { name: "New York", lat: 42.6526, lon: -73.7562 },
+            { name: "North Carolina", lat: 35.7804, lon: -78.6391 },
+            { name: "North Dakota", lat: 46.8208, lon: -100.7833 },
+            { name: "Ohio", lat: 39.9612, lon: -82.9988 },
+            { name: "Oklahoma", lat: 35.4922, lon: -97.5033 },
+            { name: "Oregon", lat: 44.9385, lon: -123.0304 },
+            { name: "Pennsylvania", lat: 40.2640, lon: -76.8839 },
+            { name: "Rhode Island", lat: 41.8309, lon: -71.4147 },
+            { name: "South Carolina", lat: 34.0003, lon: -81.0332 },
+            { name: "South Dakota", lat: 44.3670, lon: -100.3464 },
+            { name: "Tennessee", lat: 36.1627, lon: -86.7816 },
+            { name: "Texas", lat: 30.2747, lon: -97.7404 },
+            { name: "Utah", lat: 40.7775, lon: -111.8882 },
+            { name: "Vermont", lat: 44.2624, lon: -72.5805 },
+            { name: "Virginia", lat: 37.5407, lon: -77.4360 },
+            { name: "Washington", lat: 47.0379, lon: -122.9007 },
+            { name: "West Virginia", lat: 38.3498, lon: -81.6326 },
+            { name: "Wisconsin", lat: 43.0747, lon: -89.3844 },
+            { name: "Wyoming", lat: 41.1400, lon: -104.8202 },
+            { name: "District of Columbia", lat: 38.9072, lon: -77.0369 }
+        ];
         const eteBinding = { AA: 0, BB: 1, CC: 2, DD: 3 };
         const worldMap = {
             e: { name: "Earth", src: planetSources[0] },
@@ -205,11 +292,16 @@
         const sitCapsule = document.getElementById("sitCapsule");
         const pinStage = document.getElementById("pinStage");
         const pinImage = document.getElementById("pinImage");
+        const weatherSummary = document.getElementById("weatherSummary");
+        const weatherPopup = document.getElementById("weatherPopup");
+        const weatherPopupBody = document.getElementById("weatherPopupBody");
+        const weatherState = document.getElementById("weatherState");
         let rocketImg = new Image();
         let lizardImg = new Image();
         const planets = [];
         let landingTimer = null;
         let activeWorld = null;
+        let latestWeather = null;
         const sampleCanvas = document.createElement("canvas");
         const sampleCtx = sampleCanvas.getContext("2d", { willReadFrequently: true });
 
@@ -233,8 +325,6 @@
         function updateEtePreview() {
             const i = selectedPlanetIndex();
             document.getElementById("ETE").src = planetSources[i];
-            document.getElementById("image1").src = planetSources[i];
-            document.getElementById("image2").src = planetSources[(i + 1) % 4];
             document.getElementById("eteTextBoxContainer").style.display = "block";
             document.getElementById("eteTextLabel").textContent = `Enter data for ${imageSelect.value}:`;
             applyModifierPreview();
@@ -256,6 +346,51 @@
             });
             box.style.display = "block";
         }
+        function selectedState() {
+            const name = weatherState.value;
+            return US_STATES.find((s) => s.name === name) || null;
+        }
+        async function fetchWeather(lat, lon, label) {
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto`;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error("weather HTTP " + res.status);
+            const data = await res.json();
+            const cur = data.current || {};
+            latestWeather = {
+                label: label,
+                temp: cur.temperature_2m,
+                humidity: cur.relative_humidity_2m,
+                wind: cur.wind_speed_10m,
+                code: cur.weather_code,
+                time: cur.time
+            };
+            weatherSummary.textContent =
+                label + " (state capital area): " + latestWeather.temp + "°F · wind " +
+                latestWeather.wind + " mph · humidity " + latestWeather.humidity + "% · " +
+                (latestWeather.time || "") + " · Open-Meteo";
+        }
+        function loadWeather() {
+            const state = selectedState();
+            if (!state) {
+                latestWeather = null;
+                weatherSummary.textContent = "No weather loaded. Pick a state to pull a rough statewide reading.";
+                return;
+            }
+            weatherSummary.textContent = "Updating weather for " + state.name + "…";
+            fetchWeather(state.lat, state.lon, state.name).catch((err) => {
+                weatherSummary.textContent = "Weather unavailable: " + err.message;
+            });
+        }
+        function openWeatherPopup() {
+            if (latestWeather) {
+                weatherPopupBody.textContent =
+                    `${latestWeather.label}: ${latestWeather.temp}°F, wind ${latestWeather.wind} mph. Popup actions not wired yet.`;
+            } else {
+                weatherPopupBody.textContent = "Placeholder. Tell me what this box should do next.";
+            }
+            weatherPopup.classList.add("show");
+        }
+        function closeWeatherPopup() { weatherPopup.classList.remove("show"); }
         function renderFrame() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             const halfW = canvas.width / 2, halfH = canvas.height / 2;
@@ -294,18 +429,11 @@
         }
         function showZxcvMarks() { document.querySelectorAll(".zxcv-mark").forEach((el) => el.classList.add("show")); }
         function hideZxcvMarks() { document.querySelectorAll(".zxcv-mark").forEach((el) => el.classList.remove("show")); }
-        function resetZoom() {
-            worldOverlayImg.classList.remove("zoom-z");
-            worldOverlayImg.style.transform = "";
-        }
-        function resetPin() {
-            pinStage.classList.remove("show", "fill");
-            pinStage.style.display = "none";
-        }
+        function resetZoom() { worldOverlayImg.classList.remove("zoom-z"); worldOverlayImg.style.transform = ""; }
+        function resetPin() { pinStage.classList.remove("show", "fill"); pinStage.style.display = "none"; }
         function openPinFill(event) {
             if (event) { event.preventDefault(); event.stopPropagation(); }
-            if (!isWorldOpen() || !activeWorld) return;
-            if (!sitGate.classList.contains("settled")) return;
+            if (!isWorldOpen() || !activeWorld || !sitGate.classList.contains("settled")) return;
             hideZxcvMarks();
             const dest = zxcvTargets.x;
             sitGate.classList.add("blast");
@@ -321,8 +449,7 @@
         }
         function zoomZOnCurrentPage(event) {
             if (event) { event.preventDefault(); event.stopPropagation(); }
-            if (!isWorldOpen() || !activeWorld) return;
-            if (!sitGate.classList.contains("settled")) return;
+            if (!isWorldOpen() || !activeWorld || !sitGate.classList.contains("settled")) return;
             hideZxcvMarks();
             worldOverlayImg.classList.add("zoom-z");
         }
@@ -331,8 +458,7 @@
             if (corner === "z") { zoomZOnCurrentPage(event); return; }
             if (corner === "x") { openPinFill(event); return; }
             const dest = zxcvTargets[corner];
-            if (!dest || !isWorldOpen()) return;
-            if (!sitGate.classList.contains("settled") || sitGate.classList.contains("blast")) return;
+            if (!dest || !isWorldOpen() || !sitGate.classList.contains("settled") || sitGate.classList.contains("blast")) return;
             hideZxcvMarks();
             sitGate.classList.add("blast");
             sitGate.style.top = dest.top;
@@ -362,14 +488,12 @@
             worldDialogTitle.textContent = `What would you like to do ${world.name}?`;
             worldDialog.style.display = "block";
             worldOverlay.style.display = "block";
-            worldOverlay.setAttribute("aria-hidden", "false");
             keylock.value = letter;
         }
         function closeWorld() {
             resetSit();
             activeWorld = null;
             worldOverlay.style.display = "none";
-            worldOverlay.setAttribute("aria-hidden", "true");
             worldDialog.style.display = "block";
         }
         function startExploreFreefall() {
@@ -410,6 +534,7 @@
             if (event.preventDefault) event.preventDefault();
             openWorld(letter);
         }
+
         imageSelect.addEventListener("change", updateEtePreview);
         document.getElementById("eteTextSubmit").addEventListener("click", missionNameCallback);
         document.getElementById("modifierForm").addEventListener("submit", (e) => { e.preventDefault(); applyModifierPreview(); renderFrame(); });
@@ -421,10 +546,16 @@
             missionNameCallback();
             responseMessage.textContent = "Saved locally: " + document.getElementById("missionName").value;
         });
-        document.getElementById("missionPlanetDropdown").addEventListener("change", () => {
-            const url = document.getElementById("missionPlanetDropdown").value;
-            if (url) window.open(url, "_blank");
+        document.getElementById("openWeatherPopup").addEventListener("click", openWeatherPopup);
+        document.getElementById("closeWeatherPopup").addEventListener("click", closeWeatherPopup);
+        document.getElementById("refreshWeather").addEventListener("click", loadWeather);
+        US_STATES.forEach((s) => {
+            const opt = document.createElement("option");
+            opt.value = s.name;
+            opt.textContent = s.name;
+            weatherState.appendChild(opt);
         });
+        weatherState.addEventListener("change", loadWeather);
         document.addEventListener("click", (event) => {
             const span = event.target.closest(".erbm-key");
             if (span && !isWorldOpen()) myFunction({ currentTarget: span, target: span, preventDefault() {} });
@@ -432,24 +563,13 @@
         keylock.addEventListener("input", myFunction);
         document.addEventListener("keydown", (event) => {
             if (event.repeat) return;
-            if (event.key === "Escape") { closeWorld(); return; }
+            if (event.key === "Escape") { closeWeatherPopup(); closeWorld(); return; }
             const letter = String(event.key || "").toLowerCase();
             if (isWorldOpen()) {
                 event.stopPropagation();
-                if (letter === "z" && sitGate.classList.contains("settled")) {
-                    event.preventDefault();
-                    zoomZOnCurrentPage(event);
-                    return;
-                }
-                if (letter === "x" && sitGate.classList.contains("settled")) {
-                    event.preventDefault();
-                    openPinFill(event);
-                    return;
-                }
-                if ("cv".includes(letter) && sitGate.classList.contains("settled")) {
-                    event.preventDefault();
-                    blastSitTo(letter, event);
-                }
+                if (letter === "z" && sitGate.classList.contains("settled")) { event.preventDefault(); zoomZOnCurrentPage(event); return; }
+                if (letter === "x" && sitGate.classList.contains("settled")) { event.preventDefault(); openPinFill(event); return; }
+                if ("cv".includes(letter) && sitGate.classList.contains("settled")) { event.preventDefault(); blastSitTo(letter, event); }
                 return;
             }
             if (event.target && (event.target.tagName === "TEXTAREA" || (event.target.tagName === "INPUT" && event.target.id !== "keylock"))) return;
@@ -462,23 +582,11 @@
                 openWorld(el.dataset.key);
             });
         });
-        document.getElementById("mark-z").addEventListener("click", (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            zoomZOnCurrentPage(event);
-        });
-        document.getElementById("mark-x").addEventListener("click", (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            openPinFill(event);
-        });
+        document.getElementById("mark-z").addEventListener("click", (event) => { event.preventDefault(); event.stopPropagation(); zoomZOnCurrentPage(event); });
+        document.getElementById("mark-x").addEventListener("click", (event) => { event.preventDefault(); event.stopPropagation(); openPinFill(event); });
         document.querySelectorAll(".zxcv-mark").forEach((btn) => {
             if (btn.dataset.corner === "z" || btn.dataset.corner === "x") return;
-            btn.addEventListener("click", (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                blastSitTo(btn.dataset.corner, event);
-            });
+            btn.addEventListener("click", (event) => { event.preventDefault(); event.stopPropagation(); blastSitTo(btn.dataset.corner, event); });
         });
         document.getElementById("closeOverlay").addEventListener("click", closeWorld);
         document.querySelectorAll("#worldDialog button[data-act]").forEach((btn) => {
