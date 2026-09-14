@@ -396,18 +396,26 @@
             const halfW = canvas.width / 2, halfH = canvas.height / 2;
             const q = [{ x: 0, y: 0 }, { x: halfW, y: 0 }, { x: 0, y: halfH }, { x: halfW, y: halfH }];
             Object.keys(eteBinding).forEach((k, i) => { if (planets[i]) ctx.drawImage(planets[i], q[i].x, q[i].y, halfW, halfH); });
-            if (!rocketImg.naturalWidth || !lizardImg.naturalWidth) return;
             const size = parseFloat(document.getElementById("rocketSize").value) || 1;
             const rot = parseFloat(document.getElementById("rotation").value) || 0;
-            const rw = Math.max(8, rocketImg.naturalWidth * size);
-            const rh = Math.max(8, rocketImg.naturalHeight * size);
-            ctx.save();
-            ctx.translate(canvas.width / 2, canvas.height / 2);
-            ctx.rotate(rot * Math.PI / 180);
-            ctx.drawImage(rocketImg, -rw / 2, -rh / 2, rw, rh);
-            ctx.globalAlpha = 0.5;
-            ctx.drawImage(lizardImg, -rw / 2, -rh / 2, rw, rh);
-            ctx.restore();
+            const pad = 18;
+            if (rocketImg && rocketImg.naturalWidth) {
+                const rw = Math.max(8, rocketImg.naturalWidth * size);
+                const rh = Math.max(8, rocketImg.naturalHeight * size);
+                ctx.save();
+                ctx.translate(pad + rw / 2, pad + rh / 2);
+                ctx.rotate(rot * Math.PI / 180);
+                ctx.drawImage(rocketImg, -rw / 2, -rh / 2, rw, rh);
+                ctx.restore();
+            }
+            if (lizardImg && lizardImg.naturalWidth) {
+                const lw = Math.max(8, lizardImg.naturalWidth * size);
+                const lh = Math.max(8, lizardImg.naturalHeight * size);
+                ctx.save();
+                ctx.translate(canvas.width - pad - lw / 2, canvas.height - pad - lh / 2);
+                ctx.drawImage(lizardImg, -lw / 2, -lh / 2, lw, lh);
+                ctx.restore();
+            }
         }
         function sampleWorldColor() {
             const fallbacks = { e: [40, 90, 150], r: [160, 70, 40], b: [20, 20, 24], m: [130, 130, 140] };
