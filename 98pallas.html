@@ -8,6 +8,11 @@
         body { font-family: Arial, sans-serif; margin: 20px; overflow-x: hidden; }
         #activityRow { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
         #activityRow > section { flex: 1 1 320px; min-width: 280px; }
+        #wikiBox { width: 200px; height: 200px; object-fit: cover; border: 1px solid #ccc; background: #eee; display: block; }
+        #wikiRow { display: flex; gap: 12px; align-items: flex-start; margin-top: 12px; }
+        #wikiActions { display: flex; flex-direction: column; gap: 8px; }
+        #wikiActions button { padding: 8px 12px; cursor: pointer; min-width: 120px; }
+        #wikiCaption { max-width: 420px; font-size: 13px; margin-top: 8px; line-height: 1.35; }
         #modifiedImage { width: 200px; margin-top: 10px; border: 1px solid #ccc; }
         #ETE { width: 200px; height: 200px; object-fit: cover; border: 1px solid #ccc; }
         #eteTextBoxContainer { display: none; width: 200px; height: 200px; border: 1px solid #ccc; padding: 10px; box-sizing: border-box; }
@@ -100,6 +105,14 @@
                 <input type="number" id="rocketSize" name="rocketSize" step="0.05" value="0.25">
                 <button type="submit">HIBERNATION</button>
             </form>
+            <div id="wikiRow">
+                <img id="wikiBox" alt="Wikipedia box">
+                <div id="wikiActions">
+                    <button type="button" id="btnAnimal">Animal</button>
+                    <button type="button" id="btnFact">random fact</button>
+                </div>
+            </div>
+            <div id="wikiCaption"></div>
             <img id="modifiedImage" alt="Modified Output">
         </section>
         <section id="weatherActivity">
@@ -296,6 +309,8 @@
         const weatherPopup = document.getElementById("weatherPopup");
         const weatherPopupBody = document.getElementById("weatherPopupBody");
         const weatherState = document.getElementById("weatherState");
+        const wikiBox = document.getElementById("wikiBox");
+        const wikiCaption = document.getElementById("wikiCaption");
         let rocketImg = new Image();
         let lizardImg = new Image();
         const planets = [];
@@ -391,6 +406,56 @@
             weatherPopup.classList.add("show");
         }
         function closeWeatherPopup() { weatherPopup.classList.remove("show"); }
+        window.wikiGate = ({
+            animals: ["Lion","Tiger","Elephant","Penguin","Red fox","Snowy owl","Bottlenose dolphin","Koala","Giant panda","Gray wolf","Cheetah","Giraffe","Hippopotamus","Kangaroo","Bald eagle","Octopus","Sea otter","Polar bear","Chameleon","Axolotl"],
+            calculus: ["Calculus","Derivative","Integral","Limit (mathematics)","Fundamental theorem of calculus","Differential calculus","Integral calculus","Taylor series","Chain rule","Product rule","Mean value theorem","Infinitesimal","Differential equation","Partial derivative"],
+            fetchSummary(title, done) {
+                if (title && window.fetch) {
+                    fetch("https://en.wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(title), { headers: { "Accept": "application/json" } })
+                        .then((res) => { if (res && res.ok) { return res.json(); } throw new Error("wiki"); })
+                        .then((data) => { if (data) { done(data); } })
+                        .catch(() => { if (wikiCaption) { wikiCaption.textContent = "Wikipedia is unavailable right now."; } });
+                }
+            },
+            loadAnimal() {
+                const list = this.animals;
+                if (list && list.length) {
+                    const title = list[Math.floor(Math.random() * list.length)];
+                    if (typeof title === "string") {
+                        if (wikiCaption) { wikiCaption.textContent = "Loading animal…"; }
+                        this.fetchSummary(title, (data) => {
+                            if (data && data.thumbnail && data.thumbnail.source) {
+                                wikiBox.src = data.thumbnail.source;
+                            } else if (data && data.originalimage && data.originalimage.source) {
+                                wikiBox.src = data.originalimage.source;
+                            }
+                            if (wikiCaption) {
+                                wikiCaption.textContent = (data.title || title) + (data.extract ? " — " + data.extract : "");
+                            }
+                        });
+                    }
+                }
+            },
+            loadFact() {
+                const list = this.calculus;
+                if (list && list.length) {
+                    const title = list[Math.floor(Math.random() * list.length)];
+                    if (typeof title === "string") {
+                        if (wikiCaption) { wikiCaption.textContent = "Loading calculus fact…"; }
+                        this.fetchSummary(title, (data) => {
+                            if (data && data.thumbnail && data.thumbnail.source) {
+                                wikiBox.src = data.thumbnail.source;
+                            }
+                            if (data && data.extract) {
+                                wikiCaption.textContent = (data.title || title) + " — " + data.extract;
+                            } else if (wikiCaption) {
+                                wikiCaption.textContent = title;
+                            }
+                        });
+                    }
+                }
+            }
+        });
         function spriteBox(img, size, capFrac, scaleFrac) {
             const cap = Math.min(canvas.width, canvas.height) * capFrac;
             let w = Math.max(1, img.naturalWidth) * size * scaleFrac;
@@ -569,6 +634,12 @@
         document.getElementById("openWeatherPopup").addEventListener("click", openWeatherPopup);
         document.getElementById("closeWeatherPopup").addEventListener("click", closeWeatherPopup);
         document.getElementById("refreshWeather").addEventListener("click", loadWeather);
+        document.getElementById("btnAnimal").addEventListener("click", () => {
+            if (window.wikiGate) { window.wikiGate.loadAnimal(); }
+        });
+        document.getElementById("btnFact").addEventListener("click", () => {
+            if (window.wikiGate) { window.wikiGate.loadFact(); }
+        });
         US_STATES.forEach((s) => {
             const opt = document.createElement("option");
             opt.value = s.name;
