@@ -392,9 +392,9 @@
         }
         function closeWeatherPopup() { weatherPopup.classList.remove("show"); }
         function spriteBox(img, size) {
-            const cap = Math.min(canvas.width, canvas.height) * 0.14;
-            let w = Math.max(1, img.naturalWidth) * size * 0.22;
-            let h = Math.max(1, img.naturalHeight) * size * 0.22;
+            const cap = Math.min(canvas.width, canvas.height) * 0.189;
+            let w = Math.max(1, img.naturalWidth) * size * 0.297;
+            let h = Math.max(1, img.naturalHeight) * size * 0.297;
             const m = Math.max(w, h);
             if (m > cap) {
                 const k = cap / m;
@@ -414,6 +414,7 @@
             if (rocketImg && rocketImg.naturalWidth) {
                 const box = spriteBox(rocketImg, size);
                 ctx.save();
+                ctx.globalAlpha = 0.55;
                 ctx.translate(pad + box.w / 2, pad + box.h / 2);
                 ctx.rotate(rot * Math.PI / 180);
                 ctx.drawImage(rocketImg, -box.w / 2, -box.h / 2, box.w, box.h);
@@ -422,6 +423,7 @@
             if (lizardImg && lizardImg.naturalWidth) {
                 const box = spriteBox(lizardImg, size);
                 ctx.save();
+                ctx.globalAlpha = 0.55;
                 ctx.translate(canvas.width - pad - box.w / 2, canvas.height - pad - box.h / 2);
                 ctx.drawImage(lizardImg, -box.w / 2, -box.h / 2, box.w, box.h);
                 ctx.restore();
