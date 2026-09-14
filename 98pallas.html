@@ -97,7 +97,7 @@
                 <label>Rotation (degrees):</label>
                 <input type="number" id="rotation" name="rotation" step="1" value="0">
                 <label>Rocket Size:</label>
-                <input type="number" id="rocketSize" name="rocketSize" step="0.1" value="1.0">
+                <input type="number" id="rocketSize" name="rocketSize" step="0.05" value="0.25">
                 <button type="submit">HIBERNATION</button>
             </form>
             <img id="modifiedImage" alt="Modified Output">
@@ -391,29 +391,39 @@
             weatherPopup.classList.add("show");
         }
         function closeWeatherPopup() { weatherPopup.classList.remove("show"); }
+        function spriteBox(img, size) {
+            const cap = Math.min(canvas.width, canvas.height) * 0.14;
+            let w = Math.max(1, img.naturalWidth) * size * 0.22;
+            let h = Math.max(1, img.naturalHeight) * size * 0.22;
+            const m = Math.max(w, h);
+            if (m > cap) {
+                const k = cap / m;
+                w *= k;
+                h *= k;
+            }
+            return { w: Math.max(12, w), h: Math.max(12, h) };
+        }
         function renderFrame() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             const halfW = canvas.width / 2, halfH = canvas.height / 2;
             const q = [{ x: 0, y: 0 }, { x: halfW, y: 0 }, { x: 0, y: halfH }, { x: halfW, y: halfH }];
             Object.keys(eteBinding).forEach((k, i) => { if (planets[i]) ctx.drawImage(planets[i], q[i].x, q[i].y, halfW, halfH); });
-            const size = parseFloat(document.getElementById("rocketSize").value) || 1;
+            const size = parseFloat(document.getElementById("rocketSize").value) || 0.25;
             const rot = parseFloat(document.getElementById("rotation").value) || 0;
-            const pad = 18;
+            const pad = 14;
             if (rocketImg && rocketImg.naturalWidth) {
-                const rw = Math.max(8, rocketImg.naturalWidth * size);
-                const rh = Math.max(8, rocketImg.naturalHeight * size);
+                const box = spriteBox(rocketImg, size);
                 ctx.save();
-                ctx.translate(pad + rw / 2, pad + rh / 2);
+                ctx.translate(pad + box.w / 2, pad + box.h / 2);
                 ctx.rotate(rot * Math.PI / 180);
-                ctx.drawImage(rocketImg, -rw / 2, -rh / 2, rw, rh);
+                ctx.drawImage(rocketImg, -box.w / 2, -box.h / 2, box.w, box.h);
                 ctx.restore();
             }
             if (lizardImg && lizardImg.naturalWidth) {
-                const lw = Math.max(8, lizardImg.naturalWidth * size);
-                const lh = Math.max(8, lizardImg.naturalHeight * size);
+                const box = spriteBox(lizardImg, size);
                 ctx.save();
-                ctx.translate(canvas.width - pad - lw / 2, canvas.height - pad - lh / 2);
-                ctx.drawImage(lizardImg, -lw / 2, -lh / 2, lw, lh);
+                ctx.translate(canvas.width - pad - box.w / 2, canvas.height - pad - box.h / 2);
+                ctx.drawImage(lizardImg, -box.w / 2, -box.h / 2, box.w, box.h);
                 ctx.restore();
             }
         }
@@ -611,19 +621,22 @@
         });
         Promise.all([
             ...planetSources.map((src) => loadImage(src).catch(() => null)),
-            loadImage(ROCKET_SRC),
-            loadImage(LIZARD_SRC),
+            loadImage(ROCKET_SRC).catch(() => null),
+            loadImage(LIZARD_SRC).catch(() => null),
             loadImage(SIT_SRC_LOCAL).catch(() => loadImage(SIT_SRC_FALLBACK).catch(() => null)),
             loadImage(PIN_SRC_LOCAL).catch(() => loadImage(PIN_SRC_FALLBACK).catch(() => null))
         ]).then((loaded) => {
             loaded.slice(0, 4).forEach((img, i) => { planets[i] = img; });
-            rocketImg = loaded[4];
-            lizardImg = loaded[5];
+            if (loaded[4]) rocketImg = loaded[4];
+            if (loaded[5]) lizardImg = loaded[5];
             if (loaded[6]) sitCapsule.src = loaded[6].src;
             if (loaded[7]) pinImage.src = loaded[7].src;
             updateEtePreview();
             renderFrame();
             setInterval(renderFrame, 250);
+        }).catch(() => {
+            updateEtePreview();
+            renderFrame();
         });
     </script>
 </body>
