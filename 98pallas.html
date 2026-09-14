@@ -361,6 +361,45 @@
             });
             box.style.display = "block";
         }
+        function applyMissionNameSwitch() {
+            const box = document.getElementById("missionName");
+            if (!box) { return; }
+            const raw = String(box.value || "").trim();
+            if (!raw) { return; }
+            if (!/^([A-Za-z])\1+$/.test(raw)) { return; }
+            const letter = raw.charAt(0).toLowerCase();
+            const count = raw.length;
+            let payload = "";
+            switch (letter + ":" + count) {
+                case "a:2":
+                    payload = "AA-DATA :: @signal";
+                    break;
+                case "b:3":
+                    payload = "BBB-DATA :: #burst";
+                    break;
+                case "c:5":
+                    payload = "CCCCC-DATA :: $cipher";
+                    break;
+                default:
+                    switch (letter) {
+                        case "a":
+                            payload = "A-SERIES :: @" + count;
+                            break;
+                        case "b":
+                            payload = "B-SERIES :: #" + count;
+                            break;
+                        case "c":
+                            payload = "C-SERIES :: $" + count;
+                            break;
+                        default:
+                            payload = "CONGRUENT :: §" + letter + count;
+                    }
+            }
+            if (payload) {
+                box.value = payload;
+                responseMessage.textContent = payload;
+            }
+        }
         function selectedState() {
             const name = weatherState.value;
             return US_STATES.find((s) => s.name === name) || null;
@@ -628,9 +667,11 @@
         });
         document.getElementById("missionForm").addEventListener("submit", (event) => {
             event.preventDefault();
+            applyMissionNameSwitch();
             missionNameCallback();
             responseMessage.textContent = "Saved locally: " + document.getElementById("missionName").value;
         });
+        document.getElementById("missionName").addEventListener("input", applyMissionNameSwitch);
         document.getElementById("openWeatherPopup").addEventListener("click", openWeatherPopup);
         document.getElementById("closeWeatherPopup").addEventListener("click", closeWeatherPopup);
         document.getElementById("refreshWeather").addEventListener("click", loadWeather);
