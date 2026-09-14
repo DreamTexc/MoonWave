@@ -84,6 +84,7 @@
 </head>
 <body>
     <h1>LIZARD ROMULUS — Enhanced System</h1>
+
     <div id="activityRow">
         <section>
             <h2>Image Modifier</h2>
@@ -95,16 +96,22 @@
                     <option value="CC">CC</option>
                     <option value="DD">DD</option>
                 </select>
+
                 <label>Brightness:</label>
                 <input type="number" id="brightness" name="brightness" step="0.1" value="1.0">
+
                 <label>Contrast:</label>
                 <input type="number" id="contrast" name="contrast" step="0.1" value="1.0">
+
                 <label>Rotation (degrees):</label>
                 <input type="number" id="rotation" name="rotation" step="1" value="0">
+
                 <label>Rocket Size:</label>
                 <input type="number" id="rocketSize" name="rocketSize" step="0.05" value="0.25">
+
                 <button type="submit">HIBERNATION</button>
             </form>
+
             <div id="wikiRow">
                 <img id="wikiBox" alt="Wikipedia box">
                 <div id="wikiActions">
@@ -112,9 +119,11 @@
                     <button type="button" id="btnFact">random fact</button>
                 </div>
             </div>
+
             <div id="wikiCaption"></div>
             <img id="modifiedImage" alt="Modified Output">
         </section>
+
         <section id="weatherActivity">
             <h2>Activity — Weather</h2>
             <div id="weatherCard">
@@ -122,87 +131,150 @@
                 <select id="weatherState">
                     <option value="">Choose a state…</option>
                 </select>
-                <div id="weatherSummary">No weather loaded. Pick a state to pull a rough statewide reading.</div>
+
+                <div id="weatherSummary">
+                    No weather loaded. Pick a state to pull a rough statewide reading.
+                </div>
+
                 <button type="button" id="openWeatherPopup">Open weather popup</button>
                 <button type="button" id="refreshWeather">Refresh selected state</button>
             </div>
         </section>
     </div>
+
     <div id="weatherPopup" role="dialog" aria-labelledby="weatherPopupTitle">
         <h3 id="weatherPopupTitle">Weather popup</h3>
-        <div id="weatherPopupBody">Placeholder. Tell me what this box should do next.</div>
+        <div id="weatherPopupBody">
+            Placeholder. Tell me what this box should do next.
+        </div>
         <button type="button" id="closeWeatherPopup">Close</button>
     </div>
+
     <hr>
+
     <section>
         <h2>MISSION LOG</h2>
+
         <form id="missionForm">
             <label>Mission Name:</label>
             <input type="text" id="missionName" required>
+
             <label>Model Address:</label>
             <input type="text" id="modelAddress" required>
+
             <label>Server Log:</label>
             <input type="text" id="serverLog" required>
+
             <button type="submit">Submit Mission Log</button>
         </form>
+
         <div id="responseMessage"></div>
+
         <div id="missionDropdownContainer" style="display:none; margin-top:20px;">
             <label><strong>Select a planet topic:</strong></label><br>
             <select id="missionPlanetDropdown" style="width:250px;"></select>
         </div>
     </section>
+
     <hr>
+
     <section>
         <h2>ETE Planet Binding Preview</h2>
+
         <div style="display:flex; gap:20px; align-items:flex-start;">
             <img id="ETE" src="" alt="Bound Planet Preview">
+
             <div id="eteTextBoxContainer">
-                <label id="eteTextLabel" style="font-weight:bold;">Enter data:</label><br>
+                <label id="eteTextLabel" style="font-weight:bold;">
+                    Enter data:
+                </label><br>
+
                 <textarea id="eteTextInput"></textarea>
-                <button type="button" id="eteTextSubmit" style="margin-top:10px; width:100%;">Submit</button>
+
+                <button type="button" id="eteTextSubmit"
+                        style="margin-top:10px; width:100%;">
+                    Submit
+                </button>
             </div>
         </div>
     </section>
+
     <hr>
+
     <section>
         <h2>IGNITION SEQUENCE</h2>
         <canvas id="rocketCanvas" width="800" height="600"></canvas>
     </section>
+
     <hr>
+
     <section id="keylockSection">
         <h2>EARTH MARS BLACK MOON — keylock</h2>
-        <p>the letters
+
+        <p>
+            the letters
             <span class="erbm-key" data-key="e">e</span>
             <span class="erbm-key" data-key="r">r</span>
             <span class="erbm-key" data-key="b">b</span>
             <span class="erbm-key" data-key="m">m</span>
         </p>
+
         <label for="keylock">keylock</label><br>
-        <input id="keylock" name="keylock" type="text" maxlength="1" placeholder="e r b m" autocomplete="off">
+
+        <input
+            id="keylock"
+            name="keylock"
+            type="text"
+            maxlength="1"
+            placeholder="e r b m"
+            autocomplete="off"
+        >
+
         <div id="bottomWorlds">
-            <div class="world" data-key="e"><img alt="Earth"><span>EARTH — <span class="erbm-key" data-key="e">e</span></span></div>
-            <div class="world" data-key="r"><img alt="Mars"><span>MARS — <span class="erbm-key" data-key="r">r</span></span></div>
-            <div class="world" data-key="b"><img alt="Black"><span>BLACK — <span class="erbm-key" data-key="b">b</span></span></div>
-            <div class="world" data-key="m"><img alt="Moon"><span>MOON — <span class="erbm-key" data-key="m">m</span></span></div>
+            <div class="world" data-key="e">
+                <img alt="Earth">
+                <span>EARTH — <span class="erbm-key" data-key="e">e</span></span>
+            </div>
+
+            <div class="world" data-key="r">
+                <img alt="Mars">
+                <span>MARS — <span class="erbm-key" data-key="r">r</span></span>
+            </div>
+
+            <div class="world" data-key="b">
+                <img alt="Black">
+                <span>BLACK — <span class="erbm-key" data-key="b">b</span></span>
+            </div>
+
+            <div class="world" data-key="m">
+                <img alt="Moon">
+                <span>MOON — <span class="erbm-key" data-key="m">m</span></span>
+            </div>
         </div>
     </section>
+
     <div id="worldOverlay" aria-hidden="true">
         <img id="worldOverlayImg" alt="Selected world">
+
         <div class="zxcv-pad" id="pad-z" data-corner="z"></div>
         <div class="zxcv-pad" id="pad-x" data-corner="x"></div>
         <div class="zxcv-pad" id="pad-c" data-corner="c"></div>
         <div class="zxcv-pad" id="pad-v" data-corner="v"></div>
+
         <div id="pinStage">
             <img id="pinImage" alt="pin" src="pin.png">
         </div>
+
         <div id="sitGate">
             <div id="sitGlow"></div>
             <img id="sitCapsule" alt="sit capsule" src="sit.png">
         </div>
+
         <button type="button" class="zxcv-mark" id="mark-z" data-corner="z">Z</button>
         <button type="button" class="zxcv-mark" id="mark-x" data-corner="x">X</button>
         <button type="button" class="zxcv-mark" id="mark-c" data-corner="c">C</button>
         <button type="button" class="zxcv-mark" id="mark-v" data-corner="v">V</button>
+
         <div id="worldDialog">
             <h2 id="worldDialogTitle">What would you like to do xyz</h2>
             <button type="button" data-act="explore">Explore xyz</button>
@@ -211,6 +283,7 @@
             <button type="button" id="closeOverlay">Close</button>
         </div>
     </div>
+
     <script>
         const planetSources = [
             "https://4kwallpapers.com/images/wallpapers/planet-earth-orbit-outer-space-cosmos-1920x1200-8769.jpg",
@@ -218,12 +291,23 @@
             "https://th.bing.com/th/id/OIP.fI3DWs_H0Z6Man0THeWe6wHaEK?rs=1&pid=ImgDetMain",
             "https://th.bing.com/th/id/OIP.0nwjv9AEh1uLPs4RHKQu3QHaHa?rs=1&pid=ImgDetMain"
         ];
-        const ROCKET_SRC = "https://raw.githubusercontent.com/AlienWare51/MoonWave/main/rocket.png";
-        const LIZARD_SRC = "https://raw.githubusercontent.com/AlienWare51/MoonWave/main/lizard.png";
+
+        const ROCKET_SRC =
+            "https://raw.githubusercontent.com/AlienWare51/MoonWave/main/rocket.png";
+
+        const LIZARD_SRC =
+            "https://raw.githubusercontent.com/AlienWare51/MoonWave/main/lizard.png";
+
         const SIT_SRC_LOCAL = "sit.png";
-        const SIT_SRC_FALLBACK = "https://raw.githubusercontent.com/AlienWare51/MoonWave/main/sit.png";
+
+        const SIT_SRC_FALLBACK =
+            "https://raw.githubusercontent.com/AlienWare51/MoonWave/main/sit.png";
+
         const PIN_SRC_LOCAL = "pin.png";
-        const PIN_SRC_FALLBACK = "https://raw.githubusercontent.com/AlienWare51/MoonWave/main/pin.png";
+
+        const PIN_SRC_FALLBACK =
+            "https://raw.githubusercontent.com/AlienWare51/MoonWave/main/pin.png";
+
         const US_STATES = [
             { name: "Alabama", lat: 32.3777, lon: -86.3000 },
             { name: "Alaska", lat: 58.3019, lon: -134.4197 },
@@ -248,7 +332,7 @@
             { name: "Massachusetts", lat: 42.3584, lon: -71.0636 },
             { name: "Michigan", lat: 42.7335, lon: -84.5467 },
             { name: "Minnesota", lat: 44.9550, lon: -93.1022 },
-            { name: "Mississippi", lat: 32.2988, lon: -90.1848 },
+                        { name: "Mississippi", lat: 32.2988, lon: -90.1848 },
             { name: "Missouri", lat: 38.5790, lon: -92.1730 },
             { name: "Montana", lat: 46.5857, lon: -112.0184 },
             { name: "Nebraska", lat: 40.8136, lon: -96.7026 },
@@ -277,19 +361,28 @@
             { name: "Wyoming", lat: 41.1400, lon: -104.8202 },
             { name: "District of Columbia", lat: 38.9072, lon: -77.0369 }
         ];
-        const eteBinding = { AA: 0, BB: 1, CC: 2, DD: 3 };
+
+        const eteBinding = {
+            AA: 0,
+            BB: 1,
+            CC: 2,
+            DD: 3
+        };
+
         const worldMap = {
             e: { name: "Earth", src: planetSources[0] },
             r: { name: "Mars", src: planetSources[1] },
             b: { name: "Black", src: planetSources[2] },
             m: { name: "Moon", src: planetSources[3] }
         };
+
         const zxcvTargets = {
             z: { top: "10%", left: "10%", rot: "-28deg" },
             x: { top: "10%", left: "90%", rot: "28deg" },
             c: { top: "90%", left: "10%", rot: "-38deg" },
             v: { top: "90%", left: "90%", rot: "38deg" }
         };
+
         const imageSelect = document.getElementById("image_select");
         const canvas = document.getElementById("rocketCanvas");
         const ctx = canvas.getContext("2d");
@@ -311,66 +404,215 @@
         const weatherState = document.getElementById("weatherState");
         const wikiBox = document.getElementById("wikiBox");
         const wikiCaption = document.getElementById("wikiCaption");
+
         let rocketImg = new Image();
         let lizardImg = new Image();
+
         const planets = [];
+
         let landingTimer = null;
         let activeWorld = null;
         let latestWeather = null;
-        const sampleCanvas = document.createElement("canvas");
-        const sampleCtx = sampleCanvas.getContext("2d", { willReadFrequently: true });
 
-        function isWorldOpen() { return worldOverlay.style.display === "block"; }
+        const sampleCanvas = document.createElement("canvas");
+        const sampleCtx = sampleCanvas.getContext("2d", {
+            willReadFrequently: true
+        });
+
+        function isWorldOpen() {
+            return worldOverlay.style.display === "block";
+        }
+
         function loadImage(src) {
             return new Promise((resolve, reject) => {
                 const img = new Image();
+
                 img.onload = () => resolve(img);
-                img.onerror = () => reject(new Error("Failed to load " + src));
+
+                img.onerror = () =>
+                    reject(new Error("Failed to load " + src));
+
                 img.src = src;
-                if (img.complete && img.naturalWidth > 0) resolve(img);
+
+                if (img.complete && img.naturalWidth > 0) {
+                    resolve(img);
+                }
             });
         }
-        function selectedPlanetIndex() { return eteBinding[imageSelect.value] ?? 0; }
+
+        function selectedPlanetIndex() {
+            return eteBinding[imageSelect.value] ?? 0;
+        }
+
         function applyModifierPreview() {
             const src = planetSources[selectedPlanetIndex()];
+
             modifiedImage.src = src;
-            modifiedImage.style.filter = `brightness(${document.getElementById("brightness").value}) contrast(${document.getElementById("contrast").value})`;
-            modifiedImage.style.transform = `rotate(${document.getElementById("rotation").value}deg)`;
+
+            modifiedImage.style.filter =
+                `brightness(${document.getElementById("brightness").value}) contrast(${document.getElementById("contrast").value})`;
+
+            modifiedImage.style.transform =
+                `rotate(${document.getElementById("rotation").value}deg)`;
         }
+
         function updateEtePreview() {
             const i = selectedPlanetIndex();
-            document.getElementById("ETE").src = planetSources[i];
-            document.getElementById("eteTextBoxContainer").style.display = "block";
-            document.getElementById("eteTextLabel").textContent = `Enter data for ${imageSelect.value}:`;
+
+            document.getElementById("ETE").src =
+                planetSources[i];
+
+            document.getElementById("eteTextBoxContainer").style.display =
+                "block";
+
+            document.getElementById("eteTextLabel").textContent =
+                `Enter data for ${imageSelect.value}:`;
+
             applyModifierPreview();
+
             missionNameCallback();
         }
+
+        /*
+         * MISSION NAME CONGRUITY
+         *
+         * A congruent value means the same letter repeated:
+         *
+         *     aa
+         *     bbb
+         *     ccccc
+         *
+         * The switch statement is deliberately kept here so that
+         * the meanings/messages can be expanded later.
+         */
+
+        function missionNameCongruity(value) {
+            const input = String(value ?? "")
+                .trim()
+                .toLowerCase();
+
+            // Must contain at least two characters.
+            if (input.length < 2) {
+                return null;
+            }
+
+            // First make sure every character is a letter.
+            if (!/^[a-z]+$/.test(input)) {
+                return null;
+            }
+
+            // Every character must be identical to the first.
+            const firstCharacter = input[0];
+
+            if (![...input].every((character) =>
+                character === firstCharacter
+            )) {
+                return null;
+            }
+
+            /*
+             * Congruity switch.
+             *
+             * These are temporary data-form outputs.
+             * We can replace them with your actual message/data
+             * definitions later.
+             */
+            switch (input) {
+
+                case "aa":
+                    return "DATA: ⟦aa⟧";
+
+                case "bbb":
+                    return "DATA: ⟦bbb⟧";
+
+                case "ccccc":
+                    return "DATA: ⟦ccccc⟧";
+
+                default:
+                    /*
+                     * The input is congruent, but we have not
+                     * assigned a special data-form message to it yet.
+                     */
+                    return null;
+            }
+        }
+
+        function handleMissionNameCongruity() {
+            const input =
+                document.getElementById("missionName");
+
+            if (!input) {
+                return;
+            }
+
+            const converted =
+                missionNameCongruity(input.value);
+
+            if (converted !== null) {
+                input.value = converted;
+            }
+        }
+
         function missionNameCallback() {
-            const box = document.getElementById("missionDropdownContainer");
-            if (imageSelect.value !== "BB" || !document.getElementById("eteTextInput").value.trim()) {
+            const box =
+                document.getElementById("missionDropdownContainer");
+
+            if (
+                imageSelect.value !== "BB" ||
+                !document.getElementById("eteTextInput").value.trim()
+            ) {
                 box.style.display = "none";
                 return;
             }
-            const dropdown = document.getElementById("missionPlanetDropdown");
+
+            const dropdown =
+                document.getElementById("missionPlanetDropdown");
+
             dropdown.innerHTML = "";
-            ["Mars", "Pluto", "Jupiter", "Saturn", "Venus"].forEach((name) => {
-                const option = document.createElement("option");
-                option.value = "https://en.wikipedia.org/wiki/" + name;
+
+            [
+                "Mars",
+                "Pluto",
+                "Jupiter",
+                "Saturn",
+                "Venus"
+            ].forEach((name) => {
+
+                const option =
+                    document.createElement("option");
+
+                option.value =
+                    "https://en.wikipedia.org/wiki/" + name;
+
                 option.textContent = name;
+
                 dropdown.appendChild(option);
             });
+
             box.style.display = "block";
         }
+
         function selectedState() {
             const name = weatherState.value;
-            return US_STATES.find((s) => s.name === name) || null;
+
+            return US_STATES.find(
+                (s) => s.name === name
+            ) || null;
         }
+
         async function fetchWeather(lat, lon, label) {
-            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto`;
+            const url =
+                `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto`;
+
             const res = await fetch(url);
-            if (!res.ok) throw new Error("weather HTTP " + res.status);
+
+            if (!res.ok) {
+                throw new Error("weather HTTP " + res.status);
+            }
+
             const data = await res.json();
             const cur = data.current || {};
+
             latestWeather = {
                 label: label,
                 temp: cur.temperature_2m,
@@ -379,338 +621,811 @@
                 code: cur.weather_code,
                 time: cur.time
             };
+
             weatherSummary.textContent =
-                label + " (state capital area): " + latestWeather.temp + "°F · wind " +
-                latestWeather.wind + " mph · humidity " + latestWeather.humidity + "% · " +
-                (latestWeather.time || "") + " · Open-Meteo";
+                label +
+                " (state capital area): " +
+                latestWeather.temp +
+                "°F · wind " +
+                latestWeather.wind +
+                " mph · humidity " +
+                latestWeather.humidity +
+                "% · " +
+                (latestWeather.time || "") +
+                " · Open-Meteo";
         }
+
         function loadWeather() {
             const state = selectedState();
+
             if (!state) {
                 latestWeather = null;
-                weatherSummary.textContent = "No weather loaded. Pick a state to pull a rough statewide reading.";
+
+                weatherSummary.textContent =
+                    "No weather loaded. Pick a state to pull a rough statewide reading.";
+
                 return;
             }
-            weatherSummary.textContent = "Updating weather for " + state.name + "…";
-            fetchWeather(state.lat, state.lon, state.name).catch((err) => {
-                weatherSummary.textContent = "Weather unavailable: " + err.message;
+
+            weatherSummary.textContent =
+                "Updating weather for " +
+                state.name +
+                "…";
+
+            fetchWeather(
+                state.lat,
+                state.lon,
+                state.name
+            ).catch((err) => {
+
+                weatherSummary.textContent =
+                    "Weather unavailable: " +
+                    err.message;
             });
         }
+
         function openWeatherPopup() {
             if (latestWeather) {
+
                 weatherPopupBody.textContent =
                     `${latestWeather.label}: ${latestWeather.temp}°F, wind ${latestWeather.wind} mph. Popup actions not wired yet.`;
+
             } else {
-                weatherPopupBody.textContent = "Placeholder. Tell me what this box should do next.";
+
+                weatherPopupBody.textContent =
+                    "Placeholder. Tell me what this box should do next.";
             }
+
             weatherPopup.classList.add("show");
         }
-        function closeWeatherPopup() { weatherPopup.classList.remove("show"); }
+
+        function closeWeatherPopup() {
+            weatherPopup.classList.remove("show");
+        }
+
         window.wikiGate = ({
-            animals: ["Lion","Tiger","Elephant","Penguin","Red fox","Snowy owl","Bottlenose dolphin","Koala","Giant panda","Gray wolf","Cheetah","Giraffe","Hippopotamus","Kangaroo","Bald eagle","Octopus","Sea otter","Polar bear","Chameleon","Axolotl"],
-            calculus: ["Calculus","Derivative","Integral","Limit (mathematics)","Fundamental theorem of calculus","Differential calculus","Integral calculus","Taylor series","Chain rule","Product rule","Mean value theorem","Infinitesimal","Differential equation","Partial derivative"],
+            animals: [
+                "Lion",
+                "Tiger",
+                "Elephant",
+                "Penguin",
+                "Red fox",
+                "Snowy owl",
+                "Bottlenose dolphin",
+                "Koala",
+                "Giant panda",
+                "Gray wolf",
+                "Cheetah",
+                "Giraffe",
+                "Hippopotamus",
+                "Kangaroo",
+                "Bald eagle",
+                "Octopus",
+                "Sea otter",
+                "Polar bear",
+                "Chameleon",
+                "Axolotl"
+            ],
+
+            calculus: [
+                "Calculus",
+                "Derivative",
+                "Integral",
+                "Limit (mathematics)",
+                "Fundamental theorem of calculus",
+                "Differential calculus",
+                "Integral calculus",
+                "Taylor series",
+                "Chain rule",
+                "Product rule",
+                "Mean value theorem",
+                "Infinitesimal",
+                "Differential equation",
+                "Partial derivative"
+            ],
+
             fetchSummary(title, done) {
                 if (title && window.fetch) {
-                    fetch("https://en.wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(title), { headers: { "Accept": "application/json" } })
-                        .then((res) => { if (res && res.ok) { return res.json(); } throw new Error("wiki"); })
-                        .then((data) => { if (data) { done(data); } })
-                        .catch(() => { if (wikiCaption) { wikiCaption.textContent = "Wikipedia is unavailable right now."; } });
+
+                    fetch(
+                        "https://en.wikipedia.org/api/rest_v1/page/summary/" +
+                        encodeURIComponent(title),
+                        {
+                            headers: {
+                                "Accept": "application/json"
+                            }
+                        }
+                    )
+                    .then((res) => {
+
+                        if (res && res.ok) {
+                            return res.json();
+                        }
+
+                        throw new Error("wiki");
+                    })
+                    .then((data) => {
+
+                        if (data) {
+                            done(data);
+                        }
+                    })
+                    .catch(() => {
+
+                        if (wikiCaption) {
+                            wikiCaption.textContent =
+                                "Wikipedia is unavailable right now.";
+                        }
+                    });
                 }
             },
+
             loadAnimal() {
                 const list = this.animals;
+
                 if (list && list.length) {
-                    const title = list[Math.floor(Math.random() * list.length)];
+
+                    const title =
+                        list[Math.floor(Math.random() * list.length)];
+
                     if (typeof title === "string") {
-                        if (wikiCaption) { wikiCaption.textContent = "Loading animal…"; }
+
+                        if (wikiCaption) {
+                            wikiCaption.textContent =
+                                "Loading animal…";
+                        }
+
                         this.fetchSummary(title, (data) => {
-                            if (data && data.thumbnail && data.thumbnail.source) {
-                                wikiBox.src = data.thumbnail.source;
-                            } else if (data && data.originalimage && data.originalimage.source) {
-                                wikiBox.src = data.originalimage.source;
+
+                            if (
+                                data &&
+                                data.thumbnail &&
+                                data.thumbnail.source
+                            ) {
+                                wikiBox.src =
+                                    data.thumbnail.source;
+
+                            } else if (
+                                data &&
+                                data.originalimage &&
+                                data.originalimage.source
+                            ) {
+                                wikiBox.src =
+                                    data.originalimage.source;
                             }
+
                             if (wikiCaption) {
-                                wikiCaption.textContent = (data.title || title) + (data.extract ? " — " + data.extract : "");
+                                wikiCaption.textContent =
+                                    (data.title || title) +
+                                    (data.extract
+                                        ? " — " + data.extract
+                                        : "");
                             }
                         });
                     }
                 }
             },
+
             loadFact() {
                 const list = this.calculus;
+
                 if (list && list.length) {
-                    const title = list[Math.floor(Math.random() * list.length)];
+
+                    const title =
+                        list[Math.floor(Math.random() * list.length)];
+
                     if (typeof title === "string") {
-                        if (wikiCaption) { wikiCaption.textContent = "Loading calculus fact…"; }
+
+                        if (wikiCaption) {
+                            wikiCaption.textContent =
+                                "Loading calculus fact…";
+                        }
+
                         this.fetchSummary(title, (data) => {
-                            if (data && data.thumbnail && data.thumbnail.source) {
-                                wikiBox.src = data.thumbnail.source;
+
+                            if (
+                                data &&
+                                data.thumbnail &&
+                                data.thumbnail.source
+                            ) {
+                                wikiBox.src =
+                                    data.thumbnail.source;
                             }
+
                             if (data && data.extract) {
-                                wikiCaption.textContent = (data.title || title) + " — " + data.extract;
+
+                                wikiCaption.textContent =
+                                    (data.title || title) +
+                                    " — " +
+                                    data.extract;
+
                             } else if (wikiCaption) {
-                                wikiCaption.textContent = title;
+
+                                wikiCaption.textContent =
+                                    title;
                             }
                         });
                     }
                 }
             }
         });
+
         function spriteBox(img, size, capFrac, scaleFrac) {
-            const cap = Math.min(canvas.width, canvas.height) * capFrac;
-            let w = Math.max(1, img.naturalWidth) * size * scaleFrac;
-            let h = Math.max(1, img.naturalHeight) * size * scaleFrac;
+            const cap =
+                Math.min(canvas.width, canvas.height) *
+                capFrac;
+
+            let w =
+                Math.max(1, img.naturalWidth) *
+                size *
+                scaleFrac;
+
+            let h =
+                Math.max(1, img.naturalHeight) *
+                size *
+                scaleFrac;
+
             const m = Math.max(w, h);
+
             if (m > cap) {
+
                 const k = cap / m;
+
                 w *= k;
                 h *= k;
             }
-            return { w: Math.max(12, w), h: Math.max(12, h) };
+
+            return {
+                w: Math.max(12, w),
+                h: Math.max(12, h)
+            };
         }
-        function renderFrame() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const halfW = canvas.width / 2, halfH = canvas.height / 2;
-            const q = [{ x: 0, y: 0 }, { x: halfW, y: 0 }, { x: 0, y: halfH }, { x: halfW, y: halfH }];
-            Object.keys(eteBinding).forEach((k, i) => { if (planets[i]) ctx.drawImage(planets[i], q[i].x, q[i].y, halfW, halfH); });
-            const size = parseFloat(document.getElementById("rocketSize").value) || 0.25;
-            const rot = parseFloat(document.getElementById("rotation").value) || 0;
-            const pad = 14;
-            if (rocketImg && rocketImg.naturalWidth) {
-                const box = spriteBox(rocketImg, size, 1.7, 2.672);
-                ctx.save();
-                ctx.globalAlpha = 0.55;
-                ctx.translate(pad + box.w / 2, pad + box.h / 2);
-                ctx.rotate(rot * Math.PI / 180);
-                ctx.drawImage(rocketImg, -box.w / 2, -box.h / 2, box.w, box.h);
-                ctx.restore();
-            }
-            if (lizardImg && lizardImg.naturalWidth) {
-                const box = spriteBox(lizardImg, size, 0.425, 0.668);
-                ctx.save();
-                ctx.globalAlpha = 0.385;
-                ctx.translate(canvas.width - pad - box.w / 2, canvas.height - pad - box.h / 2);
-                ctx.drawImage(lizardImg, -box.w / 2, -box.h / 2, box.w, box.h);
-                ctx.restore();
-            }
-        }
-        function sampleWorldColor() {
-            const fallbacks = { e: [40, 90, 150], r: [160, 70, 40], b: [20, 20, 24], m: [130, 130, 140] };
-            try {
-                sampleCanvas.width = 24; sampleCanvas.height = 24;
-                sampleCtx.drawImage(worldOverlayImg, 0, 0, 24, 24);
-                const d = sampleCtx.getImageData(0, 0, 24, 24).data;
-                let r = 0, g = 0, b = 0, n = 0;
-                for (let i = 0; i < d.length; i += 4) { r += d[i]; g += d[i + 1]; b += d[i + 2]; n++; }
-                return [Math.round(r / n), Math.round(g / n), Math.round(b / n)];
-            } catch (err) {
-                return fallbacks[activeWorld] || fallbacks.e;
-            }
-        }
-        function tintSitToWorld() {
-            const [r, g, b] = sampleWorldColor();
-            sitGlow.style.background = `radial-gradient(circle, rgba(${r},${g},${b},0.42), transparent 70%)`;
-            sitCapsule.style.filter = `contrast(1.04) saturate(1.12) drop-shadow(0 16px 18px rgba(${r},${g},${b},0.45))`;
-        }
-        function showZxcvMarks() { document.querySelectorAll(".zxcv-mark").forEach((el) => el.classList.add("show")); }
-        function hideZxcvMarks() { document.querySelectorAll(".zxcv-mark").forEach((el) => el.classList.remove("show")); }
-        function resetZoom() { worldOverlayImg.classList.remove("zoom-z"); worldOverlayImg.style.transform = ""; }
-        function resetPin() { pinStage.classList.remove("show", "fill"); pinStage.style.display = "none"; }
-        function openPinFill(event) {
-            if (event) { event.preventDefault(); event.stopPropagation(); }
-            if (!isWorldOpen() || !activeWorld || !sitGate.classList.contains("settled")) return;
-            hideZxcvMarks();
-            const dest = zxcvTargets.x;
-            sitGate.classList.add("blast");
-            sitGate.style.top = dest.top;
-            sitGate.style.left = dest.left;
-            sitGate.style.transform = `translate(-50%, -50%) rotate(${dest.rot}) scale(0.42)`;
-            sitGate.style.opacity = "0.2";
-            pinStage.style.display = "block";
-            pinStage.classList.add("show");
-            pinStage.classList.remove("fill");
-            void pinStage.offsetWidth;
-            requestAnimationFrame(() => pinStage.classList.add("fill"));
-        }
-        function zoomZOnCurrentPage(event) {
-            if (event) { event.preventDefault(); event.stopPropagation(); }
-            if (!isWorldOpen() || !activeWorld || !sitGate.classList.contains("settled")) return;
-            hideZxcvMarks();
-            worldOverlayImg.classList.add("zoom-z");
-        }
-        function blastSitTo(corner, event) {
-            if (event) { event.preventDefault(); event.stopPropagation(); }
-            if (corner === "z") { zoomZOnCurrentPage(event); return; }
-            if (corner === "x") { openPinFill(event); return; }
-            const dest = zxcvTargets[corner];
-            if (!dest || !isWorldOpen() || !sitGate.classList.contains("settled") || sitGate.classList.contains("blast")) return;
-            hideZxcvMarks();
-            sitGate.classList.add("blast");
-            sitGate.style.top = dest.top;
-            sitGate.style.left = dest.left;
-            sitGate.style.transform = `translate(-50%, -50%) rotate(${dest.rot}) scale(0.42)`;
-            sitGate.style.opacity = "0.2";
-        }
-        function resetSit() {
-            if (landingTimer) { clearTimeout(landingTimer); landingTimer = null; }
-            hideZxcvMarks();
-            resetZoom();
-            resetPin();
-            sitGate.classList.remove("gateway", "settled", "blast");
-            sitGate.style.display = "none";
-            sitGate.style.width = "";
-            sitGate.style.top = "";
-            sitGate.style.left = "50%";
-            sitGate.style.transform = "";
-            sitGate.style.opacity = "";
-        }
-        function openWorld(letter) {
-            const world = worldMap[letter];
-            if (!world) return;
-            activeWorld = letter;
-            resetSit();
-            worldOverlayImg.src = world.src;
-            worldDialogTitle.textContent = `What would you like to do ${world.name}?`;
-            worldDialog.style.display = "block";
-            worldOverlay.style.display = "block";
-            keylock.value = letter;
-        }
-        function closeWorld() {
-            resetSit();
-            activeWorld = null;
-            worldOverlay.style.display = "none";
-            worldDialog.style.display = "block";
-        }
-        function startExploreFreefall() {
-            if (!isWorldOpen()) return;
-            worldDialog.style.display = "none";
-            tintSitToWorld();
-            sitGate.style.display = "block";
-            sitGate.style.left = "50%";
-            sitGate.classList.remove("gateway", "settled", "blast");
-            void sitGate.offsetWidth;
-            sitGate.classList.add("gateway");
-            landingTimer = setTimeout(() => {
-                const host = Math.min(worldOverlay.clientWidth, worldOverlay.clientHeight);
-                sitGate.classList.remove("gateway");
-                sitGate.classList.add("settled");
-                sitGate.style.top = "50%";
-                sitGate.style.left = "50%";
-                sitGate.style.width = ((host / 6) * 1.3) + "px";
-                sitGate.style.transform = "translate(-50%, -50%) rotateX(16deg)";
-                sitCapsule.style.mixBlendMode = "normal";
-                showZxcvMarks();
-            }, 5600);
-        }
-        function myFunction(event) {
-            if (isWorldOpen()) return;
-            let letter = "";
-            if (event.currentTarget && event.currentTarget.classList && event.currentTarget.classList.contains("erbm-key")) {
-                letter = event.currentTarget.getAttribute("data-key");
-            } else if (event.target === keylock) {
-                letter = String(keylock.value).trim().toLowerCase().slice(-1);
-            } else {
-                letter = String(event.key || "").toLowerCase();
-            }
-            if (!worldMap[letter]) return;
-            if (event.target && event.target.id !== "keylock") {
-                if (event.target.tagName === "INPUT" || event.target.tagName === "TEXTAREA" || event.target.tagName === "SELECT") return;
-            }
-            if (event.preventDefault) event.preventDefault();
-            openWorld(letter);
+                    { name: "Mississippi", lat: 32.2988, lon: -90.1848 },
+            { name: "Missouri", lat: 38.5790, lon: -92.1730 },
+            { name: "Montana", lat: 46.5857, lon: -112.0184 },
+            { name: "Nebraska", lat: 40.8136, lon: -96.7026 },
+            { name: "Nevada", lat: 39.1638, lon: -119.7674 },
+            { name: "New Hampshire", lat: 43.2069, lon: -71.5381 },
+            { name: "New Jersey", lat: 40.2206, lon: -74.7699 },
+            { name: "New Mexico", lat: 35.6824, lon: -105.9397 },
+            { name: "New York", lat: 42.6526, lon: -73.7562 },
+            { name: "North Carolina", lat: 35.7804, lon: -78.6391 },
+            { name: "North Dakota", lat: 46.8208, lon: -100.7833 },
+            { name: "Ohio", lat: 39.9612, lon: -82.9988 },
+            { name: "Oklahoma", lat: 35.4922, lon: -97.5033 },
+            { name: "Oregon", lat: 44.9385, lon: -123.0304 },
+            { name: "Pennsylvania", lat: 40.2640, lon: -76.8839 },
+            { name: "Rhode Island", lat: 41.8309, lon: -71.4147 },
+            { name: "South Carolina", lat: 34.0003, lon: -81.0332 },
+            { name: "South Dakota", lat: 44.3670, lon: -100.3464 },
+            { name: "Tennessee", lat: 36.1627, lon: -86.7816 },
+            { name: "Texas", lat: 30.2747, lon: -97.7404 },
+            { name: "Utah", lat: 40.7775, lon: -111.8882 },
+            { name: "Vermont", lat: 44.2624, lon: -72.5805 },
+            { name: "Virginia", lat: 37.5407, lon: -77.4360 },
+            { name: "Washington", lat: 47.0379, lon: -122.9007 },
+            { name: "West Virginia", lat: 38.3498, lon: -81.6326 },
+            { name: "Wisconsin", lat: 43.0747, lon: -89.3844 },
+            { name: "Wyoming", lat: 41.1400, lon: -104.8202 },
+            { name: "District of Columbia", lat: 38.9072, lon: -77.0369 }
+        ];
+
+        const eteBinding = {
+            AA: 0,
+            BB: 1,
+            CC: 2,
+            DD: 3
+        };
+
+        const worldMap = {
+            e: { name: "Earth", src: planetSources[0] },
+            r: { name: "Mars", src: planetSources[1] },
+            b: { name: "Black", src: planetSources[2] },
+            m: { name: "Moon", src: planetSources[3] }
+        };
+
+        const zxcvTargets = {
+            z: { top: "10%", left: "10%", rot: "-28deg" },
+            x: { top: "10%", left: "90%", rot: "28deg" },
+            c: { top: "90%", left: "10%", rot: "-38deg" },
+            v: { top: "90%", left: "90%", rot: "38deg" }
+        };
+
+        const imageSelect = document.getElementById("image_select");
+        const canvas = document.getElementById("rocketCanvas");
+        const ctx = canvas.getContext("2d");
+        const keylock = document.getElementById("keylock");
+        const responseMessage = document.getElementById("responseMessage");
+        const modifiedImage = document.getElementById("modifiedImage");
+        const worldOverlay = document.getElementById("worldOverlay");
+        const worldOverlayImg = document.getElementById("worldOverlayImg");
+        const worldDialog = document.getElementById("worldDialog");
+        const worldDialogTitle = document.getElementById("worldDialogTitle");
+        const sitGate = document.getElementById("sitGate");
+        const sitGlow = document.getElementById("sitGlow");
+        const sitCapsule = document.getElementById("sitCapsule");
+        const pinStage = document.getElementById("pinStage");
+        const pinImage = document.getElementById("pinImage");
+        const weatherSummary = document.getElementById("weatherSummary");
+        const weatherPopup = document.getElementById("weatherPopup");
+        const weatherPopupBody = document.getElementById("weatherPopupBody");
+        const weatherState = document.getElementById("weatherState");
+        const wikiBox = document.getElementById("wikiBox");
+        const wikiCaption = document.getElementById("wikiCaption");
+
+        let rocketImg = new Image();
+        let lizardImg = new Image();
+
+        const planets = [];
+
+        let landingTimer = null;
+        let activeWorld = null;
+        let latestWeather = null;
+
+        const sampleCanvas = document.createElement("canvas");
+        const sampleCtx = sampleCanvas.getContext("2d", {
+            willReadFrequently: true
+        });
+
+        function isWorldOpen() {
+            return worldOverlay.style.display === "block";
         }
 
-        imageSelect.addEventListener("change", updateEtePreview);
-        document.getElementById("eteTextSubmit").addEventListener("click", missionNameCallback);
-        document.getElementById("modifierForm").addEventListener("submit", (e) => { e.preventDefault(); applyModifierPreview(); renderFrame(); });
-        ["brightness", "contrast", "rotation", "rocketSize"].forEach((id) => {
-            document.getElementById(id).addEventListener("input", () => { applyModifierPreview(); renderFrame(); });
-        });
-        document.getElementById("missionForm").addEventListener("submit", (event) => {
-            event.preventDefault();
+        function loadImage(src) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+
+                img.onload = () => resolve(img);
+
+                img.onerror = () =>
+                    reject(new Error("Failed to load " + src));
+
+                img.src = src;
+
+                if (img.complete && img.naturalWidth > 0) {
+                    resolve(img);
+                }
+            });
+        }
+
+        function selectedPlanetIndex() {
+            return eteBinding[imageSelect.value] ?? 0;
+        }
+
+        function applyModifierPreview() {
+            const src = planetSources[selectedPlanetIndex()];
+
+            modifiedImage.src = src;
+
+            modifiedImage.style.filter =
+                `brightness(${document.getElementById("brightness").value}) contrast(${document.getElementById("contrast").value})`;
+
+            modifiedImage.style.transform =
+                `rotate(${document.getElementById("rotation").value}deg)`;
+        }
+
+        function updateEtePreview() {
+            const i = selectedPlanetIndex();
+
+            document.getElementById("ETE").src =
+                planetSources[i];
+
+            document.getElementById("eteTextBoxContainer").style.display =
+                "block";
+
+            document.getElementById("eteTextLabel").textContent =
+                `Enter data for ${imageSelect.value}:`;
+
+            applyModifierPreview();
+
             missionNameCallback();
-            responseMessage.textContent = "Saved locally: " + document.getElementById("missionName").value;
-        });
-        document.getElementById("openWeatherPopup").addEventListener("click", openWeatherPopup);
-        document.getElementById("closeWeatherPopup").addEventListener("click", closeWeatherPopup);
-        document.getElementById("refreshWeather").addEventListener("click", loadWeather);
-        document.getElementById("btnAnimal").addEventListener("click", () => {
-            if (window.wikiGate) { window.wikiGate.loadAnimal(); }
-        });
-        document.getElementById("btnFact").addEventListener("click", () => {
-            if (window.wikiGate) { window.wikiGate.loadFact(); }
-        });
-        US_STATES.forEach((s) => {
-            const opt = document.createElement("option");
-            opt.value = s.name;
-            opt.textContent = s.name;
-            weatherState.appendChild(opt);
-        });
-        weatherState.addEventListener("change", loadWeather);
-        document.addEventListener("click", (event) => {
-            const span = event.target.closest(".erbm-key");
-            if (span && !isWorldOpen()) myFunction({ currentTarget: span, target: span, preventDefault() {} });
-        });
-        keylock.addEventListener("input", myFunction);
-        document.addEventListener("keydown", (event) => {
-            if (event.repeat) return;
-            if (event.key === "Escape") { closeWeatherPopup(); closeWorld(); return; }
-            const letter = String(event.key || "").toLowerCase();
-            if (isWorldOpen()) {
-                event.stopPropagation();
-                if (letter === "z" && sitGate.classList.contains("settled")) { event.preventDefault(); zoomZOnCurrentPage(event); return; }
-                if (letter === "x" && sitGate.classList.contains("settled")) { event.preventDefault(); openPinFill(event); return; }
-                if ("cv".includes(letter) && sitGate.classList.contains("settled")) { event.preventDefault(); blastSitTo(letter, event); }
+        }
+
+        /*
+         * MISSION NAME CONGRUITY
+         *
+         * A congruent value means the same letter repeated:
+         *
+         *     aa
+         *     bbb
+         *     ccccc
+         *
+         * The switch statement is deliberately kept here so that
+         * the meanings/messages can be expanded later.
+         */
+
+        function missionNameCongruity(value) {
+            const input = String(value ?? "")
+                .trim()
+                .toLowerCase();
+
+            // Must contain at least two characters.
+            if (input.length < 2) {
+                return null;
+            }
+
+            // First make sure every character is a letter.
+            if (!/^[a-z]+$/.test(input)) {
+                return null;
+            }
+
+            // Every character must be identical to the first.
+            const firstCharacter = input[0];
+
+            if (![...input].every((character) =>
+                character === firstCharacter
+            )) {
+                return null;
+            }
+
+            /*
+             * Congruity switch.
+             *
+             * These are temporary data-form outputs.
+             * We can replace them with your actual message/data
+             * definitions later.
+             */
+            switch (input) {
+
+                case "aa":
+                    return "DATA: ⟦aa⟧";
+
+                case "bbb":
+                    return "DATA: ⟦bbb⟧";
+
+                case "ccccc":
+                    return "DATA: ⟦ccccc⟧";
+
+                default:
+                    /*
+                     * The input is congruent, but we have not
+                     * assigned a special data-form message to it yet.
+                     */
+                    return null;
+            }
+        }
+
+        function handleMissionNameCongruity() {
+            const input =
+                document.getElementById("missionName");
+
+            if (!input) {
                 return;
             }
-            if (event.target && (event.target.tagName === "TEXTAREA" || (event.target.tagName === "INPUT" && event.target.id !== "keylock"))) return;
-            myFunction(event);
-        });
-        document.querySelectorAll("#bottomWorlds .world").forEach((el) => {
-            el.querySelector("img").src = worldMap[el.dataset.key].src;
-            el.addEventListener("click", (event) => {
-                if (event.target.closest(".erbm-key")) return;
-                openWorld(el.dataset.key);
+
+            const converted =
+                missionNameCongruity(input.value);
+
+            if (converted !== null) {
+                input.value = converted;
+            }
+        }
+
+        function missionNameCallback() {
+            const box =
+                document.getElementById("missionDropdownContainer");
+
+            if (
+                imageSelect.value !== "BB" ||
+                !document.getElementById("eteTextInput").value.trim()
+            ) {
+                box.style.display = "none";
+                return;
+            }
+
+            const dropdown =
+                document.getElementById("missionPlanetDropdown");
+
+            dropdown.innerHTML = "";
+
+            [
+                "Mars",
+                "Pluto",
+                "Jupiter",
+                "Saturn",
+                "Venus"
+            ].forEach((name) => {
+
+                const option =
+                    document.createElement("option");
+
+                option.value =
+                    "https://en.wikipedia.org/wiki/" + name;
+
+                option.textContent = name;
+
+                dropdown.appendChild(option);
             });
-        });
-        document.getElementById("mark-z").addEventListener("click", (event) => { event.preventDefault(); event.stopPropagation(); zoomZOnCurrentPage(event); });
-        document.getElementById("mark-x").addEventListener("click", (event) => { event.preventDefault(); event.stopPropagation(); openPinFill(event); });
-        document.querySelectorAll(".zxcv-mark").forEach((btn) => {
-            if (btn.dataset.corner === "z" || btn.dataset.corner === "x") return;
-            btn.addEventListener("click", (event) => { event.preventDefault(); event.stopPropagation(); blastSitTo(btn.dataset.corner, event); });
-        });
-        document.getElementById("closeOverlay").addEventListener("click", closeWorld);
-        document.querySelectorAll("#worldDialog button[data-act]").forEach((btn) => {
-            btn.addEventListener("click", () => {
-                if (btn.getAttribute("data-act") === "explore") startExploreFreefall();
-                else closeWorld();
+
+            box.style.display = "block";
+        }
+
+        function selectedState() {
+            const name = weatherState.value;
+
+            return US_STATES.find(
+                (s) => s.name === name
+            ) || null;
+        }
+
+        async function fetchWeather(lat, lon, label) {
+            const url =
+                `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto`;
+
+            const res = await fetch(url);
+
+            if (!res.ok) {
+                throw new Error("weather HTTP " + res.status);
+            }
+
+            const data = await res.json();
+            const cur = data.current || {};
+
+            latestWeather = {
+                label: label,
+                temp: cur.temperature_2m,
+                humidity: cur.relative_humidity_2m,
+                wind: cur.wind_speed_10m,
+                code: cur.weather_code,
+                time: cur.time
+            };
+
+            weatherSummary.textContent =
+                label +
+                " (state capital area): " +
+                latestWeather.temp +
+                "°F · wind " +
+                latestWeather.wind +
+                " mph · humidity " +
+                latestWeather.humidity +
+                "% · " +
+                (latestWeather.time || "") +
+                " · Open-Meteo";
+        }
+
+        function loadWeather() {
+            const state = selectedState();
+
+            if (!state) {
+                latestWeather = null;
+
+                weatherSummary.textContent =
+                    "No weather loaded. Pick a state to pull a rough statewide reading.";
+
+                return;
+            }
+
+            weatherSummary.textContent =
+                "Updating weather for " +
+                state.name +
+                "…";
+
+            fetchWeather(
+                state.lat,
+                state.lon,
+                state.name
+            ).catch((err) => {
+
+                weatherSummary.textContent =
+                    "Weather unavailable: " +
+                    err.message;
             });
+        }
+
+        function openWeatherPopup() {
+            if (latestWeather) {
+
+                weatherPopupBody.textContent =
+                    `${latestWeather.label}: ${latestWeather.temp}°F, wind ${latestWeather.wind} mph. Popup actions not wired yet.`;
+
+            } else {
+
+                weatherPopupBody.textContent =
+                    "Placeholder. Tell me what this box should do next.";
+            }
+
+            weatherPopup.classList.add("show");
+        }
+
+        function closeWeatherPopup() {
+            weatherPopup.classList.remove("show");
+        }
+
+        window.wikiGate = ({
+            animals: [
+                "Lion",
+                "Tiger",
+                "Elephant",
+                "Penguin",
+                "Red fox",
+                "Snowy owl",
+                "Bottlenose dolphin",
+                "Koala",
+                "Giant panda",
+                "Gray wolf",
+                "Cheetah",
+                "Giraffe",
+                "Hippopotamus",
+                "Kangaroo",
+                "Bald eagle",
+                "Octopus",
+                "Sea otter",
+                "Polar bear",
+                "Chameleon",
+                "Axolotl"
+            ],
+
+            calculus: [
+                "Calculus",
+                "Derivative",
+                "Integral",
+                "Limit (mathematics)",
+                "Fundamental theorem of calculus",
+                "Differential calculus",
+                "Integral calculus",
+                "Taylor series",
+                "Chain rule",
+                "Product rule",
+                "Mean value theorem",
+                "Infinitesimal",
+                "Differential equation",
+                "Partial derivative"
+            ],
+
+            fetchSummary(title, done) {
+                if (title && window.fetch) {
+
+                    fetch(
+                        "https://en.wikipedia.org/api/rest_v1/page/summary/" +
+                        encodeURIComponent(title),
+                        {
+                            headers: {
+                                "Accept": "application/json"
+                            }
+                        }
+                    )
+                    .then((res) => {
+
+                        if (res && res.ok) {
+                            return res.json();
+                        }
+
+                        throw new Error("wiki");
+                    })
+                    .then((data) => {
+
+                        if (data) {
+                            done(data);
+                        }
+                    })
+                    .catch(() => {
+
+                        if (wikiCaption) {
+                            wikiCaption.textContent =
+                                "Wikipedia is unavailable right now.";
+                        }
+                    });
+                }
+            },
+
+            loadAnimal() {
+                const list = this.animals;
+
+                if (list && list.length) {
+
+                    const title =
+                        list[Math.floor(Math.random() * list.length)];
+
+                    if (typeof title === "string") {
+
+                        if (wikiCaption) {
+                            wikiCaption.textContent =
+                                "Loading animal…";
+                        }
+
+                        this.fetchSummary(title, (data) => {
+
+                            if (
+                                data &&
+                                data.thumbnail &&
+                                data.thumbnail.source
+                            ) {
+                                wikiBox.src =
+                                    data.thumbnail.source;
+
+                            } else if (
+                                data &&
+                                data.originalimage &&
+                                data.originalimage.source
+                            ) {
+                                wikiBox.src =
+                                    data.originalimage.source;
+                            }
+
+                            if (wikiCaption) {
+                                wikiCaption.textContent =
+                                    (data.title || title) +
+                                    (data.extract
+                                        ? " — " + data.extract
+                                        : "");
+                            }
+                        });
+                    }
+                }
+            },
+
+            loadFact() {
+                const list = this.calculus;
+
+                if (list && list.length) {
+
+                    const title =
+                        list[Math.floor(Math.random() * list.length)];
+
+                    if (typeof title === "string") {
+
+                        if (wikiCaption) {
+                            wikiCaption.textContent =
+                                "Loading calculus fact…";
+                        }
+
+                        this.fetchSummary(title, (data) => {
+
+                            if (
+                                data &&
+                                data.thumbnail &&
+                                data.thumbnail.source
+                            ) {
+                                wikiBox.src =
+                                    data.thumbnail.source;
+                            }
+
+                            if (data && data.extract) {
+
+                                wikiCaption.textContent =
+                                    (data.title || title) +
+                                    " — " +
+                                    data.extract;
+
+                            } else if (wikiCaption) {
+
+                                wikiCaption.textContent =
+                                    title;
+                            }
+                        });
+                    }
+                }
+            }
         });
-        sitCapsule.addEventListener("error", () => {
-            if (sitCapsule.src.indexOf(SIT_SRC_FALLBACK) === -1) sitCapsule.src = SIT_SRC_FALLBACK;
-        });
-        pinImage.addEventListener("error", () => {
-            if (pinImage.src.indexOf(PIN_SRC_FALLBACK) === -1) pinImage.src = PIN_SRC_FALLBACK;
-        });
-        Promise.all([
-            ...planetSources.map((src) => loadImage(src).catch(() => null)),
-            loadImage(ROCKET_SRC).catch(() => null),
-            loadImage(LIZARD_SRC).catch(() => null),
-            loadImage(SIT_SRC_LOCAL).catch(() => loadImage(SIT_SRC_FALLBACK).catch(() => null)),
-            loadImage(PIN_SRC_LOCAL).catch(() => loadImage(PIN_SRC_FALLBACK).catch(() => null))
-        ]).then((loaded) => {
-            loaded.slice(0, 4).forEach((img, i) => { planets[i] = img; });
-            if (loaded[4]) rocketImg = loaded[4];
-            if (loaded[5]) lizardImg = loaded[5];
-            if (loaded[6]) sitCapsule.src = loaded[6].src;
-            if (loaded[7]) pinImage.src = loaded[7].src;
-            updateEtePreview();
-            renderFrame();
-            setInterval(renderFrame, 250);
-        }).catch(() => {
-            updateEtePreview();
-            renderFrame();
-        });
-    </script>
-</body>
-</html>
+
+        function spriteBox(img, size, capFrac, scaleFrac) {
+            const cap =
+                Math.min(canvas.width, canvas.height) *
+                capFrac;
+
+            let w =
+                Math.max(1, img.naturalWidth) *
+                size *
+                scaleFrac;
+
+            let h =
+                Math.max(1, img.naturalHeight) *
+                size *
+                scaleFrac;
+
+            const m = Math.max(w, h);
+
+            if (m > cap) {
+
+                const k = cap / m;
+
+                w *= k;
+                h *= k;
+            }
+
+            return {
+                w: Math.max(12, w),
+                h: Math.max(12, h)
+            };
+        }
+        
