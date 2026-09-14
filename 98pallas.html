@@ -392,9 +392,9 @@
         }
         function closeWeatherPopup() { weatherPopup.classList.remove("show"); }
         function spriteBox(img, size) {
-            const cap = Math.min(canvas.width, canvas.height) * 0.189;
-            let w = Math.max(1, img.naturalWidth) * size * 0.297;
-            let h = Math.max(1, img.naturalHeight) * size * 0.297;
+            const cap = Math.min(canvas.width, canvas.height) * 0.425;
+            let w = Math.max(1, img.naturalWidth) * size * 0.668;
+            let h = Math.max(1, img.naturalHeight) * size * 0.668;
             const m = Math.max(w, h);
             if (m > cap) {
                 const k = cap / m;
