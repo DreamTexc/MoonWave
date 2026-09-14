@@ -391,10 +391,10 @@
             weatherPopup.classList.add("show");
         }
         function closeWeatherPopup() { weatherPopup.classList.remove("show"); }
-        function spriteBox(img, size) {
-            const cap = Math.min(canvas.width, canvas.height) * 0.425;
-            let w = Math.max(1, img.naturalWidth) * size * 0.668;
-            let h = Math.max(1, img.naturalHeight) * size * 0.668;
+        function spriteBox(img, size, capFrac, scaleFrac) {
+            const cap = Math.min(canvas.width, canvas.height) * capFrac;
+            let w = Math.max(1, img.naturalWidth) * size * scaleFrac;
+            let h = Math.max(1, img.naturalHeight) * size * scaleFrac;
             const m = Math.max(w, h);
             if (m > cap) {
                 const k = cap / m;
@@ -412,7 +412,7 @@
             const rot = parseFloat(document.getElementById("rotation").value) || 0;
             const pad = 14;
             if (rocketImg && rocketImg.naturalWidth) {
-                const box = spriteBox(rocketImg, size);
+                const box = spriteBox(rocketImg, size, 1.7, 2.672);
                 ctx.save();
                 ctx.globalAlpha = 0.55;
                 ctx.translate(pad + box.w / 2, pad + box.h / 2);
@@ -421,9 +421,9 @@
                 ctx.restore();
             }
             if (lizardImg && lizardImg.naturalWidth) {
-                const box = spriteBox(lizardImg, size);
+                const box = spriteBox(lizardImg, size, 0.425, 0.668);
                 ctx.save();
-                ctx.globalAlpha = 0.55;
+                ctx.globalAlpha = 0.385;
                 ctx.translate(canvas.width - pad - box.w / 2, canvas.height - pad - box.h / 2);
                 ctx.drawImage(lizardImg, -box.w / 2, -box.h / 2, box.w, box.h);
                 ctx.restore();
