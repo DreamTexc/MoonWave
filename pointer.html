@@ -37,12 +37,21 @@
     }
     .card:hover { border-color: #888; }
     .card.held { border-color: #fc3; }
+    .card[data-index="4"] { padding: 0; }
     .card[data-index="5"] { padding: 0; background: #15202b; }
     .card[data-index="6"] {
       font-size: 12px;
       line-height: 1.35;
       align-items: flex-start;
       padding-top: 12px;
+    }
+    #ice {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 10px;
+      pointer-events: none;
     }
     #dimpleCanvas {
       width: 100%;
@@ -92,13 +101,7 @@
     const NUCLEI = ['a','e','i','o','u','ae','io','ou','ai'];
     const CODAS = ['','n','r','l','s','t','k','m','x','th'];
 
-    const dimple = {
-      x: 0.5,
-      y: 0.5,
-      rings: [],
-      lastDrop: 0,
-      dropEvery: 1600
-    };
+    const dimple = { x: 0.5, y: 0.5, rings: [], lastDrop: 0, dropEvery: 1600 };
 
     function generateRandomWord() {
       if (Math.random() < 0.72) {
@@ -132,7 +135,7 @@
         case 1: return '1';
         case 2: return '2';
         case 3: return '3';
-        case 4: return '4';
+        case 4: return '';
         case 5: return '';
         case 6: return boxSixWords;
         default: return '';
@@ -177,7 +180,16 @@
         const el = document.createElement('div');
         el.className = 'card';
         el.dataset.index = i;
-        if (i === 5) {
+        if (i === 4) {
+          const ice = document.createElement('img');
+          ice.id = 'ice';
+          ice.alt = 'ice';
+          ice.src = 'ice.png';
+          ice.onerror = function () {
+            this.src = 'https://raw.githubusercontent.com/DreamTexc/MoonWave/main/ice.png';
+          };
+          el.appendChild(ice);
+        } else if (i === 5) {
           const canvas = document.createElement('canvas');
           canvas.id = 'dimpleCanvas';
           el.appendChild(canvas);
@@ -217,10 +229,8 @@
       const ctx = canvas.getContext('2d');
       const w = canvas.width;
       const h = canvas.height;
-
       ctx.fillStyle = '#15202b';
       ctx.fillRect(0, 0, w, h);
-
       const gx = dimple.x * w;
       const gy = dimple.y * h;
       const sheen = ctx.createRadialGradient(gx, gy, 0, gx, gy, Math.min(w, h) * 0.55);
@@ -228,17 +238,14 @@
       sheen.addColorStop(1, 'rgba(21,32,43,0)');
       ctx.fillStyle = sheen;
       ctx.fillRect(0, 0, w, h);
-
       ctx.beginPath();
       ctx.arc(gx, gy, Math.max(2, Math.min(w, h) * 0.018), 0, Math.PI * 2);
       ctx.fillStyle = 'rgba(210,230,240,0.22)';
       ctx.fill();
-
       if (now - dimple.lastDrop >= dimple.dropEvery) {
         dimple.lastDrop = now;
         doWaterRipple();
       }
-
       for (let i = dimple.rings.length - 1; i >= 0; i--) {
         const ring = dimple.rings[i];
         ring.r += Math.max(0.35, Math.min(w, h) * 0.0045);
