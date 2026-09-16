@@ -120,7 +120,7 @@
   <div id="sheet">
     <div id="stage">
       <div id="grid"></div>
-      <img id="geek" alt="geek" src="geek.png">
+      <img id="geek" alt="geek" src="https://raw.githubusercontent.com/DreamTexc/MoonWave/main/geek.png">
 
       <div id="under-box-3">
         <div class="caption">UNDER BOX 3 · INFO LOOP · RATIO</div>
@@ -148,7 +148,7 @@
               <label>object type
                 <select id="graph-type">
                   <option value="knot">space curve / knot</option>
-                  <option value="plane">(r − r0) · a = 0 plane</option>
+                  <option value="plane">(r − r0) · a = 0 plane + (r − r0) × a = 0 line</option>
                   <option value="angle">θ ⟂  ψ1, ψ2 angle vector</option>
                 </select>
               </label>
@@ -158,7 +158,7 @@
               knot uses p/q from the inheritance box. Drag canvas to yaw.
             </div>
             <div id="panel-plane" class="panel">
-              Plane through r0 with normal a. Shown only when selected.
+              Grid = plane (r − r0) · a = 0. Gold line = (r − r0) × a = 0 (through r0, parallel to a).
               <div>
                 <label>r0x <input id="r0x" type="number" value="0" step="0.1"></label>
                 <label>r0y <input id="r0y" type="number" value="0" step="0.1"></label>
@@ -171,7 +171,7 @@
               </div>
             </div>
             <div id="panel-angle" class="panel">
-              Right angle θ with vectors at ψ1 and ψ2. Shown only when selected.
+              Arc sweeps ψ1 → ψ2. Square mark appears when |ψ2−ψ1| or θ is 90°.
               <div>
                 <label>θ° <input id="theta" type="number" value="90" min="1" max="179" step="1"></label>
                 <label>ψ1° <input id="psi1" type="number" value="20" min="-180" max="180" step="1"></label>
@@ -213,7 +213,11 @@ scale: 1</textarea>
       do { const w = generateRandomWord(); if (picked.indexOf(w) === -1) picked.push(w); } while (picked.length < 5);
       return picked;
     }
-    geek.onerror = function () { this.src = 'https://raw.githubusercontent.com/DreamTexc/MoonWave/main/geek.png'; };
+    const GEEK_SRC = 'https://raw.githubusercontent.com/DreamTexc/MoonWave/main/geek.png';
+    const ICE_SRC = 'https://raw.githubusercontent.com/DreamTexc/MoonWave/main/ice.png';
+    const GEEK_FALLBACK = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="10" fill="%23222"/><circle cx="32" cy="26" r="12" fill="%23f4b44a"/><rect x="16" y="40" width="32" height="16" rx="8" fill="%2366ccff"/></svg>';
+    const ICE_FALLBACK = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="10" fill="%2315202b"/><path d="M32 8 L52 52 H12 Z" fill="%238ec8e6" opacity="0.85"/></svg>';
+    geek.onerror = function () { this.onerror = null; this.src = GEEK_FALLBACK; };
     function paintBoxSix() {
       const el = document.querySelector('[data-index="6"]');
       if (!el) return;
@@ -300,8 +304,8 @@ scale: 1</textarea>
         el.className = 'card';
         el.dataset.index = i;
         if (i === 4) {
-          const ice = document.createElement('img'); ice.id = 'ice'; ice.src = 'ice.png';
-          ice.onerror = function () { this.src = 'https://raw.githubusercontent.com/DreamTexc/MoonWave/main/ice.png'; };
+          const ice = document.createElement('img'); ice.id = 'ice'; ice.src = ICE_SRC;
+          ice.onerror = function () { this.onerror = null; this.src = ICE_FALLBACK; };
           el.appendChild(ice);
         } else if (i === 5) {
           const canvas = document.createElement('canvas'); canvas.id = 'dimpleCanvas'; el.appendChild(canvas);
@@ -509,48 +513,48 @@ scale: 1</textarea>
               this.line3(ctx, this.project(p1.x,p1.y,p1.z,w,h,extra.scale), this.project(p2.x,p2.y,p2.z,w,h,extra.scale), 'rgba(120,180,220,0.45)', 1);
               this.line3(ctx, this.project(q1.x,q1.y,q1.z,w,h,extra.scale), this.project(q2.x,q2.y,q2.z,w,h,extra.scale), 'rgba(120,180,220,0.45)', 1);
             }
-            var nTip = { x: r0.x + a.x * 1.6, y: r0.y + a.y * 1.6, z: r0.z + a.z * 1.6 };
+            var lineSpan = 2.8;
+            var L1 = { x: r0.x - a.x * lineSpan, y: r0.y - a.y * lineSpan, z: r0.z - a.z * lineSpan };
+            var L2 = { x: r0.x + a.x * lineSpan, y: r0.y + a.y * lineSpan, z: r0.z + a.z * lineSpan };
             var A = this.project(r0.x, r0.y, r0.z, w, h, extra.scale);
-            var B = this.project(nTip.x, nTip.y, nTip.z, w, h, extra.scale);
-            this.line3(ctx, A, B, '#f4b44a', 2.4);
+            this.line3(ctx, this.project(L1.x,L1.y,L1.z,w,h,extra.scale), this.project(L2.x,L2.y,L2.z,w,h,extra.scale), '#f4b44a', 2.6);
             ctx.fillStyle = '#f4b44a'; ctx.beginPath(); ctx.arc(A.X, A.Y, 3.4, 0, Math.PI * 2); ctx.fill();
             document.getElementById('eq-line').textContent =
-              '(r − r0) · a = 0   r0=(' + r0.x + ',' + r0.y + ',' + r0.z + ')  a=(' +
-              num('ax',0) + ',' + num('ay',0) + ',' + num('az',1) + ')';
+              'plane (r−r0)·a=0   line (r−r0)×a=0   r0=(' + r0.x + ',' + r0.y + ',' + r0.z +
+              ')  a=(' + num('ax',0) + ',' + num('ay',0) + ',' + num('az',1) + ')';
           },
           drawAngle: function (ctx, w, h, extra) {
-            var theta = num('theta', 90) * Math.PI / 180;
-            var psi1 = num('psi1', 20) * Math.PI / 180;
-            var psi2 = num('psi2', 70) * Math.PI / 180;
+            var thetaDeg = num('theta', 90);
+            var psi1Deg = num('psi1', 20);
+            var psi2Deg = num('psi2', 70);
+            var psi1 = psi1Deg * Math.PI / 180;
             var origin = this.project(0, 0, 0, w, h, extra.scale);
-            function vec(psi, elev) {
-              return { x: Math.cos(elev) * Math.cos(psi), y: Math.sin(elev), z: Math.cos(elev) * Math.sin(psi) };
-            }
-            var e1 = vec(psi1, 0);
-            var e2 = vec(psi2, 0);
-            var P1 = this.project(e1.x * 2.2, e1.y * 2.2, e1.z * 2.2, w, h, extra.scale);
-            var P2 = this.project(e2.x * 2.2, e2.y * 2.2, e2.z * 2.2, w, h, extra.scale);
+            var e1 = { x: Math.cos(psi1), y: 0, z: Math.sin(psi1) };
+            var e2 = { x: Math.cos(psi2Deg * Math.PI / 180), y: 0, z: Math.sin(psi2Deg * Math.PI / 180) };
+            var P1 = this.project(e1.x * 2.2, 0, e1.z * 2.2, w, h, extra.scale);
+            var P2 = this.project(e2.x * 2.2, 0, e2.z * 2.2, w, h, extra.scale);
             this.line3(ctx, origin, P1, '#6cf', 2.2);
             this.line3(ctx, origin, P2, '#f86', 2.2);
-            var steps = 28, prev = null;
+            var sweep = ((psi2Deg - psi1Deg + 540) % 360) - 180;
+            var sweepRad = sweep * Math.PI / 180;
+            var steps = 36, prev = null;
             for (var i = 0; i <= steps; i++) {
-              var t = (i / steps) * theta;
-              var ax = Math.cos(psi1 + t), az = Math.sin(psi1 + t);
-              var Q = this.project(ax * 0.7, 0, az * 0.7, w, h, extra.scale);
+              var t = psi1 + sweepRad * (i / steps);
+              var Q = this.project(Math.cos(t) * 0.75, 0, Math.sin(t) * 0.75, w, h, extra.scale);
               if (prev) this.line3(ctx, prev, Q, '#f4b44a', 1.6);
               prev = Q;
             }
-            if (Math.abs(num('theta', 90) - 90) < 4) {
-              var rx = Math.cos(psi1 + Math.PI / 4) * 0.35, rz = Math.sin(psi1 + Math.PI / 4) * 0.35;
-              var R = this.project(rx, 0, rz, w, h, extra.scale);
-              ctx.fillStyle = '#f4b44a'; ctx.fillRect(R.X - 4, R.Y - 4, 8, 8);
+            var gap = Math.abs(sweep);
+            if (Math.abs(gap - 90) < 4 || Math.abs(thetaDeg - 90) < 4) {
+              var mid = psi1 + sweepRad / 2;
+              var Rpt = this.project(Math.cos(mid) * 0.38, 0, Math.sin(mid) * 0.38, w, h, extra.scale);
+              ctx.fillStyle = '#f4b44a'; ctx.fillRect(Rpt.X - 4, Rpt.Y - 4, 8, 8);
             }
             ctx.fillStyle = '#6cf'; ctx.beginPath(); ctx.arc(P1.X, P1.Y, 3, 0, Math.PI * 2); ctx.fill();
             ctx.fillStyle = '#f86'; ctx.beginPath(); ctx.arc(P2.X, P2.Y, 3, 0, Math.PI * 2); ctx.fill();
-            var delta = Math.abs(num('psi2', 70) - num('psi1', 20));
             document.getElementById('eq-line').textContent =
-              'θ = ' + num('theta', 90) + '° (right-angle mark if 90)   ψ1 = ' + num('psi1', 20) +
-              '°   ψ2 = ' + num('psi2', 70) + '°   |ψ2−ψ1| = ' + delta + '°';
+              'arc ψ1→ψ2 = ' + gap.toFixed(1) + '°   θ = ' + thetaDeg +
+              '°   ψ1 = ' + psi1Deg + '°   ψ2 = ' + psi2Deg + '°';
           },
           draw: function (now) {
             var canvas = document.getElementById('curveCanvas'); if (!canvas) return;
