@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>4x4 Cards</title>
+  <title>7 Cards</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -11,6 +11,11 @@
       font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
       background: #111;
       color: #eee;
+    }
+
+    #stage {
+      position: relative;
+      max-width: 720px;
     }
 
     #grid {
@@ -34,62 +39,72 @@
       font-size: 14px;
       cursor: pointer;
       user-select: none;
+      position: relative;
+      overflow: hidden;
     }
 
     .card:hover { border-color: #888; }
+    .card.held { border-color: #fc3; }
+
+    #geek {
+      position: absolute;
+      object-fit: cover;
+      pointer-events: none;
+      z-index: 5;
+      border-radius: 10px;
+    }
+
+    #geek.flip { transform: scaleX(-1); }
   </style>
 </head>
 <body>
 
-  <div id="grid"></div>
+  <div id="stage">
+    <div id="grid"></div>
+    <img id="geek" alt="geek" src="geek.png">
+  </div>
 
   <script>
-    const TOTAL = 16;
+    const TOTAL = 7;
     const grid = document.getElementById('grid');
+    const geek = document.getElementById('geek');
 
-    // change this later if you want a shared mode
     let mode = 'default';
+    let cardOneHeld = false;
+    let walkIndex = 0;
+    let walkDir = 1;
+    let lastStep = 0;
+    const STEP_MS = 900;
+
+    geek.onerror = function () {
+      this.src = 'https://raw.githubusercontent.com/DreamTexc/MoonWave/main/geek.png';
+    };
 
     function cardContent(index) {
       switch (index) {
-        case 0:  return '0';
-        case 1:  return '1';
-        case 2:  return '2';
-        case 3:  return '3';
-        case 4:  return '4';
-        case 5:  return '5';
-        case 6:  return '6';
-        case 7:  return '7';
-        case 8:  return '8';
-        case 9:  return '9';
-        case 10: return '10';
-        case 11: return '11';
-        case 12: return '12';
-        case 13: return '13';
-        case 14: return '14';
-        case 15: return '15';
+        case 0: return '0';
+        case 1: return '1';
+        case 2: return '2';
+        case 3: return '3';
+        case 4: return '4';
+        case 5: return '5';
+        case 6: return '6';
         default: return '?';
       }
     }
 
     function onCardClick(index) {
       switch (index) {
-        case 0:
         case 1:
+          cardOneHeld = !cardOneHeld;
+          document.querySelector('[data-index="1"]').classList.toggle('held', cardOneHeld);
+          break;
+        case 0:
         case 2:
         case 3:
         case 4:
         case 5:
         case 6:
-        case 7:
-        case 8:
-        case 9:
-        case 10:
-        case 11:
-        case 12:
-        case 13:
-        case 14:
-        case 15:
           console.log('clicked', index);
           break;
         default:
@@ -109,7 +124,36 @@
       }
     }
 
+    function fillCard(index) {
+      const el = document.querySelector('[data-index="' + index + '"]');
+      const stage = document.getElementById('stage').getBoundingClientRect();
+      const r = el.getBoundingClientRect();
+      geek.style.left = (r.left - stage.left) + 'px';
+      geek.style.top = (r.top - stage.top) + 'px';
+      geek.style.width = r.width + 'px';
+      geek.style.height = r.height + 'px';
+      geek.classList.toggle('flip', walkDir < 0);
+    }
+
+    function tick(now) {
+      if (!cardOneHeld) {
+        if (now - lastStep >= STEP_MS) {
+          lastStep = now;
+          walkIndex += walkDir;
+          if (walkIndex >= 3) { walkIndex = 3; walkDir = -1; }
+          if (walkIndex <= 0) { walkIndex = 0; walkDir = 1; }
+        }
+        fillCard(walkIndex);
+      }
+      requestAnimationFrame(tick);
+    }
+
     render();
+    requestAnimationFrame((now) => {
+      lastStep = now;
+      fillCard(0);
+      tick(now);
+    });
   </script>
 </body>
 </html>
