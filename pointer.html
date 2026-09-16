@@ -6,12 +6,42 @@
   <title>7 Cards</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100%; }
     body {
       font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
       background: #111;
       color: #eee;
     }
-    #stage { position: relative; max-width: 720px; }
+    body.float-opaque { background: #0a0a12; }
+    body.float-opaque #stage {
+      opacity: 0.42;
+      filter: blur(0.4px) saturate(1.15);
+      transform: translateY(-6px);
+    }
+    #reflection {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 20;
+      opacity: 0;
+      transform: scaleY(-1) translateY(-8%);
+      filter: blur(3px) brightness(1.15);
+      transform-origin: center 42%;
+    }
+    body.float-opaque #reflection { opacity: 0.55; }
+    #dotPatch {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 18;
+      opacity: 0;
+    }
+    #stage {
+      position: relative;
+      max-width: 720px;
+      z-index: 2;
+      transition: opacity 700ms ease, filter 700ms ease, transform 700ms ease;
+    }
     #grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -70,6 +100,8 @@
   </style>
 </head>
 <body>
+  <canvas id="dotPatch"></canvas>
+  <div id="reflection"></div>
   <div id="stage">
     <div id="grid"></div>
     <img id="geek" alt="geek" src="geek.png">
@@ -78,16 +110,21 @@
     const TOTAL = 7;
     const grid = document.getElementById('grid');
     const geek = document.getElementById('geek');
+    const dotPatch = document.getElementById('dotPatch');
+    const reflection = document.getElementById('reflection');
 
     let cardOneHeld = false;
     let walkIndex = 0;
     let walkDir = 1;
     let lastStep = 0;
     const STEP_MS = 900;
-
     let hitThree = false;
     let tripCount = 0;
+    let zeroHits = 0;
+    let moveCount = 0;
     let boxSixWords = '';
+    let opaqueLevel = 0;
+    let floating = false;
 
     const WORD_BANK = [
       'moon','wave','geek','trace','focus','alpha','lizard','orbit','pulse','signal',
@@ -100,13 +137,10 @@
     const ONSETS = ['b','c','d','f','g','h','j','k','l','m','n','p','r','s','t','v','w','z','br','cr','dr','fl','gr','st','tr','sk'];
     const NUCLEI = ['a','e','i','o','u','ae','io','ou','ai'];
     const CODAS = ['','n','r','l','s','t','k','m','x','th'];
-
     const dimple = { x: 0.5, y: 0.5, rings: [], lastDrop: 0, dropEvery: 1600 };
 
     function generateRandomWord() {
-      if (Math.random() < 0.72) {
-        return WORD_BANK[Math.floor(Math.random() * WORD_BANK.length)];
-      }
+      if (Math.random() < 0.72) return WORD_BANK[Math.floor(Math.random() * WORD_BANK.length)];
       const a = ONSETS[Math.floor(Math.random() * ONSETS.length)];
       const b = NUCLEI[Math.floor(Math.random() * NUCLEI.length)];
       const c = CODAS[Math.floor(Math.random() * CODAS.length)];
@@ -115,7 +149,6 @@
         : '';
       return (a + b + c + extra).slice(0, 10);
     }
-
     function generateFiveWords() {
       const picked = [];
       do {
@@ -141,10 +174,56 @@
         default: return '';
       }
     }
-
     function paintBoxSix() {
       const el = document.querySelector('[data-index="6"]');
       if (el) el.textContent = boxSixWords;
+    }
+
+    function patchScreenDots() {
+      const dpr = window.devicePixelRatio || 1;
+      dotPatch.width = Math.floor(window.innerWidth * dpr);
+      dotPatch.height = Math.floor(window.innerHeight * dpr);
+      const ctx = dotPatch.getContext('2d');
+      ctx.clearRect(0, 0, dotPatch.width, dotPatch.height);
+      const count = 140 + Math.floor(opaqueLevel * 220);
+      for (let i = 0; i < count; i++) {
+        const x = Math.random() * dotPatch.width;
+        const y = Math.random() * dotPatch.height;
+        const r = (Math.random() * 1.4 + 0.4) * dpr;
+        ctx.fillStyle = 'rgba(8,10,14,' + (0.18 + opaqueLevel * 0.55) + ')';
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      dotPatch.style.opacity = String(Math.min(0.92, 0.12 + opaqueLevel * 0.8));
+    }
+
+    function updateReflection() {
+      reflection.innerHTML = '';
+      const clone = document.getElementById('stage').cloneNode(true);
+      clone.id = 'stageClone';
+      clone.querySelectorAll('[id]').forEach((n) => n.removeAttribute('id'));
+      reflection.appendChild(clone);
+    }
+
+    function systemTest() {
+      opaqueLevel = Math.min(1, opaqueLevel + 0.04);
+      patchScreenDots();
+      updateReflection();
+    }
+
+    function floatOnItself() {
+      floating = true;
+      opaqueLevel = 1;
+      patchScreenDots();
+      updateReflection();
+      document.body.classList.add('float-opaque');
+      setTimeout(function () {
+        document.body.classList.remove('float-opaque');
+        floating = false;
+        opaqueLevel = 0.25;
+        patchScreenDots();
+      }, 2200);
     }
 
     function enforceTrip(prev, next) {
@@ -152,9 +231,11 @@
         if (next === 3) hitThree = true;
         if (next === 0 && hitThree) {
           tripCount += 1;
+          zeroHits += 1;
           hitThree = false;
           boxSixWords = generateFiveWords().join('\n');
           paintBoxSix();
+          if (zeroHits % 2 === 0) setTimeout(floatOnItself, 80);
         }
       } while (false);
     }
@@ -170,7 +251,6 @@
           break;
         default:
           console.log('clicked', index);
-          break;
       }
     }
 
@@ -227,12 +307,10 @@
       const canvas = document.getElementById('dimpleCanvas');
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
-      const w = canvas.width;
-      const h = canvas.height;
+      const w = canvas.width, h = canvas.height;
       ctx.fillStyle = '#15202b';
       ctx.fillRect(0, 0, w, h);
-      const gx = dimple.x * w;
-      const gy = dimple.y * h;
+      const gx = dimple.x * w, gy = dimple.y * h;
       const sheen = ctx.createRadialGradient(gx, gy, 0, gx, gy, Math.min(w, h) * 0.55);
       sheen.addColorStop(0, 'rgba(170,210,230,0.10)');
       sheen.addColorStop(1, 'rgba(21,32,43,0)');
@@ -287,16 +365,31 @@
           walkIndex += walkDir;
           if (walkIndex >= 3) { walkIndex = 3; walkDir = -1; }
           if (walkIndex <= 0) { walkIndex = 0; walkDir = 1; }
+          moveCount += 1;
           enforceTrip(prev, walkIndex);
+          if (moveCount % 2 === 0) {
+            setTimeout(function () {
+              opaqueLevel = Math.min(1, opaqueLevel + 0.08);
+              patchScreenDots();
+            }, 120);
+          }
         }
         fillCard(walkIndex);
       }
       requestAnimationFrame(tick);
     }
 
-    window.addEventListener('resize', sizeDimpleCanvas);
+    window.addEventListener('resize', function () {
+      sizeDimpleCanvas();
+      patchScreenDots();
+    });
+
     render();
+    patchScreenDots();
+    setInterval(systemTest, 700);
+
     requestAnimationFrame((now) => {
+      sizeDimpleCanvas();
       lastStep = now;
       dimple.lastDrop = now;
       fillCard(0);
