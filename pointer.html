@@ -6,13 +6,7 @@
   <title>7 Cards</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html {
-      min-height: 100%;
-      background: #07070b;
-      perspective: 1100px;
-    }
-
+    html { min-height: 100%; background: #07070b; perspective: 1100px; }
     body {
       font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
       background: radial-gradient(ellipse at 50% 120%, #1a1a24 0%, #07070b 62%);
@@ -20,7 +14,6 @@
       min-height: 100vh;
       overflow-x: hidden;
     }
-
     #sheet {
       position: relative;
       max-width: 760px;
@@ -31,142 +24,75 @@
       filter: drop-shadow(0 28px 34px rgba(0,0,0,.55));
       transition: transform 800ms ease, filter 800ms ease;
     }
-
-    #sheet::before,
-    #sheet::after {
+    #sheet::before, #sheet::after {
       content: '';
       position: absolute;
-      top: 8px;
-      bottom: 18px;
-      width: 28px;
-      pointer-events: none;
-      z-index: 8;
+      top: 8px; bottom: 18px; width: 28px;
+      pointer-events: none; z-index: 8;
     }
-
     #sheet::before {
       left: -10px;
       background: linear-gradient(90deg, rgba(0,0,0,.35), rgba(0,0,0,0));
       transform: perspective(400px) rotateY(18deg);
       border-radius: 18px 0 0 22px;
     }
-
     #sheet::after {
       right: -10px;
       background: linear-gradient(270deg, rgba(0,0,0,.35), rgba(0,0,0,0));
       transform: perspective(400px) rotateY(-18deg);
       border-radius: 0 18px 22px 0;
     }
-
     body.float-opaque #sheet {
       transform: perspective(900px) rotateX(12deg) translateY(-22px) scale(1.02);
       filter: drop-shadow(0 48px 50px rgba(0,0,0,.7));
     }
-
-    body.float-opaque #stage {
-      border-radius: 14px;
-      box-shadow:
-        inset 18px 0 24px rgba(0,0,0,.22),
-        inset -18px 0 24px rgba(0,0,0,.22),
-        0 2px 0 rgba(255,255,255,.06);
-    }
-
     #reflection {
-      position: fixed;
-      left: 0;
-      right: 0;
-      top: 42%;
-      height: 58%;
-      pointer-events: none;
-      z-index: 6;
-      opacity: 0.18;
-      transform: scaleY(-1);
-      filter: blur(6px) brightness(1.2);
+      position: fixed; left: 0; right: 0; top: 42%; height: 58%;
+      pointer-events: none; z-index: 6; opacity: 0.18;
+      transform: scaleY(-1); filter: blur(6px) brightness(1.2);
       mask-image: linear-gradient(to bottom, rgba(0,0,0,.35), transparent 70%);
-      -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,.35), transparent 70%);
     }
-
-    body.float-opaque #reflection { opacity: 0.34; }
-
-    #dotPatch {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 30;
-      opacity: 0.22;
-    }
-
+    #dotPatch { position: fixed; inset: 0; pointer-events: none; z-index: 30; }
     #stage {
-      position: relative;
-      max-width: 720px;
-      z-index: 2;
-      background: #111;
-      border-radius: 12px;
-      box-shadow:
-        inset 14px 0 18px rgba(0,0,0,.16),
-        inset -14px 0 18px rgba(0,0,0,.16);
+      position: relative; max-width: 720px; z-index: 2;
+      background: #111; border-radius: 12px;
     }
-
     #grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      padding: 16px;
-      max-width: 720px;
+      gap: 12px; padding: 16px; max-width: 720px;
     }
-
     .card {
-      aspect-ratio: 1;
-      border: 1px solid #444;
-      border-radius: 10px;
-      background: #1c1c1c;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 8px;
-      font-size: 14px;
-      cursor: pointer;
-      user-select: none;
-      position: relative;
-      overflow: hidden;
+      aspect-ratio: 1; border: 1px solid #444; border-radius: 10px;
+      background: #1c1c1c; display: flex; align-items: center;
+      justify-content: center; text-align: center; padding: 8px;
+      font-size: 14px; cursor: pointer; user-select: none;
+      position: relative; overflow: hidden;
     }
-
     .card:hover { border-color: #888; }
     .card.held { border-color: #fc3; }
     .card[data-index="4"] { padding: 0; }
     .card[data-index="5"] { padding: 0; background: #15202b; }
     .card[data-index="6"] {
-      font-size: 12px;
-      line-height: 1.35;
-      align-items: flex-start;
-      padding-top: 12px;
+      font-size: 12px; line-height: 1.35;
+      align-items: stretch; justify-content: flex-start;
+      padding: 8px; flex-direction: column;
+      overflow: visible; z-index: 15;
     }
-
-    #ice {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      border-radius: 10px;
-      pointer-events: none;
+    .hot-label { font-size: 9px; letter-spacing: 0.16em; color: #f4b44a; margin-bottom: 4px; }
+    .hot-word { display: block; width: 100%; text-align: left; color: #eee; cursor: pointer; }
+    .hot-word:hover { color: #f4b44a; }
+    #hotDrop {
+      display: none; position: absolute; left: 0; right: 0; top: 100%;
+      margin-top: 4px; background: #161616; border: 1px solid #666;
+      border-radius: 8px; padding: 8px; z-index: 40;
+      box-shadow: 0 10px 24px rgba(0,0,0,.45);
     }
-
-    #dimpleCanvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-      border-radius: 10px;
-    }
-
-    #geek {
-      position: absolute;
-      object-fit: cover;
-      pointer-events: none;
-      z-index: 12;
-      border-radius: 10px;
-      display: block;
-    }
-
+    #hotDrop.open { display: block; }
+    #hotDrop .info { font-size: 10px; color: #aaa; margin-bottom: 6px; }
+    #hotDrop a { display: block; color: #cfe7ff; text-decoration: none; font-size: 11px; padding: 4px 0; border-top: 1px solid #2a2a2a; }
+    #ice, #dimpleCanvas { width: 100%; height: 100%; display: block; border-radius: 10px; }
+    #geek { position: absolute; object-fit: cover; pointer-events: none; z-index: 12; border-radius: 10px; }
     #geek.flip { transform: scaleX(-1); }
   </style>
 </head>
@@ -185,28 +111,11 @@
     const geek = document.getElementById('geek');
     const dotPatch = document.getElementById('dotPatch');
     const reflection = document.getElementById('reflection');
-
-    let cardOneHeld = false;
-    let walkIndex = 0;
-    let walkDir = 1;
-    let lastStep = 0;
+    let cardOneHeld = false, walkIndex = 0, walkDir = 1, lastStep = 0;
     const STEP_MS = 900;
-    let hitThree = false;
-    let tripCount = 0;
-    let zeroHits = 0;
-    let moveCount = 0;
-    let boxSixWords = '';
-    let opaqueLevel = 0;
-    let floating = false;
-
-    const WORD_BANK = [
-      'moon','wave','geek','trace','focus','alpha','lizard','orbit','pulse','signal',
-      'vector','quark','nebula','pixel','circuit','phase','drift','echo','flux','node',
-      'spark','tidal','zenith','prism','glyph','nova','axiom','helix','ion','radar',
-      'sonic','vapor','crystal','ember','forge','haven','ivory','jade','krypton','lunar',
-      'magma','nimbus','onyx','plasma','quartz','rift','sable','torque','umbra','vortex',
-      'watt','xenon','yield','zephyr','anchor','bridge','cinder','delta','frost'
-    ];
+    let hitThree = false, tripCount = 0, zeroHits = 0, moveCount = 0;
+    let boxSixWords = '', opaqueLevel = 0;
+    const WORD_BANK = ['moon','wave','geek','trace','focus','alpha','lizard','orbit','pulse','signal','vector','quark','nebula','pixel','circuit','phase','drift','echo','flux','node','spark','tidal','zenith','prism','glyph','nova','axiom','helix','ion','radar','sonic','vapor','crystal','ember','forge','haven','ivory','jade','krypton','lunar','magma','nimbus','onyx','plasma','quartz','rift','sable','torque','umbra','vortex','watt','xenon','yield','zephyr','anchor','bridge','cinder','delta','frost'];
     const ONSETS = ['b','c','d','f','g','h','j','k','l','m','n','p','r','s','t','v','w','z','br','cr','dr','fl','gr','st','tr','sk'];
     const NUCLEI = ['a','e','i','o','u','ae','io','ou','ai'];
     const CODAS = ['','n','r','l','s','t','k','m','x','th'];
@@ -214,104 +123,69 @@
 
     function generateRandomWord() {
       if (Math.random() < 0.72) return WORD_BANK[Math.floor(Math.random() * WORD_BANK.length)];
-      const a = ONSETS[Math.floor(Math.random() * ONSETS.length)];
-      const b = NUCLEI[Math.floor(Math.random() * NUCLEI.length)];
-      const c = CODAS[Math.floor(Math.random() * CODAS.length)];
-      const extra = Math.random() < 0.35
-        ? ONSETS[Math.floor(Math.random() * ONSETS.length)] + NUCLEI[Math.floor(Math.random() * NUCLEI.length)]
-        : '';
-      return (a + b + c + extra).slice(0, 10);
+      return (ONSETS[Math.floor(Math.random()*ONSETS.length)] + NUCLEI[Math.floor(Math.random()*NUCLEI.length)] + CODAS[Math.floor(Math.random()*CODAS.length)]).slice(0,10);
     }
-
     function generateFiveWords() {
       const picked = [];
-      do {
-        const w = generateRandomWord();
-        if (picked.indexOf(w) === -1) picked.push(w);
-      } while (picked.length < 5);
+      do { const w = generateRandomWord(); if (picked.indexOf(w) === -1) picked.push(w); } while (picked.length < 5);
       return picked;
     }
-
-    geek.onerror = function () {
-      this.src = 'https://raw.githubusercontent.com/DreamTexc/MoonWave/main/geek.png';
-    };
-
-    function cardContent(index) {
-      switch (index) {
-        case 0: return '0';
-        case 1: return '1';
-        case 2: return '2';
-        case 3: return '3';
-        case 4: return '';
-        case 5: return '';
-        case 6: return boxSixWords;
-        default: return '';
-      }
-    }
+    geek.onerror = function () { this.src = 'https://raw.githubusercontent.com/DreamTexc/MoonWave/main/geek.png'; };
 
     function paintBoxSix() {
       const el = document.querySelector('[data-index="6"]');
-      if (el) el.textContent = boxSixWords;
+      if (!el) return;
+      el.innerHTML = '';
+      const label = document.createElement('div');
+      label.className = 'hot-label';
+      label.textContent = 'HOT';
+      el.appendChild(label);
+      const words = boxSixWords ? boxSixWords.split('\n').filter(Boolean) : [];
+      words.forEach((word) => {
+        const row = document.createElement('span');
+        row.className = 'hot-word';
+        row.textContent = word;
+        row.addEventListener('click', function (e) { e.stopPropagation(); openHotSearch(word, el); });
+        el.appendChild(row);
+      });
+      let drop = document.getElementById('hotDrop');
+      if (!drop) { drop = document.createElement('div'); drop.id = 'hotDrop'; }
+      el.appendChild(drop);
     }
 
-    function patchScreenDots() {
-      const dpr = window.devicePixelRatio || 1;
-      dotPatch.width = Math.floor(window.innerWidth * dpr);
-      dotPatch.height = Math.floor(window.innerHeight * dpr);
-      const ctx = dotPatch.getContext('2d');
-      ctx.clearRect(0, 0, dotPatch.width, dotPatch.height);
-      const count = 28 + Math.floor(opaqueLevel * 18);
-      for (let i = 0; i < count; i++) {
-        const x = Math.random() * dotPatch.width;
-        const y = Math.random() * dotPatch.height;
-        const r = (Math.random() * 0.6 + 0.35) * dpr;
-        ctx.fillStyle = 'rgba(255,255,255,0.06)';
-        ctx.beginPath();
-        ctx.arc(x, y, r, 0, Math.PI * 2);
-        ctx.fill();
+    async function generateSearchResults(word) {
+      const q = word || generateRandomWord();
+      const query = encodeURIComponent(q);
+      try {
+        const res = await fetch('https://en.wikipedia.org/w/api.php?action=opensearch&limit=3&namespace=0&origin=*&search=' + query);
+        const data = await res.json();
+        const out = [];
+        for (let i = 0; i < Math.min(3, (data[1] || []).length); i++) out.push({ title: data[1][i], href: data[3][i] });
+        while (out.length < 3) out.push({ title: q + ' — Google ' + (out.length + 1), href: 'https://www.google.com/search?q=' + query });
+        return { word: q, results: out.slice(0, 3) };
+      } catch (err) {
+        return { word: q, results: [
+          { title: q + ' result 1', href: 'https://www.google.com/search?q=' + query },
+          { title: q + ' result 2', href: 'https://www.google.com/search?q=' + query + '+wiki' },
+          { title: q + ' result 3', href: 'https://www.google.com/search?q=' + query + '+meaning' }
+        ]};
       }
-      dotPatch.style.opacity = '1';
     }
 
-    function updateReflection() {
-      reflection.innerHTML = '';
-      const clone = document.getElementById('sheet').cloneNode(true);
-      clone.id = 'sheetClone';
-      clone.querySelectorAll('[id]').forEach((n) => n.removeAttribute('id'));
-      reflection.appendChild(clone);
-    }
-
-    function systemTest() {
-      opaqueLevel = Math.min(0.35, opaqueLevel + 0.01);
-      patchScreenDots();
-      updateReflection();
-    }
-
-    function floatOnItself() {
-      floating = true;
-      patchScreenDots();
-      updateReflection();
-      document.body.classList.add('float-opaque');
-      setTimeout(function () {
-        document.body.classList.remove('float-opaque');
-        floating = false;
-        opaqueLevel = 0.08;
-        patchScreenDots();
-      }, 2200);
-    }
-
-    function enforceTrip(prev, next) {
-      do {
-        if (next === 3) hitThree = true;
-        if (next === 0 && hitThree) {
-          tripCount += 1;
-          zeroHits += 1;
-          hitThree = false;
-          boxSixWords = generateFiveWords().join('\n');
-          paintBoxSix();
-          if (zeroHits % 2 === 0) setTimeout(floatOnItself, 80);
-        }
-      } while (false);
+    async function openHotSearch(word, box) {
+      const drop = document.getElementById('hotDrop') || document.createElement('div');
+      drop.id = 'hotDrop';
+      box.appendChild(drop);
+      drop.classList.add('open');
+      drop.innerHTML = '<div class="info">info · searching ' + word + '</div>';
+      const pack = await generateSearchResults(word);
+      drop.innerHTML = '<div class="info">info · ' + pack.word + '</div>';
+      pack.results.forEach((item, i) => {
+        const a = document.createElement('a');
+        a.href = item.href; a.target = '_blank'; a.rel = 'noopener';
+        a.textContent = (i + 1) + '. ' + item.title;
+        drop.appendChild(a);
+      });
     }
 
     function onCardClick(index) {
@@ -320,12 +194,26 @@
           cardOneHeld = !cardOneHeld;
           document.querySelector('[data-index="1"]').classList.toggle('held', cardOneHeld);
           break;
-        case 5:
-          doWaterRipple();
+        case 5: doWaterRipple(); break;
+        case 6: {
+          const words = boxSixWords ? boxSixWords.split('\n').filter(Boolean) : [];
+          openHotSearch(words[0] || generateRandomWord(), document.querySelector('[data-index="6"]'));
           break;
-        default:
-          console.log('clicked', index);
+        }
+        default: console.log('clicked', index);
       }
+    }
+
+    function enforceTrip(prev, next) {
+      do {
+        if (next === 3) hitThree = true;
+        if (next === 0 && hitThree) {
+          tripCount += 1; zeroHits += 1; hitThree = false;
+          boxSixWords = generateFiveWords().join('\n');
+          paintBoxSix();
+          if (zeroHits % 2 === 0) setTimeout(function(){ document.body.classList.add('float-opaque'); setTimeout(function(){ document.body.classList.remove('float-opaque'); }, 2200); }, 80);
+        }
+      } while (false);
     }
 
     function render() {
@@ -335,106 +223,52 @@
         el.className = 'card';
         el.dataset.index = i;
         if (i === 4) {
-          const ice = document.createElement('img');
-          ice.id = 'ice';
-          ice.alt = 'ice';
-          ice.src = 'ice.png';
-          ice.onerror = function () {
-            this.src = 'https://raw.githubusercontent.com/DreamTexc/MoonWave/main/ice.png';
-          };
+          const ice = document.createElement('img'); ice.id = 'ice'; ice.src = 'ice.png';
+          ice.onerror = function () { this.src = 'https://raw.githubusercontent.com/DreamTexc/MoonWave/main/ice.png'; };
           el.appendChild(ice);
         } else if (i === 5) {
-          const canvas = document.createElement('canvas');
-          canvas.id = 'dimpleCanvas';
-          el.appendChild(canvas);
-        } else {
-          el.textContent = cardContent(i);
-        }
+          const canvas = document.createElement('canvas'); canvas.id = 'dimpleCanvas'; el.appendChild(canvas);
+        } else el.textContent = i === 6 ? '' : String(i);
         el.addEventListener('click', () => onCardClick(i));
         grid.appendChild(el);
       }
-      sizeDimpleCanvas();
+      paintBoxSix();
     }
 
     function sizeDimpleCanvas() {
-      const canvas = document.getElementById('dimpleCanvas');
-      if (!canvas) return;
-      const r = canvas.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
+      const canvas = document.getElementById('dimpleCanvas'); if (!canvas) return;
+      const r = canvas.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
       canvas.width = Math.max(1, Math.floor(r.width * dpr));
       canvas.height = Math.max(1, Math.floor(r.height * dpr));
     }
-
-    function doWaterRipple(at) {
-      const canvas = document.getElementById('dimpleCanvas');
-      if (!canvas) return;
-      dimple.rings.push({
-        x: at && at.x != null ? at.x : dimple.x,
-        y: at && at.y != null ? at.y : dimple.y,
-        r: 2,
-        max: Math.min(canvas.width, canvas.height) * 0.42,
-        life: 1
-      });
+    function doWaterRipple() {
+      const canvas = document.getElementById('dimpleCanvas'); if (!canvas) return;
+      dimple.rings.push({ x: 0.5, y: 0.5, r: 2, max: Math.min(canvas.width, canvas.height) * 0.42, life: 1 });
     }
-
     function drawDimple(now) {
-      const canvas = document.getElementById('dimpleCanvas');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      const w = canvas.width, h = canvas.height;
-      ctx.fillStyle = '#15202b';
-      ctx.fillRect(0, 0, w, h);
-      const gx = dimple.x * w, gy = dimple.y * h;
-      const sheen = ctx.createRadialGradient(gx, gy, 0, gx, gy, Math.min(w, h) * 0.55);
-      sheen.addColorStop(0, 'rgba(170,210,230,0.10)');
-      sheen.addColorStop(1, 'rgba(21,32,43,0)');
-      ctx.fillStyle = sheen;
-      ctx.fillRect(0, 0, w, h);
-      ctx.beginPath();
-      ctx.arc(gx, gy, Math.max(2, Math.min(w, h) * 0.018), 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(210,230,240,0.22)';
-      ctx.fill();
-      if (now - dimple.lastDrop >= dimple.dropEvery) {
-        dimple.lastDrop = now;
-        doWaterRipple();
-      }
+      const canvas = document.getElementById('dimpleCanvas'); if (!canvas) return;
+      const ctx = canvas.getContext('2d'), w = canvas.width, h = canvas.height;
+      ctx.fillStyle = '#15202b'; ctx.fillRect(0,0,w,h);
+      if (now - dimple.lastDrop >= dimple.dropEvery) { dimple.lastDrop = now; doWaterRipple(); }
       for (let i = dimple.rings.length - 1; i >= 0; i--) {
         const ring = dimple.rings[i];
-        ring.r += Math.max(0.35, Math.min(w, h) * 0.0045);
-        ring.life -= 0.012;
-        if (ring.life <= 0 || ring.r > ring.max) {
-          dimple.rings.splice(i, 1);
-          continue;
-        }
-        ctx.beginPath();
-        ctx.arc(ring.x * w, ring.y * h, ring.r, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(190,220,235,' + (0.22 * ring.life) + ')';
-        ctx.lineWidth = Math.max(0.6, 1.4 * ring.life);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.arc(ring.x * w, ring.y * h, ring.r * 0.72, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(255,255,255,' + (0.08 * ring.life) + ')';
-        ctx.lineWidth = 0.6;
-        ctx.stroke();
+        ring.r += Math.max(0.35, Math.min(w,h)*0.0045); ring.life -= 0.012;
+        if (ring.life <= 0 || ring.r > ring.max) { dimple.rings.splice(i,1); continue; }
+        ctx.beginPath(); ctx.arc(ring.x*w, ring.y*h, ring.r, 0, Math.PI*2);
+        ctx.strokeStyle = 'rgba(190,220,235,' + (0.22*ring.life) + ')'; ctx.stroke();
       }
     }
-
     function fillCard(index) {
       const stageEl = document.getElementById('stage');
-      const el = stageEl.querySelector('[data-index="' + index + '"]');
-      if (!el) return;
-      const stage = stageEl.getBoundingClientRect();
-      const r = el.getBoundingClientRect();
-      const sx = stage.width / stageEl.offsetWidth || 1;
-      const sy = stage.height / stageEl.offsetHeight || 1;
-      geek.style.left = ((r.left - stage.left) / sx) + 'px';
-      geek.style.top = ((r.top - stage.top) / sy) + 'px';
-      geek.style.width = (r.width / sx) + 'px';
-      geek.style.height = (r.height / sy) + 'px';
-      geek.style.display = 'block';
+      const el = stageEl.querySelector('[data-index="' + index + '"]'); if (!el) return;
+      const stage = stageEl.getBoundingClientRect(), r = el.getBoundingClientRect();
+      const sx = stage.width / stageEl.offsetWidth || 1, sy = stage.height / stageEl.offsetHeight || 1;
+      geek.style.left = ((r.left-stage.left)/sx)+'px';
+      geek.style.top = ((r.top-stage.top)/sy)+'px';
+      geek.style.width = (r.width/sx)+'px';
+      geek.style.height = (r.height/sy)+'px';
       geek.classList.toggle('flip', walkDir < 0);
     }
-
     function tick(now) {
       drawDimple(now);
       if (!cardOneHeld) {
@@ -446,35 +280,24 @@
           if (walkIndex <= 0) { walkIndex = 0; walkDir = 1; }
           moveCount += 1;
           enforceTrip(prev, walkIndex);
-          if (moveCount % 2 === 0) {
-            setTimeout(function () {
-              opaqueLevel = Math.min(0.35, opaqueLevel + 0.02);
-              patchScreenDots();
-            }, 120);
-          }
         }
         fillCard(walkIndex);
       }
       requestAnimationFrame(tick);
     }
-
-    window.addEventListener('resize', function () {
-      sizeDimpleCanvas();
-      patchScreenDots();
-    });
-
+    function patchScreenDots() {
+      const dpr = window.devicePixelRatio || 1;
+      dotPatch.width = Math.floor(innerWidth*dpr); dotPatch.height = Math.floor(innerHeight*dpr);
+      const ctx = dotPatch.getContext('2d'); ctx.clearRect(0,0,dotPatch.width,dotPatch.height);
+      for (let i = 0; i < 28; i++) {
+        ctx.fillStyle = 'rgba(255,255,255,0.06)';
+        ctx.beginPath(); ctx.arc(Math.random()*dotPatch.width, Math.random()*dotPatch.height, 0.7*dpr, 0, Math.PI*2); ctx.fill();
+      }
+    }
     render();
     patchScreenDots();
-    updateReflection();
-    setInterval(systemTest, 700);
-
-    requestAnimationFrame((now) => {
-      sizeDimpleCanvas();
-      lastStep = now;
-      dimple.lastDrop = now;
-      fillCard(0);
-      tick(now);
-    });
+    setInterval(function(){ patchScreenDots(); }, 700);
+    requestAnimationFrame(function(now){ sizeDimpleCanvas(); lastStep = now; dimple.lastDrop = now; fillCard(0); tick(now); });
   </script>
 </body>
 </html>
