@@ -131,7 +131,15 @@
     }
     #live-info {
       background: #0d0d12; border: 1px solid #333; border-radius: 8px; padding: 8px;
-      max-height: 160px; overflow: auto; font-family: ui-monospace, Consolas, monospace;
+      max-height: 140px; overflow: auto; font-family: ui-monospace, Consolas, monospace;
+    }
+    .ratio-row {
+      display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+      margin-top: 8px; font-size: 12px; color: #ccc;
+    }
+    .ratio-row input[type="number"] {
+      width: 64px; background: #0d0d12; color: #eee;
+      border: 1px solid #444; border-radius: 6px; padding: 4px 6px;
     }
     table.singleton-wrap {
       width: calc(100% - 32px);
@@ -150,13 +158,16 @@
       padding: 8px 14px; font-weight: 700; cursor: pointer;
     }
     #user-code {
-      width: 100%; min-height: 110px; margin-top: 8px;
+      width: 100%; min-height: 72px; margin-top: 8px;
       background: #0d0d12; color: #d8d8e0; border: 1px solid #333;
       border-radius: 8px; padding: 8px; font: 12px ui-monospace, Consolas, monospace;
     }
-    #check-result { display: block; margin-top: 6px; font-size: 12px; color: #aaa; }
-    #check-result.ok { color: #6f6; }
-    #check-result.bad { color: #f66; }
+    #check-result { display: block; margin-top: 6px; font-size: 12px; color: #aaa; white-space: pre-wrap; text-align: left; }
+    #curveCanvas {
+      width: 100%; height: 260px; display: block;
+      background: #0a0c12; border: 1px solid #333; border-radius: 8px; margin-top: 8px;
+    }
+    #eq-line { font: 12px ui-monospace, Consolas, monospace; color: #cfe7ff; margin-top: 6px; text-align: left; }
   </style>
 </head>
 <body>
@@ -168,7 +179,7 @@
       <img id="geek" alt="geek" src="geek.png">
 
       <div id="under-box-3">
-        <div class="caption">UNDER BOX 3 · INFO LOOP</div>
+        <div class="caption">UNDER BOX 3 · INFO LOOP · RATIO</div>
         <div class="dpad">
           <button class="up" data-dir="up" type="button">▲</button>
           <button class="left" data-dir="left" type="button">◀</button>
@@ -176,27 +187,25 @@
           <button class="right" data-dir="right" type="button">▶</button>
           <button class="down" data-dir="down" type="button">▼</button>
         </div>
-        <div id="loop-log">Click a direction. Object 2.info is a copy — Object 1 stays original.</div>
+        <div class="ratio-row">
+          <label>p <input id="ratio-p" type="number" value="2" min="1" max="12" step="1"></label>
+          <label>q <input id="ratio-q" type="number" value="3" min="1" max="12" step="1"></label>
+          <span id="ratio-readout">p/q = 2/3</span>
+        </div>
+        <div id="loop-log">Click a direction. Object 2.info is a copy — Object 1 stays original. Ratio drives the live curve.</div>
         <div id="live-info"></div>
       </div>
 
       <table class="singleton-wrap">
         <tr>
           <td>
-            <button id="correct-feedback" type="button">Correct Feedback</button>
-            <div id="check-result">singleton · waiting</div>
-            <textarea id="user-code">function Vehicle(name) {
-  this.name = name;
-  this.info = { type: "base", note: "source template" };
-}
-function Car(name) {
-  Vehicle.call(this, name);
-  this.info = Object.assign({}, this.info, { type: "car" });
-}
-const one = new Vehicle("Object 1");
-const two = new Car("Object 2");
-const three = new Vehicle("Object 3");
-</textarea>
+            <button id="correct-feedback" type="button">Correct Feedback → Space Curve</button>
+            <div id="eq-line">x = f(t), y = g(t), z = h(t)</div>
+            <canvas id="curveCanvas" width="640" height="260"></canvas>
+            <div id="check-result">singleton math viz · waiting</div>
+            <textarea id="user-code" placeholder="insert relevant info: note, phase, scale…">note: torus knot from inheritance ratio
+phase: 0
+scale: 1</textarea>
           </td>
         </tr>
       </table>
@@ -372,6 +381,8 @@ const three = new Vehicle("Object 3");
         }
         fillCard(walkIndex);
       }
+      var viz = SpaceCurve.getInstance();
+      viz.draw(now);
       requestAnimationFrame(tick);
     }
     function patchScreenDots() {
@@ -386,7 +397,7 @@ const three = new Vehicle("Object 3");
 
     function InfoSource(label) {
       this.label = label;
-      this.info = { heading: 'N', message: 'source template — do not mutate', ticks: 0 };
+      this.info = { heading: 'N', message: 'source template — do not mutate', ticks: 0, p: 2, q: 3 };
     }
     function InfoChild(label, source) {
       InfoSource.call(this, label);
@@ -399,12 +410,19 @@ const three = new Vehicle("Object 3");
     var object2 = new InfoChild('Object 2', object1);
     var object3 = new InfoSource('Object 3');
 
+    function syncRatioFromInputs() {
+      var p = Math.max(1, parseInt(document.getElementById('ratio-p').value, 10) || 2);
+      var q = Math.max(1, parseInt(document.getElementById('ratio-q').value, 10) || 3);
+      object2.info.p = p;
+      object2.info.q = q;
+      document.getElementById('ratio-readout').textContent = 'p/q = ' + p + '/' + q;
+    }
     function renderLiveInfo() {
       var el = document.getElementById('live-info');
       if (!el) return;
       el.textContent =
         object1.label + '.info (original):\n' + JSON.stringify(object1.info, null, 2) +
-        '\n\n' + object2.label + '.info (copy):\n' + JSON.stringify(object2.info, null, 2) +
+        '\n\n' + object2.label + '.info (copy / live ratio):\n' + JSON.stringify(object2.info, null, 2) +
         '\n\n' + object3.label + '.info:\n' + JSON.stringify(object3.info, null, 2);
     }
     var headings = ['N', 'E', 'S', 'W'];
@@ -418,7 +436,7 @@ const three = new Vehicle("Object 3");
       object2.info.heading = headings[idx];
       object2.info.message = 'loop #' + object2.info.ticks + ' via ' + dir + ' → ' + object2.info.heading;
       document.getElementById('loop-log').textContent =
-        'Feedback on Object 2 only. Object 1.info unchanged.';
+        'Feedback on Object 2 only. Ratio p/q and heading drive x=f(t), y=g(t), z=h(t).';
       renderLiveInfo();
     }
     document.querySelectorAll('.dpad button[data-dir]').forEach(function (btn) {
@@ -429,33 +447,135 @@ const three = new Vehicle("Object 3");
     });
     document.getElementById('reset-info').addEventListener('click', function (e) {
       e.stopPropagation();
+      var p = object2.info.p, q = object2.info.q;
       object2.info = Object.assign({}, object1.info, {
         message: 'working copy reset from Object 1',
-        inheritedFrom: object1.label
+        inheritedFrom: object1.label,
+        p: p,
+        q: q
       });
       document.getElementById('loop-log').textContent = 'Reset copy from Object 1. Original untouched.';
       renderLiveInfo();
     });
+    document.getElementById('ratio-p').addEventListener('input', function () { syncRatioFromInputs(); renderLiveInfo(); });
+    document.getElementById('ratio-q').addEventListener('input', function () { syncRatioFromInputs(); renderLiveInfo(); });
 
-    var CorrectFeedback = (function () {
+    var SpaceCurve = (function () {
       var instance;
+      function parseInsert(text) {
+        var phase = 0, scale = 1, note = '';
+        String(text || '').split(/\n/).forEach(function (line) {
+          var m = line.match(/^\s*phase\s*:\s*([-0-9.]+)/i);
+          if (m) phase = parseFloat(m[1]) || 0;
+          m = line.match(/^\s*scale\s*:\s*([-0-9.]+)/i);
+          if (m) scale = parseFloat(m[1]) || 1;
+          m = line.match(/^\s*note\s*:\s*(.+)/i);
+          if (m) note = m[1];
+        });
+        return { phase: phase, scale: scale, note: note };
+      }
+      function headingAngle(h) {
+        return ({ N: 0, E: Math.PI / 2, S: Math.PI, W: 3 * Math.PI / 2 }[h] || 0);
+      }
       function create() {
         return {
           name: 'Correct Feedback',
-          check: function (code) {
-            var src = String(code || '');
-            var decls = src.match(/function\s+[A-Z][A-Za-z0-9_]*\s*\(/g) || [];
-            var news = src.match(/\bnew\s+[A-Z][A-Za-z0-9_]*\s*\(/g) || [];
-            var ok = decls.length > 0 && news.length > 0;
+          kind: 'space-curve',
+          f: function (t, p, q, R, r, phase) {
+            return (R + r * Math.cos(q * t + phase)) * Math.cos(p * t);
+          },
+          g: function (t, p, q, R, r, phase) {
+            return (R + r * Math.cos(q * t + phase)) * Math.sin(p * t);
+          },
+          h: function (t, p, q, R, r, phase) {
+            return r * Math.sin(q * t + phase);
+          },
+          transform: function (info, insert) {
+            var p = Math.max(1, info.p || 2);
+            var q = Math.max(1, info.q || 3);
+            var ticks = info.ticks || 0;
+            var yaw = headingAngle(info.heading) + ticks * 0.08;
+            var extra = parseInsert(insert);
+            var R = 2, r = 0.7 + 0.05 * Math.min(ticks, 20);
             return {
-              ok: ok,
-              decls: decls,
-              news: news,
-              usesCallThis: /\.call\s*\(\s*this/.test(src),
-              summary: ok
-                ? 'PASS: constructor function instance(s) found.'
-                : 'FAIL: need a constructor (function Name(){}) and a new Name().'
+              p: p, q: q, R: R, r: r,
+              phase: extra.phase + ticks * 0.12,
+              scale: extra.scale,
+              yaw: yaw,
+              pitch: 0.45,
+              note: extra.note,
+              ticks: ticks,
+              heading: info.heading
             };
+          },
+          project: function (x, y, z, yaw, pitch, w, h, scale) {
+            var cy = Math.cos(yaw), sy = Math.sin(yaw);
+            var cp = Math.cos(pitch), sp = Math.sin(pitch);
+            var x1 = x * cy - z * sy;
+            var z1 = x * sy + z * cy;
+            var y1 = y * cp - z1 * sp;
+            var z2 = y * sp + z1 * cp;
+            var persp = 3.2 / (3.2 + z2);
+            return {
+              X: w * 0.5 + x1 * 46 * scale * persp,
+              Y: h * 0.52 - y1 * 46 * scale * persp,
+              depth: z2
+            };
+          },
+          draw: function (now) {
+            var canvas = document.getElementById('curveCanvas');
+            if (!canvas) return;
+            var ctx = canvas.getContext('2d');
+            var w = canvas.width, h = canvas.height;
+            var params = this.transform(object2.info, document.getElementById('user-code').value);
+            var tOff = (now || 0) * 0.00035;
+            ctx.fillStyle = '#0a0c12';
+            ctx.fillRect(0, 0, w, h);
+            ctx.strokeStyle = 'rgba(80,90,110,0.45)';
+            ctx.beginPath();
+            ctx.moveTo(20, h * 0.52); ctx.lineTo(w - 20, h * 0.52);
+            ctx.moveTo(w * 0.5, 16); ctx.lineTo(w * 0.5, h - 16);
+            ctx.stroke();
+
+            var steps = 720;
+            var pts = [];
+            for (var i = 0; i <= steps; i++) {
+              var t = (i / steps) * Math.PI * 2 + tOff;
+              var x = this.f(t, params.p, params.q, params.R, params.r, params.phase);
+              var y = this.g(t, params.p, params.q, params.R, params.r, params.phase);
+              var z = this.h(t, params.p, params.q, params.R, params.r, params.phase);
+              pts.push(this.project(x, y, z, params.yaw, params.pitch, w, h, params.scale));
+            }
+            ctx.lineWidth = 2;
+            for (var j = 1; j < pts.length; j++) {
+              var a = pts[j - 1], b = pts[j];
+              var k = j / pts.length;
+              ctx.strokeStyle = 'hsla(' + (200 + k * 80) + ',70%,65%,' + (0.25 + 0.55 * (1 - (b.depth + 3) / 8)) + ')';
+              ctx.beginPath();
+              ctx.moveTo(a.X, a.Y);
+              ctx.lineTo(b.X, b.Y);
+              ctx.stroke();
+            }
+            var tip = pts[pts.length - 1];
+            ctx.fillStyle = '#f4b44a';
+            ctx.beginPath();
+            ctx.arc(tip.X, tip.Y, 3.2, 0, Math.PI * 2);
+            ctx.fill();
+
+            document.getElementById('eq-line').textContent =
+              'x = f(t) = (R + r cos(q t + φ)) cos(p t)   ' +
+              'y = g(t) = (R + r cos(q t + φ)) sin(p t)   ' +
+              'z = h(t) = r sin(q t + φ)   | p/q=' + params.p + '/' + params.q +
+              '  heading=' + params.heading + '  ticks=' + params.ticks;
+          },
+          describe: function () {
+            var params = this.transform(object2.info, document.getElementById('user-code').value);
+            return this.name + ' transformed → literal curve object\n' +
+              'p/q = ' + params.p + '/' + params.q +
+              '  φ = ' + params.phase.toFixed(3) +
+              '  yaw = ' + params.yaw.toFixed(3) +
+              '  scale = ' + params.scale +
+              (params.note ? '\nnote: ' + params.note : '');
           }
         };
       }
@@ -468,17 +588,13 @@ const three = new Vehicle("Object 3");
     })();
 
     document.getElementById('correct-feedback').addEventListener('click', function () {
-      var singleton = CorrectFeedback.getInstance();
-      var result = singleton.check(document.getElementById('user-code').value);
+      var singleton = SpaceCurve.getInstance();
       var out = document.getElementById('check-result');
-      out.className = result.ok ? 'ok' : 'bad';
-      out.textContent = result.summary +
-        ' · decls ' + (result.decls.join(', ') || 'none') +
-        ' · new ' + (result.news.join(', ') || 'none') +
-        ' · call(this)=' + result.usesCallThis;
+      out.textContent = singleton.describe();
     });
 
     render();
+    syncRatioFromInputs();
     renderLiveInfo();
     patchScreenDots();
     setInterval(function(){ patchScreenDots(); }, 700);
