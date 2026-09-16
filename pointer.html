@@ -94,6 +94,69 @@
     #ice, #dimpleCanvas { width: 100%; height: 100%; display: block; border-radius: 10px; }
     #geek { position: absolute; object-fit: cover; pointer-events: none; z-index: 12; border-radius: 10px; }
     #geek.flip { transform: scaleX(-1); }
+
+    #under-box-3 {
+      margin: 0 16px 12px;
+      padding: 10px;
+      border: 1px solid #3a3a48;
+      border-radius: 10px;
+      background: #16161c;
+    }
+    #under-box-3 .caption {
+      font-size: 10px; letter-spacing: .14em; color: #f4b44a; margin-bottom: 6px;
+    }
+    .dpad {
+      display: grid;
+      grid-template-columns: 44px 44px 44px;
+      grid-template-rows: 44px 44px 44px;
+      gap: 4px;
+      width: max-content;
+    }
+    .dpad button {
+      border: 1px solid #555;
+      background: #222;
+      color: #eee;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .dpad button:hover { border-color: #aaa; }
+    .dpad .up    { grid-column: 2; grid-row: 1; }
+    .dpad .left  { grid-column: 1; grid-row: 2; }
+    .dpad .mid   { grid-column: 2; grid-row: 2; font-size: 9px; letter-spacing: .08em; color: #f4b44a; }
+    .dpad .right { grid-column: 3; grid-row: 2; }
+    .dpad .down  { grid-column: 2; grid-row: 3; }
+    #loop-log, #live-info {
+      margin-top: 8px; font-size: 11px; color: #bbb; white-space: pre-wrap;
+    }
+    #live-info {
+      background: #0d0d12; border: 1px solid #333; border-radius: 8px; padding: 8px;
+      max-height: 160px; overflow: auto; font-family: ui-monospace, Consolas, monospace;
+    }
+    table.singleton-wrap {
+      width: calc(100% - 32px);
+      margin: 0 16px 14px;
+      border-collapse: collapse;
+    }
+    table.singleton-wrap td {
+      border: 1px solid #444;
+      border-radius: 8px;
+      padding: 8px;
+      background: #15151b;
+      text-align: center;
+    }
+    #correct-feedback {
+      background: #f4b44a; color: #111; border: 0; border-radius: 8px;
+      padding: 8px 14px; font-weight: 700; cursor: pointer;
+    }
+    #user-code {
+      width: 100%; min-height: 110px; margin-top: 8px;
+      background: #0d0d12; color: #d8d8e0; border: 1px solid #333;
+      border-radius: 8px; padding: 8px; font: 12px ui-monospace, Consolas, monospace;
+    }
+    #check-result { display: block; margin-top: 6px; font-size: 12px; color: #aaa; }
+    #check-result.ok { color: #6f6; }
+    #check-result.bad { color: #f66; }
   </style>
 </head>
 <body>
@@ -103,6 +166,40 @@
     <div id="stage">
       <div id="grid"></div>
       <img id="geek" alt="geek" src="geek.png">
+
+      <div id="under-box-3">
+        <div class="caption">UNDER BOX 3 · INFO LOOP</div>
+        <div class="dpad">
+          <button class="up" data-dir="up" type="button">▲</button>
+          <button class="left" data-dir="left" type="button">◀</button>
+          <button class="mid" id="reset-info" type="button">INFO</button>
+          <button class="right" data-dir="right" type="button">▶</button>
+          <button class="down" data-dir="down" type="button">▼</button>
+        </div>
+        <div id="loop-log">Click a direction. Object 2.info is a copy — Object 1 stays original.</div>
+        <div id="live-info"></div>
+      </div>
+
+      <table class="singleton-wrap">
+        <tr>
+          <td>
+            <button id="correct-feedback" type="button">Correct Feedback</button>
+            <div id="check-result">singleton · waiting</div>
+            <textarea id="user-code">function Vehicle(name) {
+  this.name = name;
+  this.info = { type: "base", note: "source template" };
+}
+function Car(name) {
+  Vehicle.call(this, name);
+  this.info = Object.assign({}, this.info, { type: "car" });
+}
+const one = new Vehicle("Object 1");
+const two = new Car("Object 2");
+const three = new Vehicle("Object 3");
+</textarea>
+          </td>
+        </tr>
+      </table>
     </div>
   </div>
   <script>
@@ -120,7 +217,6 @@
     const NUCLEI = ['a','e','i','o','u','ae','io','ou','ai'];
     const CODAS = ['','n','r','l','s','t','k','m','x','th'];
     const dimple = { x: 0.5, y: 0.5, rings: [], lastDrop: 0, dropEvery: 1600 };
-
     function generateRandomWord() {
       if (Math.random() < 0.72) return WORD_BANK[Math.floor(Math.random() * WORD_BANK.length)];
       return (ONSETS[Math.floor(Math.random()*ONSETS.length)] + NUCLEI[Math.floor(Math.random()*NUCLEI.length)] + CODAS[Math.floor(Math.random()*CODAS.length)]).slice(0,10);
@@ -131,7 +227,6 @@
       return picked;
     }
     geek.onerror = function () { this.src = 'https://raw.githubusercontent.com/DreamTexc/MoonWave/main/geek.png'; };
-
     function paintBoxSix() {
       const el = document.querySelector('[data-index="6"]');
       if (!el) return;
@@ -152,7 +247,6 @@
       if (!drop) { drop = document.createElement('div'); drop.id = 'hotDrop'; }
       el.appendChild(drop);
     }
-
     async function generateSearchResults(word) {
       const q = word || generateRandomWord();
       const query = encodeURIComponent(q);
@@ -171,7 +265,6 @@
         ]};
       }
     }
-
     async function openHotSearch(word, box) {
       const drop = document.getElementById('hotDrop') || document.createElement('div');
       drop.id = 'hotDrop';
@@ -187,7 +280,6 @@
         drop.appendChild(a);
       });
     }
-
     function onCardClick(index) {
       switch (index) {
         case 1:
@@ -203,7 +295,6 @@
         default: console.log('clicked', index);
       }
     }
-
     function enforceTrip(prev, next) {
       do {
         if (next === 3) hitThree = true;
@@ -215,7 +306,6 @@
         }
       } while (false);
     }
-
     function render() {
       grid.innerHTML = '';
       for (let i = 0; i < TOTAL; i++) {
@@ -234,7 +324,6 @@
       }
       paintBoxSix();
     }
-
     function sizeDimpleCanvas() {
       const canvas = document.getElementById('dimpleCanvas'); if (!canvas) return;
       const r = canvas.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
@@ -294,7 +383,103 @@
         ctx.beginPath(); ctx.arc(Math.random()*dotPatch.width, Math.random()*dotPatch.height, 0.7*dpr, 0, Math.PI*2); ctx.fill();
       }
     }
+
+    function InfoSource(label) {
+      this.label = label;
+      this.info = { heading: 'N', message: 'source template — do not mutate', ticks: 0 };
+    }
+    function InfoChild(label, source) {
+      InfoSource.call(this, label);
+      this.info = Object.assign({}, source.info, {
+        message: 'working copy — user may change this',
+        inheritedFrom: source.label
+      });
+    }
+    var object1 = new InfoSource('Object 1');
+    var object2 = new InfoChild('Object 2', object1);
+    var object3 = new InfoSource('Object 3');
+
+    function renderLiveInfo() {
+      var el = document.getElementById('live-info');
+      if (!el) return;
+      el.textContent =
+        object1.label + '.info (original):\n' + JSON.stringify(object1.info, null, 2) +
+        '\n\n' + object2.label + '.info (copy):\n' + JSON.stringify(object2.info, null, 2) +
+        '\n\n' + object3.label + '.info:\n' + JSON.stringify(object3.info, null, 2);
+    }
+    var headings = ['N', 'E', 'S', 'W'];
+    function applyDirection(dir) {
+      object2.info.ticks += 1;
+      var idx = headings.indexOf(object2.info.heading);
+      if (idx < 0) idx = 0;
+      if (dir === 'left') idx = (idx + 3) % 4;
+      else if (dir === 'right') idx = (idx + 1) % 4;
+      else if (dir === 'down') idx = (idx + 2) % 4;
+      object2.info.heading = headings[idx];
+      object2.info.message = 'loop #' + object2.info.ticks + ' via ' + dir + ' → ' + object2.info.heading;
+      document.getElementById('loop-log').textContent =
+        'Feedback on Object 2 only. Object 1.info unchanged.';
+      renderLiveInfo();
+    }
+    document.querySelectorAll('.dpad button[data-dir]').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        applyDirection(btn.getAttribute('data-dir'));
+      });
+    });
+    document.getElementById('reset-info').addEventListener('click', function (e) {
+      e.stopPropagation();
+      object2.info = Object.assign({}, object1.info, {
+        message: 'working copy reset from Object 1',
+        inheritedFrom: object1.label
+      });
+      document.getElementById('loop-log').textContent = 'Reset copy from Object 1. Original untouched.';
+      renderLiveInfo();
+    });
+
+    var CorrectFeedback = (function () {
+      var instance;
+      function create() {
+        return {
+          name: 'Correct Feedback',
+          check: function (code) {
+            var src = String(code || '');
+            var decls = src.match(/function\s+[A-Z][A-Za-z0-9_]*\s*\(/g) || [];
+            var news = src.match(/\bnew\s+[A-Z][A-Za-z0-9_]*\s*\(/g) || [];
+            var ok = decls.length > 0 && news.length > 0;
+            return {
+              ok: ok,
+              decls: decls,
+              news: news,
+              usesCallThis: /\.call\s*\(\s*this/.test(src),
+              summary: ok
+                ? 'PASS: constructor function instance(s) found.'
+                : 'FAIL: need a constructor (function Name(){}) and a new Name().'
+            };
+          }
+        };
+      }
+      return {
+        getInstance: function () {
+          if (!instance) instance = create();
+          return instance;
+        }
+      };
+    })();
+
+    document.getElementById('correct-feedback').addEventListener('click', function () {
+      var singleton = CorrectFeedback.getInstance();
+      var result = singleton.check(document.getElementById('user-code').value);
+      var out = document.getElementById('check-result');
+      out.className = result.ok ? 'ok' : 'bad';
+      out.textContent = result.summary +
+        ' · decls ' + (result.decls.join(', ') || 'none') +
+        ' · new ' + (result.news.join(', ') || 'none') +
+        ' · call(this)=' + result.usesCallThis;
+    });
+
     render();
+    renderLiveInfo();
     patchScreenDots();
     setInterval(function(){ patchScreenDots(); }, 700);
     requestAnimationFrame(function(now){ sizeDimpleCanvas(); lastStep = now; dimple.lastDrop = now; fillCard(0); tick(now); });
