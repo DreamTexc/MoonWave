@@ -53,20 +53,12 @@
       mask-image: linear-gradient(to bottom, rgba(0,0,0,.35), transparent 70%);
     }
     #dotPatch { position: fixed; inset: 0; pointer-events: none; z-index: 30; }
-    #stage {
-      position: relative; max-width: 720px; z-index: 2;
-      background: #111; border-radius: 12px;
-    }
-    #grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px; padding: 16px; max-width: 720px;
-    }
+    #stage { position: relative; max-width: 720px; z-index: 2; background: #111; border-radius: 12px; }
+    #grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 16px; max-width: 720px; }
     .card {
       aspect-ratio: 1; border: 1px solid #444; border-radius: 10px;
-      background: #1c1c1c; display: flex; align-items: center;
-      justify-content: center; text-align: center; padding: 8px;
-      font-size: 14px; cursor: pointer; user-select: none;
+      background: #1c1c1c; display: flex; align-items: center; justify-content: center;
+      text-align: center; padding: 8px; font-size: 14px; cursor: pointer; user-select: none;
       position: relative; overflow: hidden;
     }
     .card:hover { border-color: #888; }
@@ -74,10 +66,8 @@
     .card[data-index="4"] { padding: 0; }
     .card[data-index="5"] { padding: 0; background: #15202b; }
     .card[data-index="6"] {
-      font-size: 12px; line-height: 1.35;
-      align-items: stretch; justify-content: flex-start;
-      padding: 8px; flex-direction: column;
-      overflow: visible; z-index: 15;
+      font-size: 12px; line-height: 1.35; align-items: stretch; justify-content: flex-start;
+      padding: 8px; flex-direction: column; overflow: visible; z-index: 15;
     }
     .hot-label { font-size: 9px; letter-spacing: 0.16em; color: #f4b44a; margin-bottom: 4px; }
     .hot-word { display: block; width: 100%; text-align: left; color: #eee; cursor: pointer; }
@@ -85,8 +75,7 @@
     #hotDrop {
       display: none; position: absolute; left: 0; right: 0; top: 100%;
       margin-top: 4px; background: #161616; border: 1px solid #666;
-      border-radius: 8px; padding: 8px; z-index: 40;
-      box-shadow: 0 10px 24px rgba(0,0,0,.45);
+      border-radius: 8px; padding: 8px; z-index: 40; box-shadow: 0 10px 24px rgba(0,0,0,.45);
     }
     #hotDrop.open { display: block; }
     #hotDrop .info { font-size: 10px; color: #aaa; margin-bottom: 6px; }
@@ -94,79 +83,34 @@
     #ice, #dimpleCanvas { width: 100%; height: 100%; display: block; border-radius: 10px; }
     #geek { position: absolute; object-fit: cover; pointer-events: none; z-index: 12; border-radius: 10px; }
     #geek.flip { transform: scaleX(-1); }
-
-    #under-box-3 {
-      margin: 0 16px 12px;
-      padding: 10px;
-      border: 1px solid #3a3a48;
-      border-radius: 10px;
-      background: #16161c;
-    }
-    #under-box-3 .caption {
-      font-size: 10px; letter-spacing: .14em; color: #f4b44a; margin-bottom: 6px;
-    }
-    .dpad {
-      display: grid;
-      grid-template-columns: 44px 44px 44px;
-      grid-template-rows: 44px 44px 44px;
-      gap: 4px;
-      width: max-content;
-    }
-    .dpad button {
-      border: 1px solid #555;
-      background: #222;
-      color: #eee;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-    }
+    #under-box-3 { margin: 0 16px 12px; padding: 10px; border: 1px solid #3a3a48; border-radius: 10px; background: #16161c; }
+    #under-box-3 .caption { font-size: 10px; letter-spacing: .14em; color: #f4b44a; margin-bottom: 6px; }
+    .dpad { display: grid; grid-template-columns: 44px 44px 44px; grid-template-rows: 44px 44px 44px; gap: 4px; width: max-content; }
+    .dpad button { border: 1px solid #555; background: #222; color: #eee; border-radius: 8px; cursor: pointer; font-size: 16px; }
     .dpad button:hover { border-color: #aaa; }
-    .dpad .up    { grid-column: 2; grid-row: 1; }
-    .dpad .left  { grid-column: 1; grid-row: 2; }
-    .dpad .mid   { grid-column: 2; grid-row: 2; font-size: 9px; letter-spacing: .08em; color: #f4b44a; }
+    .dpad .up { grid-column: 2; grid-row: 1; }
+    .dpad .left { grid-column: 1; grid-row: 2; }
+    .dpad .mid { grid-column: 2; grid-row: 2; font-size: 9px; letter-spacing: .08em; color: #f4b44a; }
     .dpad .right { grid-column: 3; grid-row: 2; }
-    .dpad .down  { grid-column: 2; grid-row: 3; }
-    #loop-log, #live-info {
-      margin-top: 8px; font-size: 11px; color: #bbb; white-space: pre-wrap;
+    .dpad .down { grid-column: 2; grid-row: 3; }
+    #loop-log, #live-info { margin-top: 8px; font-size: 11px; color: #bbb; white-space: pre-wrap; }
+    #live-info { background: #0d0d12; border: 1px solid #333; border-radius: 8px; padding: 8px; max-height: 120px; overflow: auto; font-family: ui-monospace, Consolas, monospace; }
+    .ratio-row, .type-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; font-size: 12px; color: #ccc; }
+    .ratio-row input[type="number"], .panel input[type="number"] {
+      width: 64px; background: #0d0d12; color: #eee; border: 1px solid #444; border-radius: 6px; padding: 4px 6px;
     }
-    #live-info {
-      background: #0d0d12; border: 1px solid #333; border-radius: 8px; padding: 8px;
-      max-height: 140px; overflow: auto; font-family: ui-monospace, Consolas, monospace;
+    .type-row select {
+      background: #0d0d12; color: #eee; border: 1px solid #555; border-radius: 6px; padding: 4px 8px;
     }
-    .ratio-row {
-      display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
-      margin-top: 8px; font-size: 12px; color: #ccc;
-    }
-    .ratio-row input[type="number"] {
-      width: 64px; background: #0d0d12; color: #eee;
-      border: 1px solid #444; border-radius: 6px; padding: 4px 6px;
-    }
-    table.singleton-wrap {
-      width: calc(100% - 32px);
-      margin: 0 16px 14px;
-      border-collapse: collapse;
-    }
-    table.singleton-wrap td {
-      border: 1px solid #444;
-      border-radius: 8px;
-      padding: 8px;
-      background: #15151b;
-      text-align: center;
-    }
-    #correct-feedback {
-      background: #f4b44a; color: #111; border: 0; border-radius: 8px;
-      padding: 8px 14px; font-weight: 700; cursor: pointer;
-    }
-    #user-code {
-      width: 100%; min-height: 72px; margin-top: 8px;
-      background: #0d0d12; color: #d8d8e0; border: 1px solid #333;
-      border-radius: 8px; padding: 8px; font: 12px ui-monospace, Consolas, monospace;
-    }
+    .panel { display: none; margin-top: 8px; text-align: left; font-size: 12px; color: #ccc; }
+    .panel.on { display: block; }
+    .panel label { margin-right: 8px; display: inline-block; margin-bottom: 4px; }
+    table.singleton-wrap { width: calc(100% - 32px); margin: 0 16px 14px; border-collapse: collapse; }
+    table.singleton-wrap td { border: 1px solid #444; border-radius: 8px; padding: 8px; background: #15151b; text-align: center; }
+    #correct-feedback { background: #f4b44a; color: #111; border: 0; border-radius: 8px; padding: 8px 14px; font-weight: 700; cursor: pointer; }
+    #user-code { width: 100%; min-height: 64px; margin-top: 8px; background: #0d0d12; color: #d8d8e0; border: 1px solid #333; border-radius: 8px; padding: 8px; font: 12px ui-monospace, Consolas, monospace; }
     #check-result { display: block; margin-top: 6px; font-size: 12px; color: #aaa; white-space: pre-wrap; text-align: left; }
-    #curveCanvas {
-      width: 100%; height: 260px; display: block;
-      background: #0a0c12; border: 1px solid #333; border-radius: 8px; margin-top: 8px;
-    }
+    #curveCanvas { width: 100%; height: 280px; display: block; background: #0a0c12; border: 1px solid #333; border-radius: 8px; margin-top: 8px; cursor: grab; }
     #eq-line { font: 12px ui-monospace, Consolas, monospace; color: #cfe7ff; margin-top: 6px; text-align: left; }
   </style>
 </head>
@@ -192,18 +136,53 @@
           <label>q <input id="ratio-q" type="number" value="3" min="1" max="12" step="1"></label>
           <span id="ratio-readout">p/q = 2/3</span>
         </div>
-        <div id="loop-log">Click a direction. Object 2.info is a copy — Object 1 stays original. Ratio drives the live curve.</div>
+        <div id="loop-log">Object 2.info is a copy. Select a graph type below.</div>
         <div id="live-info"></div>
       </div>
 
       <table class="singleton-wrap">
         <tr>
           <td>
-            <button id="correct-feedback" type="button">Correct Feedback → Space Curve</button>
-            <div id="eq-line">x = f(t), y = g(t), z = h(t)</div>
-            <canvas id="curveCanvas" width="640" height="260"></canvas>
-            <div id="check-result">singleton math viz · waiting</div>
-            <textarea id="user-code" placeholder="insert relevant info: note, phase, scale…">note: torus knot from inheritance ratio
+            <button id="correct-feedback" type="button">Correct Feedback → Visualize</button>
+            <div class="type-row">
+              <label>object type
+                <select id="graph-type">
+                  <option value="knot">space curve / knot</option>
+                  <option value="plane">(r − r0) · a = 0 plane</option>
+                  <option value="angle">θ ⟂  ψ1, ψ2 angle vector</option>
+                </select>
+              </label>
+            </div>
+
+            <div id="panel-knot" class="panel on">
+              knot uses p/q from the inheritance box. Drag canvas to yaw.
+            </div>
+            <div id="panel-plane" class="panel">
+              Plane through r0 with normal a. Shown only when selected.
+              <div>
+                <label>r0x <input id="r0x" type="number" value="0" step="0.1"></label>
+                <label>r0y <input id="r0y" type="number" value="0" step="0.1"></label>
+                <label>r0z <input id="r0z" type="number" value="0" step="0.1"></label>
+              </div>
+              <div>
+                <label>ax <input id="ax" type="number" value="0" step="0.1"></label>
+                <label>ay <input id="ay" type="number" value="0" step="0.1"></label>
+                <label>az <input id="az" type="number" value="1" step="0.1"></label>
+              </div>
+            </div>
+            <div id="panel-angle" class="panel">
+              Right angle θ with vectors at ψ1 and ψ2. Shown only when selected.
+              <div>
+                <label>θ° <input id="theta" type="number" value="90" min="1" max="179" step="1"></label>
+                <label>ψ1° <input id="psi1" type="number" value="20" min="-180" max="180" step="1"></label>
+                <label>ψ2° <input id="psi2" type="number" value="70" min="-180" max="180" step="1"></label>
+              </div>
+            </div>
+
+            <div id="eq-line">select a type</div>
+            <canvas id="curveCanvas" width="640" height="280"></canvas>
+            <div id="check-result">enhancer · pick a type</div>
+            <textarea id="user-code">note: interactive object type
 phase: 0
 scale: 1</textarea>
           </td>
@@ -216,11 +195,10 @@ scale: 1</textarea>
     const grid = document.getElementById('grid');
     const geek = document.getElementById('geek');
     const dotPatch = document.getElementById('dotPatch');
-    const reflection = document.getElementById('reflection');
     let cardOneHeld = false, walkIndex = 0, walkDir = 1, lastStep = 0;
     const STEP_MS = 900;
     let hitThree = false, tripCount = 0, zeroHits = 0, moveCount = 0;
-    let boxSixWords = '', opaqueLevel = 0;
+    let boxSixWords = '';
     const WORD_BANK = ['moon','wave','geek','trace','focus','alpha','lizard','orbit','pulse','signal','vector','quark','nebula','pixel','circuit','phase','drift','echo','flux','node','spark','tidal','zenith','prism','glyph','nova','axiom','helix','ion','radar','sonic','vapor','crystal','ember','forge','haven','ivory','jade','krypton','lunar','magma','nimbus','onyx','plasma','quartz','rift','sable','torque','umbra','vortex','watt','xenon','yield','zephyr','anchor','bridge','cinder','delta','frost'];
     const ONSETS = ['b','c','d','f','g','h','j','k','l','m','n','p','r','s','t','v','w','z','br','cr','dr','fl','gr','st','tr','sk'];
     const NUCLEI = ['a','e','i','o','u','ae','io','ou','ai'];
@@ -381,8 +359,7 @@ scale: 1</textarea>
         }
         fillCard(walkIndex);
       }
-      var viz = SpaceCurve.getInstance();
-      viz.draw(now);
+      GraphKit.getInstance().draw(now);
       requestAnimationFrame(tick);
     }
     function patchScreenDots() {
@@ -422,8 +399,7 @@ scale: 1</textarea>
       if (!el) return;
       el.textContent =
         object1.label + '.info (original):\n' + JSON.stringify(object1.info, null, 2) +
-        '\n\n' + object2.label + '.info (copy / live ratio):\n' + JSON.stringify(object2.info, null, 2) +
-        '\n\n' + object3.label + '.info:\n' + JSON.stringify(object3.info, null, 2);
+        '\n\n' + object2.label + '.info (copy):\n' + JSON.stringify(object2.info, null, 2);
     }
     var headings = ['N', 'E', 'S', 'W'];
     function applyDirection(dir) {
@@ -435,147 +411,158 @@ scale: 1</textarea>
       else if (dir === 'down') idx = (idx + 2) % 4;
       object2.info.heading = headings[idx];
       object2.info.message = 'loop #' + object2.info.ticks + ' via ' + dir + ' → ' + object2.info.heading;
-      document.getElementById('loop-log').textContent =
-        'Feedback on Object 2 only. Ratio p/q and heading drive x=f(t), y=g(t), z=h(t).';
       renderLiveInfo();
     }
     document.querySelectorAll('.dpad button[data-dir]').forEach(function (btn) {
-      btn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        applyDirection(btn.getAttribute('data-dir'));
-      });
+      btn.addEventListener('click', function (e) { e.stopPropagation(); applyDirection(btn.getAttribute('data-dir')); });
     });
     document.getElementById('reset-info').addEventListener('click', function (e) {
       e.stopPropagation();
       var p = object2.info.p, q = object2.info.q;
-      object2.info = Object.assign({}, object1.info, {
-        message: 'working copy reset from Object 1',
-        inheritedFrom: object1.label,
-        p: p,
-        q: q
-      });
-      document.getElementById('loop-log').textContent = 'Reset copy from Object 1. Original untouched.';
+      object2.info = Object.assign({}, object1.info, { message: 'reset copy', inheritedFrom: object1.label, p: p, q: q });
       renderLiveInfo();
     });
     document.getElementById('ratio-p').addEventListener('input', function () { syncRatioFromInputs(); renderLiveInfo(); });
     document.getElementById('ratio-q').addEventListener('input', function () { syncRatioFromInputs(); renderLiveInfo(); });
 
-    var SpaceCurve = (function () {
+    function num(id, fallback) {
+      var v = parseFloat(document.getElementById(id).value);
+      return isFinite(v) ? v : fallback;
+    }
+    function headingAngle(h) {
+      return ({ N: 0, E: Math.PI / 2, S: Math.PI, W: 3 * Math.PI / 2 }[h] || 0);
+    }
+    function parseInsert(text) {
+      var phase = 0, scale = 1, note = '';
+      String(text || '').split(/\n/).forEach(function (line) {
+        var m = line.match(/^\s*phase\s*:\s*([-0-9.]+)/i); if (m) phase = parseFloat(m[1]) || 0;
+        m = line.match(/^\s*scale\s*:\s*([-0-9.]+)/i); if (m) scale = parseFloat(m[1]) || 1;
+        m = line.match(/^\s*note\s*:\s*(.+)/i); if (m) note = m[1];
+      });
+      return { phase: phase, scale: scale, note: note };
+    }
+
+    var GraphKit = (function () {
       var instance;
-      function parseInsert(text) {
-        var phase = 0, scale = 1, note = '';
-        String(text || '').split(/\n/).forEach(function (line) {
-          var m = line.match(/^\s*phase\s*:\s*([-0-9.]+)/i);
-          if (m) phase = parseFloat(m[1]) || 0;
-          m = line.match(/^\s*scale\s*:\s*([-0-9.]+)/i);
-          if (m) scale = parseFloat(m[1]) || 1;
-          m = line.match(/^\s*note\s*:\s*(.+)/i);
-          if (m) note = m[1];
-        });
-        return { phase: phase, scale: scale, note: note };
-      }
-      function headingAngle(h) {
-        return ({ N: 0, E: Math.PI / 2, S: Math.PI, W: 3 * Math.PI / 2 }[h] || 0);
-      }
       function create() {
         return {
-          name: 'Correct Feedback',
-          kind: 'space-curve',
-          f: function (t, p, q, R, r, phase) {
-            return (R + r * Math.cos(q * t + phase)) * Math.cos(p * t);
+          name: 'Object Type Enhancer',
+          type: 'knot',
+          dragYaw: 0,
+          dragPitch: 0.42,
+          project: function (x, y, z, w, h, scale) {
+            var yaw = this.dragYaw + headingAngle(object2.info.heading) + (object2.info.ticks || 0) * 0.04;
+            var pitch = this.dragPitch;
+            var cy = Math.cos(yaw), sy = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
+            var x1 = x * cy - z * sy, z1 = x * sy + z * cy;
+            var y1 = y * cp - z1 * sp, z2 = y * sp + z1 * cp;
+            var persp = 3.4 / (3.4 + z2);
+            return { X: w * 0.5 + x1 * 52 * scale * persp, Y: h * 0.55 - y1 * 52 * scale * persp, depth: z2 };
           },
-          g: function (t, p, q, R, r, phase) {
-            return (R + r * Math.cos(q * t + phase)) * Math.sin(p * t);
+          drawAxes: function (ctx, w, h) {
+            ctx.fillStyle = '#0a0c12'; ctx.fillRect(0, 0, w, h);
+            ctx.strokeStyle = 'rgba(80,90,110,0.4)';
+            ctx.beginPath(); ctx.moveTo(16, h * 0.55); ctx.lineTo(w - 16, h * 0.55);
+            ctx.moveTo(w * 0.5, 12); ctx.lineTo(w * 0.5, h - 12); ctx.stroke();
           },
-          h: function (t, p, q, R, r, phase) {
-            return r * Math.sin(q * t + phase);
+          line3: function (ctx, a, b, color, width) {
+            ctx.strokeStyle = color; ctx.lineWidth = width || 1.5;
+            ctx.beginPath(); ctx.moveTo(a.X, a.Y); ctx.lineTo(b.X, b.Y); ctx.stroke();
           },
-          transform: function (info, insert) {
-            var p = Math.max(1, info.p || 2);
-            var q = Math.max(1, info.q || 3);
-            var ticks = info.ticks || 0;
-            var yaw = headingAngle(info.heading) + ticks * 0.08;
-            var extra = parseInsert(insert);
-            var R = 2, r = 0.7 + 0.05 * Math.min(ticks, 20);
-            return {
-              p: p, q: q, R: R, r: r,
-              phase: extra.phase + ticks * 0.12,
-              scale: extra.scale,
-              yaw: yaw,
-              pitch: 0.45,
-              note: extra.note,
-              ticks: ticks,
-              heading: info.heading
-            };
-          },
-          project: function (x, y, z, yaw, pitch, w, h, scale) {
-            var cy = Math.cos(yaw), sy = Math.sin(yaw);
-            var cp = Math.cos(pitch), sp = Math.sin(pitch);
-            var x1 = x * cy - z * sy;
-            var z1 = x * sy + z * cy;
-            var y1 = y * cp - z1 * sp;
-            var z2 = y * sp + z1 * cp;
-            var persp = 3.2 / (3.2 + z2);
-            return {
-              X: w * 0.5 + x1 * 46 * scale * persp,
-              Y: h * 0.52 - y1 * 46 * scale * persp,
-              depth: z2
-            };
-          },
-          draw: function (now) {
-            var canvas = document.getElementById('curveCanvas');
-            if (!canvas) return;
-            var ctx = canvas.getContext('2d');
-            var w = canvas.width, h = canvas.height;
-            var params = this.transform(object2.info, document.getElementById('user-code').value);
+          drawKnot: function (ctx, w, h, now, extra) {
+            var p = object2.info.p || 2, q = object2.info.q || 3;
+            var ticks = object2.info.ticks || 0;
+            var R = 2, r = 0.7 + 0.04 * Math.min(ticks, 20);
+            var phase = extra.phase + ticks * 0.12;
             var tOff = (now || 0) * 0.00035;
-            ctx.fillStyle = '#0a0c12';
-            ctx.fillRect(0, 0, w, h);
-            ctx.strokeStyle = 'rgba(80,90,110,0.45)';
-            ctx.beginPath();
-            ctx.moveTo(20, h * 0.52); ctx.lineTo(w - 20, h * 0.52);
-            ctx.moveTo(w * 0.5, 16); ctx.lineTo(w * 0.5, h - 16);
-            ctx.stroke();
-
-            var steps = 720;
-            var pts = [];
+            var steps = 720, pts = [];
             for (var i = 0; i <= steps; i++) {
               var t = (i / steps) * Math.PI * 2 + tOff;
-              var x = this.f(t, params.p, params.q, params.R, params.r, params.phase);
-              var y = this.g(t, params.p, params.q, params.R, params.r, params.phase);
-              var z = this.h(t, params.p, params.q, params.R, params.r, params.phase);
-              pts.push(this.project(x, y, z, params.yaw, params.pitch, w, h, params.scale));
+              var x = (R + r * Math.cos(q * t + phase)) * Math.cos(p * t);
+              var y = (R + r * Math.cos(q * t + phase)) * Math.sin(p * t);
+              var z = r * Math.sin(q * t + phase);
+              pts.push(this.project(x, y, z, w, h, extra.scale));
             }
-            ctx.lineWidth = 2;
             for (var j = 1; j < pts.length; j++) {
-              var a = pts[j - 1], b = pts[j];
               var k = j / pts.length;
-              ctx.strokeStyle = 'hsla(' + (200 + k * 80) + ',70%,65%,' + (0.25 + 0.55 * (1 - (b.depth + 3) / 8)) + ')';
-              ctx.beginPath();
-              ctx.moveTo(a.X, a.Y);
-              ctx.lineTo(b.X, b.Y);
-              ctx.stroke();
+              this.line3(ctx, pts[j - 1], pts[j], 'hsla(' + (200 + k * 80) + ',70%,65%,0.75)', 2);
             }
-            var tip = pts[pts.length - 1];
-            ctx.fillStyle = '#f4b44a';
-            ctx.beginPath();
-            ctx.arc(tip.X, tip.Y, 3.2, 0, Math.PI * 2);
-            ctx.fill();
-
             document.getElementById('eq-line').textContent =
-              'x = f(t) = (R + r cos(q t + φ)) cos(p t)   ' +
-              'y = g(t) = (R + r cos(q t + φ)) sin(p t)   ' +
-              'z = h(t) = r sin(q t + φ)   | p/q=' + params.p + '/' + params.q +
-              '  heading=' + params.heading + '  ticks=' + params.ticks;
+              'x=(R+r cos(qt+φ))cos(pt)  y=(R+r cos(qt+φ))sin(pt)  z=r sin(qt+φ)  p/q=' + p + '/' + q;
+          },
+          drawPlane: function (ctx, w, h, extra) {
+            var r0 = { x: num('r0x', 0), y: num('r0y', 0), z: num('r0z', 0) };
+            var a = { x: num('ax', 0), y: num('ay', 0), z: num('az', 1) };
+            var nlen = Math.hypot(a.x, a.y, a.z) || 1;
+            a.x /= nlen; a.y /= nlen; a.z /= nlen;
+            var tmp = Math.abs(a.x) < 0.9 ? { x: 1, y: 0, z: 0 } : { x: 0, y: 1, z: 0 };
+            var u = { x: a.y * tmp.z - a.z * tmp.y, y: a.z * tmp.x - a.x * tmp.z, z: a.x * tmp.y - a.y * tmp.x };
+            var ul = Math.hypot(u.x, u.y, u.z) || 1; u.x /= ul; u.y /= ul; u.z /= ul;
+            var v = { x: a.y * u.z - a.z * u.y, y: a.z * u.x - a.x * u.z, z: a.x * u.y - a.y * u.x };
+            var span = 2.2, gridN = 8;
+            for (var i = -gridN; i <= gridN; i++) {
+              var s = (i / gridN) * span;
+              var p1 = { x: r0.x + u.x * s + v.x * (-span), y: r0.y + u.y * s + v.y * (-span), z: r0.z + u.z * s + v.z * (-span) };
+              var p2 = { x: r0.x + u.x * s + v.x * span, y: r0.y + u.y * s + v.y * span, z: r0.z + u.z * s + v.z * span };
+              var q1 = { x: r0.x + v.x * s + u.x * (-span), y: r0.y + v.y * s + u.y * (-span), z: r0.z + v.z * s + u.z * (-span) };
+              var q2 = { x: r0.x + v.x * s + u.x * span, y: r0.y + v.y * s + u.y * span, z: r0.z + v.z * s + u.z * span };
+              this.line3(ctx, this.project(p1.x,p1.y,p1.z,w,h,extra.scale), this.project(p2.x,p2.y,p2.z,w,h,extra.scale), 'rgba(120,180,220,0.45)', 1);
+              this.line3(ctx, this.project(q1.x,q1.y,q1.z,w,h,extra.scale), this.project(q2.x,q2.y,q2.z,w,h,extra.scale), 'rgba(120,180,220,0.45)', 1);
+            }
+            var nTip = { x: r0.x + a.x * 1.6, y: r0.y + a.y * 1.6, z: r0.z + a.z * 1.6 };
+            var A = this.project(r0.x, r0.y, r0.z, w, h, extra.scale);
+            var B = this.project(nTip.x, nTip.y, nTip.z, w, h, extra.scale);
+            this.line3(ctx, A, B, '#f4b44a', 2.4);
+            ctx.fillStyle = '#f4b44a'; ctx.beginPath(); ctx.arc(A.X, A.Y, 3.4, 0, Math.PI * 2); ctx.fill();
+            document.getElementById('eq-line').textContent =
+              '(r − r0) · a = 0   r0=(' + r0.x + ',' + r0.y + ',' + r0.z + ')  a=(' +
+              num('ax',0) + ',' + num('ay',0) + ',' + num('az',1) + ')';
+          },
+          drawAngle: function (ctx, w, h, extra) {
+            var theta = num('theta', 90) * Math.PI / 180;
+            var psi1 = num('psi1', 20) * Math.PI / 180;
+            var psi2 = num('psi2', 70) * Math.PI / 180;
+            var origin = this.project(0, 0, 0, w, h, extra.scale);
+            function vec(psi, elev) {
+              return { x: Math.cos(elev) * Math.cos(psi), y: Math.sin(elev), z: Math.cos(elev) * Math.sin(psi) };
+            }
+            var e1 = vec(psi1, 0);
+            var e2 = vec(psi2, 0);
+            var P1 = this.project(e1.x * 2.2, e1.y * 2.2, e1.z * 2.2, w, h, extra.scale);
+            var P2 = this.project(e2.x * 2.2, e2.y * 2.2, e2.z * 2.2, w, h, extra.scale);
+            this.line3(ctx, origin, P1, '#6cf', 2.2);
+            this.line3(ctx, origin, P2, '#f86', 2.2);
+            var steps = 28, prev = null;
+            for (var i = 0; i <= steps; i++) {
+              var t = (i / steps) * theta;
+              var ax = Math.cos(psi1 + t), az = Math.sin(psi1 + t);
+              var Q = this.project(ax * 0.7, 0, az * 0.7, w, h, extra.scale);
+              if (prev) this.line3(ctx, prev, Q, '#f4b44a', 1.6);
+              prev = Q;
+            }
+            if (Math.abs(num('theta', 90) - 90) < 4) {
+              var rx = Math.cos(psi1 + Math.PI / 4) * 0.35, rz = Math.sin(psi1 + Math.PI / 4) * 0.35;
+              var R = this.project(rx, 0, rz, w, h, extra.scale);
+              ctx.fillStyle = '#f4b44a'; ctx.fillRect(R.X - 4, R.Y - 4, 8, 8);
+            }
+            ctx.fillStyle = '#6cf'; ctx.beginPath(); ctx.arc(P1.X, P1.Y, 3, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#f86'; ctx.beginPath(); ctx.arc(P2.X, P2.Y, 3, 0, Math.PI * 2); ctx.fill();
+            var delta = Math.abs(num('psi2', 70) - num('psi1', 20));
+            document.getElementById('eq-line').textContent =
+              'θ = ' + num('theta', 90) + '° (right-angle mark if 90)   ψ1 = ' + num('psi1', 20) +
+              '°   ψ2 = ' + num('psi2', 70) + '°   |ψ2−ψ1| = ' + delta + '°';
+          },
+          draw: function (now) {
+            var canvas = document.getElementById('curveCanvas'); if (!canvas) return;
+            var ctx = canvas.getContext('2d'), w = canvas.width, h = canvas.height;
+            var extra = parseInsert(document.getElementById('user-code').value);
+            this.drawAxes(ctx, w, h);
+            if (this.type === 'plane') this.drawPlane(ctx, w, h, extra);
+            else if (this.type === 'angle') this.drawAngle(ctx, w, h, extra);
+            else this.drawKnot(ctx, w, h, now, extra);
           },
           describe: function () {
-            var params = this.transform(object2.info, document.getElementById('user-code').value);
-            return this.name + ' transformed → literal curve object\n' +
-              'p/q = ' + params.p + '/' + params.q +
-              '  φ = ' + params.phase.toFixed(3) +
-              '  yaw = ' + params.yaw.toFixed(3) +
-              '  scale = ' + params.scale +
-              (params.note ? '\nnote: ' + params.note : '');
+            return this.name + ' · type=' + this.type + ' · heading=' + object2.info.heading + ' · ticks=' + object2.info.ticks;
           }
         };
       }
@@ -587,15 +574,38 @@ scale: 1</textarea>
       };
     })();
 
-    document.getElementById('correct-feedback').addEventListener('click', function () {
-      var singleton = SpaceCurve.getInstance();
-      var out = document.getElementById('check-result');
-      out.textContent = singleton.describe();
+    function showType(type) {
+      var kit = GraphKit.getInstance();
+      kit.type = type;
+      document.getElementById('panel-knot').className = 'panel' + (type === 'knot' ? ' on' : '');
+      document.getElementById('panel-plane').className = 'panel' + (type === 'plane' ? ' on' : '');
+      document.getElementById('panel-angle').className = 'panel' + (type === 'angle' ? ' on' : '');
+    }
+    document.getElementById('graph-type').addEventListener('change', function () {
+      showType(this.value);
     });
+    document.getElementById('correct-feedback').addEventListener('click', function () {
+      document.getElementById('check-result').textContent = GraphKit.getInstance().describe();
+    });
+
+    (function enableDrag() {
+      var c = document.getElementById('curveCanvas');
+      var down = false, lx = 0, ly = 0;
+      c.addEventListener('pointerdown', function (e) { down = true; lx = e.clientX; ly = e.clientY; c.setPointerCapture(e.pointerId); });
+      c.addEventListener('pointerup', function () { down = false; });
+      c.addEventListener('pointermove', function (e) {
+        if (!down) return;
+        var kit = GraphKit.getInstance();
+        kit.dragYaw += (e.clientX - lx) * 0.01;
+        kit.dragPitch += (e.clientY - ly) * 0.01;
+        lx = e.clientX; ly = e.clientY;
+      });
+    })();
 
     render();
     syncRatioFromInputs();
     renderLiveInfo();
+    showType('knot');
     patchScreenDots();
     setInterval(function(){ patchScreenDots(); }, 700);
     requestAnimationFrame(function(now){ sizeDimpleCanvas(); lastStep = now; dimple.lastDrop = now; fillCard(0); tick(now); });
