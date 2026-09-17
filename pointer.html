@@ -6,7 +6,7 @@
   <title>7 Cards</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { min-height: 100%; background: #07070b; perspective: 1100px; }
+    html { min-height: 100%; background: #07070b; }
     body {
       font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
       background: radial-gradient(ellipse at 50% 120%, #1a1a24 0%, #07070b 62%);
@@ -19,6 +19,9 @@
       max-width: 760px;
       margin: 36px 24px 80px;
       padding-bottom: 10px;
+    }
+    #deck {
+      position: relative;
       transform: perspective(900px) rotateX(7deg) translateY(-8px);
       transform-origin: center top;
       filter: drop-shadow(0 28px 34px rgba(0,0,0,.55));
@@ -42,7 +45,7 @@
       transform: perspective(400px) rotateY(-18deg);
       border-radius: 0 18px 22px 0;
     }
-    body.float-opaque #sheet {
+    body.float-opaque #deck {
       transform: perspective(900px) rotateX(12deg) translateY(-22px) scale(1.02);
       filter: drop-shadow(0 48px 50px rgba(0,0,0,.7));
     }
@@ -52,7 +55,7 @@
       transform: scaleY(-1); filter: blur(6px) brightness(1.2);
       mask-image: linear-gradient(to bottom, rgba(0,0,0,.35), transparent 70%);
     }
-    #dotPatch { position: fixed; inset: 0; pointer-events: none; z-index: 30; }
+    #dotPatch { position: fixed; inset: 0; pointer-events: none; z-index: 1; }
     #stage { position: relative; max-width: 720px; z-index: 2; background: #111; border-radius: 12px; }
     #grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 16px; max-width: 720px; }
     .card {
@@ -99,27 +102,45 @@
     .ratio-row input[type="number"], .panel input[type="number"] {
       width: 64px; background: #0d0d12; color: #eee; border: 1px solid #444; border-radius: 6px; padding: 4px 6px;
     }
-    .type-row select { background: #0d0d12; color: #eee; border: 1px solid #555; border-radius: 6px; padding: 4px 8px; }
+    .type-row select {
+      background: #0d0d12; color: #eee; border: 1px solid #555; border-radius: 6px; padding: 4px 8px;
+    }
     .panel { display: none; margin-top: 8px; text-align: left; font-size: 12px; color: #ccc; }
     .panel.on { display: block; }
     .panel label { margin-right: 8px; display: inline-block; margin-bottom: 4px; }
-    table.singleton-wrap { width: calc(100% - 32px); margin: 0 16px 14px; border-collapse: collapse; }
+    table.singleton-wrap { width: calc(100% - 32px); margin: 0 16px 14px; border-collapse: collapse; position: relative; z-index: 20; }
     table.singleton-wrap td { border: 1px solid #444; border-radius: 8px; padding: 8px; background: #15151b; text-align: center; }
     #correct-feedback { background: #f4b44a; color: #111; border: 0; border-radius: 8px; padding: 8px 14px; font-weight: 700; cursor: pointer; }
     #user-code { width: 100%; min-height: 64px; margin-top: 8px; background: #0d0d12; color: #d8d8e0; border: 1px solid #333; border-radius: 8px; padding: 8px; font: 12px ui-monospace, Consolas, monospace; }
     #check-result { display: block; margin-top: 6px; font-size: 12px; color: #aaa; white-space: pre-wrap; text-align: left; }
     #curveCanvas { width: 100%; height: 280px; display: block; background: #0a0c12; border: 1px solid #333; border-radius: 8px; margin-top: 8px; cursor: grab; }
     #eq-line { font: 12px ui-monospace, Consolas, monospace; color: #cfe7ff; margin-top: 6px; text-align: left; }
-    #math-overlay { margin-top: 8px; border: 1px solid #3a3a48; border-radius: 8px; background: #101018; text-align: left; overflow: hidden; }
-    #math-overlay .ov-head { font-size: 10px; letter-spacing: .14em; color: #f4b44a; padding: 6px 8px; border-bottom: 1px solid #2a2a36; }
-    #chat-log { max-height: 160px; overflow: auto; padding: 8px; font-size: 12px; font-family: ui-monospace, Consolas, monospace; color: #cfd6e0; }
+    #math-overlay {
+      margin-top: 8px; border: 1px solid #3a3a48; border-radius: 8px;
+      background: #101018; text-align: left; overflow: hidden;
+      position: relative; z-index: 25; pointer-events: auto; transform: none;
+    }
+    #math-overlay .ov-head {
+      font-size: 10px; letter-spacing: .14em; color: #f4b44a; padding: 6px 8px;
+      border-bottom: 1px solid #2a2a36;
+    }
+    #chat-log {
+      max-height: 160px; overflow: auto; padding: 8px; font-size: 12px;
+      font-family: ui-monospace, Consolas, monospace; color: #cfd6e0;
+    }
     #chat-log .line { margin: 0 0 8px; white-space: pre-wrap; }
     #chat-log .q { color: #8ec8e6; }
     #chat-log .a { color: #e8e0c8; }
     #chat-log .sys { color: #888; }
     #chat-row { display: flex; gap: 6px; padding: 6px 8px; border-top: 1px solid #2a2a36; }
-    #chat-q { flex: 1; background: #0d0d12; color: #eee; border: 1px solid #444; border-radius: 6px; padding: 6px 8px; font-size: 12px; }
-    #chat-send { background: #2a3a4f; color: #eee; border: 1px solid #555; border-radius: 6px; padding: 6px 10px; cursor: pointer; }
+    #chat-q {
+      flex: 1; background: #0d0d12; color: #eee; border: 1px solid #444;
+      border-radius: 6px; padding: 6px 8px; font-size: 12px;
+    }
+    #chat-send {
+      background: #2a3a4f; color: #eee; border: 1px solid #555;
+      border-radius: 6px; padding: 6px 10px; cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -127,8 +148,11 @@
   <div id="reflection"></div>
   <div id="sheet">
     <div id="stage">
-      <div id="grid"></div>
-      <img id="geek" alt="geek" src="https://raw.githubusercontent.com/DreamTexc/MoonWave/main/geek.png">
+      <div id="deck">
+        <div id="grid"></div>
+        <img id="geek" alt="geek" src="https://raw.githubusercontent.com/DreamTexc/MoonWave/main/geek.png">
+      </div>
+
       <div id="under-box-3">
         <div class="caption">UNDER BOX 3 · INFO LOOP · RATIO</div>
         <div class="dpad">
@@ -146,6 +170,7 @@
         <div id="loop-log">Object 2.info is a copy. Select a graph type below.</div>
         <div id="live-info"></div>
       </div>
+
       <table class="singleton-wrap">
         <tr>
           <td>
@@ -159,7 +184,9 @@
                 </select>
               </label>
             </div>
-            <div id="panel-knot" class="panel on">knot uses p/q from the inheritance box. Drag canvas to yaw.</div>
+            <div id="panel-knot" class="panel on">
+              knot uses p/q from the inheritance box. Drag canvas to yaw.
+            </div>
             <div id="panel-plane" class="panel">
               Grid = plane (r − r0) · a = 0. Gold line = (r − r0) × a = 0 (through r0, parallel to a).
               <div>
@@ -348,12 +375,12 @@ scale: 1</textarea>
       }
     }
     function fillCard(index) {
-      const stageEl = document.getElementById('stage');
-      const el = stageEl.querySelector('[data-index="' + index + '"]'); if (!el) return;
-      const stage = stageEl.getBoundingClientRect(), r = el.getBoundingClientRect();
-      const sx = stage.width / stageEl.offsetWidth || 1, sy = stage.height / stageEl.offsetHeight || 1;
-      geek.style.left = ((r.left-stage.left)/sx)+'px';
-      geek.style.top = ((r.top-stage.top)/sy)+'px';
+      const deckEl = document.getElementById('deck');
+      const el = deckEl.querySelector('[data-index="' + index + '"]'); if (!el) return;
+      const deck = deckEl.getBoundingClientRect(), r = el.getBoundingClientRect();
+      const sx = deck.width / deckEl.offsetWidth || 1, sy = deck.height / deckEl.offsetHeight || 1;
+      geek.style.left = ((r.left-deck.left)/sx)+'px';
+      geek.style.top = ((r.top-deck.top)/sy)+'px';
       geek.style.width = (r.width/sx)+'px';
       geek.style.height = (r.height/sy)+'px';
       geek.classList.toggle('flip', walkDir < 0);
@@ -401,7 +428,8 @@ scale: 1</textarea>
     function syncRatioFromInputs() {
       var p = Math.max(1, parseInt(document.getElementById('ratio-p').value, 10) || 2);
       var q = Math.max(1, parseInt(document.getElementById('ratio-q').value, 10) || 3);
-      object2.info.p = p; object2.info.q = q;
+      object2.info.p = p;
+      object2.info.q = q;
       document.getElementById('ratio-readout').textContent = 'p/q = ' + p + '/' + q;
     }
     function renderLiveInfo() {
@@ -454,9 +482,12 @@ scale: 1</textarea>
       var instance;
       function create() {
         return {
-          name: 'Object Type Enhancer', type: 'knot', dragYaw: 0, dragPitch: 0.42,
+          name: 'Object Type Enhancer',
+          type: 'knot',
+          dragYaw: 0,
+          dragPitch: 0.42,
           project: function (x, y, z, w, h, scale) {
-            var yaw = this.dragYaw + headingAngle(object2.info.heading) + (object2.info.ticks || 0) * 0.04;
+            var yaw = this.dragYaw + headingAngle(object2.info.heading);
             var pitch = this.dragPitch;
             var cy = Math.cos(yaw), sy = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
             var x1 = x * cy - z * sy, z1 = x * sy + z * cy;
@@ -478,7 +509,8 @@ scale: 1</textarea>
             var p = object2.info.p || 2, q = object2.info.q || 3;
             var ticks = object2.info.ticks || 0;
             var R = 2, r = 0.7 + 0.04 * Math.min(ticks, 20);
-            var phase = extra.phase + ticks * 0.12, tOff = (now || 0) * 0.00035;
+            var phase = extra.phase + ticks * 0.12;
+            var tOff = (now || 0) * 0.00035;
             var steps = 720, pts = [];
             for (var i = 0; i <= steps; i++) {
               var t = (i / steps) * Math.PI * 2 + tOff;
@@ -524,17 +556,22 @@ scale: 1</textarea>
               ')  a=(' + num('ax',0) + ',' + num('ay',0) + ',' + num('az',1) + ')';
           },
           drawAngle: function (ctx, w, h, extra) {
-            var thetaDeg = num('theta', 90), psi1Deg = num('psi1', 20), psi2Deg = num('psi2', 70);
+            var thetaDeg = num('theta', 90);
+            var psi1Deg = num('psi1', 20);
+            var psi2Deg = num('psi2', 70);
             var psi1 = psi1Deg * Math.PI / 180;
             var origin = this.project(0, 0, 0, w, h, extra.scale);
-            var e1 = { x: Math.cos(psi1), z: Math.sin(psi1) };
-            var e2 = { x: Math.cos(psi2Deg * Math.PI / 180), z: Math.sin(psi2Deg * Math.PI / 180) };
-            this.line3(ctx, origin, this.project(e1.x * 2.2, 0, e1.z * 2.2, w, h, extra.scale), '#6cf', 2.2);
-            this.line3(ctx, origin, this.project(e2.x * 2.2, 0, e2.z * 2.2, w, h, extra.scale), '#f86', 2.2);
+            var e1 = { x: Math.cos(psi1), y: 0, z: Math.sin(psi1) };
+            var e2 = { x: Math.cos(psi2Deg * Math.PI / 180), y: 0, z: Math.sin(psi2Deg * Math.PI / 180) };
+            var P1 = this.project(e1.x * 2.2, 0, e1.z * 2.2, w, h, extra.scale);
+            var P2 = this.project(e2.x * 2.2, 0, e2.z * 2.2, w, h, extra.scale);
+            this.line3(ctx, origin, P1, '#6cf', 2.2);
+            this.line3(ctx, origin, P2, '#f86', 2.2);
             var sweep = ((psi2Deg - psi1Deg + 540) % 360) - 180;
-            var sweepRad = sweep * Math.PI / 180, prev = null;
-            for (var i = 0; i <= 36; i++) {
-              var t = psi1 + sweepRad * (i / 36);
+            var sweepRad = sweep * Math.PI / 180;
+            var steps = 36, prev = null;
+            for (var i = 0; i <= steps; i++) {
+              var t = psi1 + sweepRad * (i / steps);
               var Q = this.project(Math.cos(t) * 0.75, 0, Math.sin(t) * 0.75, w, h, extra.scale);
               if (prev) this.line3(ctx, prev, Q, '#f4b44a', 1.6);
               prev = Q;
@@ -545,8 +582,11 @@ scale: 1</textarea>
               var Rpt = this.project(Math.cos(mid) * 0.38, 0, Math.sin(mid) * 0.38, w, h, extra.scale);
               ctx.fillStyle = '#f4b44a'; ctx.fillRect(Rpt.X - 4, Rpt.Y - 4, 8, 8);
             }
+            ctx.fillStyle = '#6cf'; ctx.beginPath(); ctx.arc(P1.X, P1.Y, 3, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#f86'; ctx.beginPath(); ctx.arc(P2.X, P2.Y, 3, 0, Math.PI * 2); ctx.fill();
             document.getElementById('eq-line').textContent =
-              'arc ψ1→ψ2 = ' + gap.toFixed(1) + '°   θ = ' + thetaDeg + '°   ψ1 = ' + psi1Deg + '°   ψ2 = ' + psi2Deg + '°';
+              'arc ψ1→ψ2 = ' + gap.toFixed(1) + '°   θ = ' + thetaDeg +
+              '°   ψ1 = ' + psi1Deg + '°   ψ2 = ' + psi2Deg + '°';
           },
           draw: function (now) {
             var canvas = document.getElementById('curveCanvas'); if (!canvas) return;
@@ -562,10 +602,16 @@ scale: 1</textarea>
           }
         };
       }
-      return { getInstance: function () { if (!instance) instance = create(); return instance; } };
+      return {
+        getInstance: function () {
+          if (!instance) instance = create();
+          return instance;
+        }
+      };
     })();
     function showType(type) {
-      GraphKit.getInstance().type = type;
+      var kit = GraphKit.getInstance();
+      kit.type = type;
       document.getElementById('panel-knot').className = 'panel' + (type === 'knot' ? ' on' : '');
       document.getElementById('panel-plane').className = 'panel' + (type === 'plane' ? ' on' : '');
       document.getElementById('panel-angle').className = 'panel' + (type === 'angle' ? ' on' : '');
@@ -587,7 +633,6 @@ scale: 1</textarea>
         lx = e.clientX; ly = e.clientY;
       });
     })();
-
     function FormulaReturn(payload) {
       this.ok = true;
       this.require = 'new FormulaReturn';
@@ -598,7 +643,11 @@ scale: 1</textarea>
       this.at = Date.now();
     }
     FormulaReturn.prototype.toLog = function () {
-      return '[' + this.require + ']\n topic: ' + this.topic + '\n formula: ' + this.formula + '\n' + this.explain + '\n source: ' + this.source;
+      return '[' + this.require + ']\n' +
+        'topic: ' + this.topic + '\n' +
+        'formula: ' + this.formula + '\n' +
+        this.explain + '\n' +
+        'source: ' + this.source;
     };
     function Overlay(host) {
       this.host = host;
@@ -609,43 +658,45 @@ scale: 1</textarea>
           var p1 = num('psi1', 20), p2 = num('psi2', 70);
           return new FormulaReturn({
             topic: 'theta / umbra-circle',
-            formula: 'x=cos θ, y=sin θ  (unit circle)  θ°=' + num('theta', 90) + '  arc(ψ1→ψ2)=' + ((((p2-p1+540)%360)-180)) + '°',
+            formula: 'x = cos θ,  y = sin θ    (unit circle)    θ° = ' + num('theta', 90) +
+              '    arc(ψ1→ψ2) = ((ψ2−ψ1+540)%360)−180 = ' + ((((p2 - p1 + 540) % 360) - 180)) + '°',
             explain: 'Umbra-circle isolator: angle is an arc on the unit circle. Right-angle mark iff |ψ2−ψ1|≈90° or θ=90°.'
           });
         },
         plane: function () {
           return new FormulaReturn({
             topic: 'plane + line',
-            formula: '(r − r0) · a = 0  (plane)    (r − r0) × a = 0  (line r = r0 + t a)',
-            explain: 'Dot = offset orthogonal to a. Cross = offset parallel to a.'
+            formula: '(r − r0) · a = 0   (plane)    (r − r0) × a = 0   (line r = r0 + t a)',
+            explain: 'Dot = set of points whose offset from r0 is orthogonal to a. Cross = points whose offset is parallel to a.'
           });
         },
         knot: function () {
+          var p = object2.info.p || 2, q = object2.info.q || 3;
           return new FormulaReturn({
             topic: 'space curve / torus knot',
-            formula: 'x=(R+r cos(qt+φ))cos(pt)  y=(R+r cos(qt+φ))sin(pt)  z=r sin(qt+φ)  p/q=' + (object2.info.p||2) + '/' + (object2.info.q||3),
-            explain: 'Parametric isolator from Object 2.info p/q. Object 1.info stays frozen.'
+            formula: 'x=(R+r cos(q t+φ))cos(p t)  y=(R+r cos(q t+φ))sin(p t)  z=r sin(q t+φ)  p/q=' + p + '/' + q,
+            explain: 'Parametric isolator driven by Object 2.info ratio p/q. Inheritance copy only — Object 1.info stays frozen.'
           });
         },
         derivative: function () {
           return new FormulaReturn({
             topic: 'derivative',
-            formula: "f'(x)=lim_{h→0}[f(x+h)−f(x)]/h",
-            explain: 'Instantaneous rate. Knot velocity is (f\'(t), g\'(t), h\'(t)).'
+            formula: "f'(x) = lim_{h→0} [f(x+h)−f(x)] / h",
+            explain: 'Instantaneous rate. For the knot, velocity is (f\'(t), g\'(t), h\'(t)).'
           });
         },
         integral: function () {
           return new FormulaReturn({
             topic: 'integral',
-            formula: '∫_a^b f=lim Σ f(x_i*)Δx    FTC: ∫_a^b F\'=F(b)−F(a)',
-            explain: 'Curve length L=∫_0^{2π}√(f\'²+g\'²+h\'²) dt.'
+            formula: '∫_a^b f(x) dx = lim Σ f(x_i*) Δx    FTC: ∫_a^b F\' = F(b)−F(a)',
+            explain: 'Accumulation isolator. Curve length L = ∫_0^{2π} √(f\'²+g\'²+h\'²) dt.'
           });
         },
         limit: function () {
           return new FormulaReturn({
             topic: 'limit',
-            formula: 'lim_{x→c} f(x)=L  iff  ∀ε>0 ∃δ>0: 0<|x−c|<δ ⇒ |f(x)−L|<ε',
-            explain: 'Foundation isolator for derivative and integral.'
+            formula: 'lim_{x→c} f(x) = L  iff  ∀ε>0 ∃δ>0: 0<|x−c|<δ ⇒ |f(x)−L|<ε',
+            explain: 'Foundation isolator for derivative and integral definitions.'
           });
         }
       };
@@ -692,13 +743,18 @@ scale: 1</textarea>
         ret = key ? this.getFormula(key) : await this.wiki(q);
         if (!ret) ret = await this.wiki(q);
       } catch (e) {
-        ret = new FormulaReturn({ topic: q, formula: '(offline)', explain: String(e.message), source: 'local fallback' });
+        ret = new FormulaReturn({
+          topic: q,
+          formula: '(offline)',
+          explain: 'wiki fetch failed: ' + e.message,
+          source: 'local fallback'
+        });
       }
       this.push('a', ret.toLog());
       return ret;
     };
     var mathOverlay = new Overlay(document.getElementById('math-overlay'));
-    mathOverlay.push('sys', 'Overlay() ready. Getter: theta→umbra-circle, plane, knot, derivative, integral, limit. Else Wikipedia.');
+    mathOverlay.push('sys', 'Overlay() ready. Getter matches theta→umbra-circle, plane, knot, derivative, integral, limit. Else Wikipedia.');
     function sendChat() {
       var q = mathOverlay.input.value.trim();
       if (!q) return;
@@ -706,8 +762,9 @@ scale: 1</textarea>
       mathOverlay.ask(q);
     }
     document.getElementById('chat-send').addEventListener('click', sendChat);
-    document.getElementById('chat-q').addEventListener('keydown', function (e) { if (e.key === 'Enter') sendChat(); });
-
+    document.getElementById('chat-q').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') sendChat();
+    });
     render();
     syncRatioFromInputs();
     renderLiveInfo();
