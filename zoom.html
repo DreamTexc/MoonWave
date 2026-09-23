@@ -4,8 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MoonWave Keyboard</title>
+
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
       min-height: 100vh;
       display: flex;
@@ -18,12 +24,21 @@
       font-family: system-ui, sans-serif;
       overflow: hidden;
     }
+
+    /* -------------------------------------------------
+       DESK
+    ------------------------------------------------- */
+
     #deskWrap {
       display: none;
       width: min(720px, 92vw);
       max-height: 220px;
     }
-    #deskWrap.show { display: block; }
+
+    #deskWrap.show {
+      display: block;
+    }
+
     #deskWrap img {
       width: 100%;
       height: 220px;
@@ -31,6 +46,11 @@
       border-radius: 10px;
       border: 1px solid #444;
     }
+
+    /* -------------------------------------------------
+       THOUGHT BOX
+    ------------------------------------------------- */
+
     #thought {
       width: min(720px, 92vw);
       min-height: 36px;
@@ -40,279 +60,1418 @@
       border-radius: 8px;
       font-size: 15px;
     }
+
+    /* -------------------------------------------------
+       KEYBOARD
+    ------------------------------------------------- */
+
     #board {
       background: #2a2a2a;
       border-radius: 14px;
       padding: 12px;
-      box-shadow: inset 0 2px 0 #444, 0 12px 28px #0008;
+      box-shadow:
+        inset 0 2px 0 #444,
+        0 12px 28px #0008;
+
       display: flex;
       flex-direction: column;
       gap: 6px;
     }
-    .row { display: flex; gap: 5px; justify-content: center; }
+
+    .row {
+      display: flex;
+      gap: 5px;
+      justify-content: center;
+    }
+
     .key {
       min-width: 38px;
       height: 38px;
       padding: 0 6px;
+
       border: 1px solid #555;
       border-radius: 6px;
+
       background: #3a3a3a;
       color: #eee;
+
       display: flex;
       align-items: center;
       justify-content: center;
+
       font-size: 12px;
       user-select: none;
+
       box-shadow: 0 3px 0 #111;
+
+      cursor: pointer;
+
+      transition:
+        background 0.08s,
+        transform 0.08s,
+        box-shadow 0.08s;
     }
-    .key.wide { min-width: 64px; }
-    .key.space { min-width: 240px; }
-    .key.active, .key:active {
+
+    .key.wide {
+      min-width: 64px;
+    }
+
+    .key.space {
+      min-width: 240px;
+    }
+
+    .key.active,
+    .key:active {
       background: #6cf;
       color: #111;
       transform: translateY(2px);
       box-shadow: 0 1px 0 #111;
     }
-    #scan {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: #000a;
+
+    /* -------------------------------------------------
+       RADAR ARROW AREA
+    ------------------------------------------------- */
+
+    #radarNav {
+      position: relative;
+
+      width: 190px;
+      height: 150px;
+
+      margin: 4px auto 2px;
+
+      display: flex;
       align-items: center;
       justify-content: center;
+    }
+
+    /*
+      Radar screen behind the arrow keys.
+    */
+
+    #radar {
+      position: absolute;
+
+      width: 142px;
+      height: 142px;
+
+      left: 50%;
+      top: 50%;
+
+      transform: translate(-50%, -50%);
+
+      border-radius: 50%;
+
+      border: 1px solid #27e6ff88;
+
+      background:
+        radial-gradient(
+          circle,
+          #06252a 0%,
+          #031518 45%,
+          #020909 75%,
+          #000 100%
+        );
+
+      box-shadow:
+        0 0 12px #00eaff55,
+        inset 0 0 22px #00eaff33;
+
+      overflow: hidden;
+    }
+
+    /*
+      Radar rings.
+    */
+
+    #radar::before {
+      content: "";
+
+      position: absolute;
+      inset: 12px;
+
+      border-radius: 50%;
+
+      border: 1px solid #24eaff44;
+
+      box-shadow:
+        0 0 0 20px #00eaff08,
+        0 0 0 40px #00eaff06;
+    }
+
+    /*
+      Crosshair.
+    */
+
+    #radar::after {
+      content: "";
+
+      position: absolute;
+
+      left: 50%;
+      top: 0;
+
+      width: 1px;
+      height: 100%;
+
+      background: #24eaff33;
+
+      box-shadow:
+        0 71px 0 #24eaff00,
+        0 0 0 0 #24eaff00;
+    }
+
+    #radarCross {
+      position: absolute;
+
+      left: 50%;
+      top: 50%;
+
+      width: 142px;
+      height: 1px;
+
+      transform: translate(-50%, -50%);
+
+      background: #24eaff33;
+
+      pointer-events: none;
+    }
+
+    /*
+      Radar sweep.
+    */
+
+    #radarSweep {
+      position: absolute;
+
+      left: 50%;
+      top: 50%;
+
+      width: 68px;
+      height: 2px;
+
+      transform-origin: left center;
+
+      background: linear-gradient(
+        90deg,
+        #00ffffaa,
+        #00ffff00
+      );
+
+      box-shadow: 0 0 8px #00ffff;
+
+      animation: radarSweep 2.4s linear infinite;
+
+      pointer-events: none;
+    }
+
+    @keyframes radarSweep {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /*
+      Radar center.
+    */
+
+    #radarCenter {
+      position: absolute;
+
+      left: 50%;
+      top: 50%;
+
+      width: 8px;
+      height: 8px;
+
+      transform: translate(-50%, -50%);
+
+      border-radius: 50%;
+
+      background: #6ff;
+
+      box-shadow:
+        0 0 5px #6ff,
+        0 0 14px #00ffff;
+
+      z-index: 3;
+    }
+
+    /*
+      Arrow key cluster.
+    */
+
+    #arrowCluster {
+      position: relative;
+
+      width: 128px;
+      height: 112px;
+
+      z-index: 5;
+
+      display: grid;
+
+      grid-template-columns: 38px 38px 38px;
+      grid-template-rows: 38px 38px 38px;
+
+      gap: 5px;
+
+      justify-content: center;
+      align-content: center;
+    }
+
+    .arrow-key {
+      min-width: 38px;
+      width: 38px;
+      height: 38px;
+
+      border: 1px solid #35717a;
+      border-radius: 7px;
+
+      background: #18343a;
+      color: #8ff;
+
+      font-size: 17px;
+      font-weight: bold;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      cursor: pointer;
+
+      box-shadow:
+        0 3px 0 #061011,
+        0 0 5px #00eaff22;
+
+      user-select: none;
+
+      transition:
+        background 0.08s,
+        transform 0.08s,
+        box-shadow 0.08s;
+    }
+
+    .arrow-key:hover {
+      background: #20505a;
+    }
+
+    .arrow-key.active,
+    .arrow-key:active {
+      background: #64f6ff;
+      color: #031014;
+
+      transform: translateY(2px);
+
+      box-shadow:
+        0 1px 0 #061011,
+        0 0 18px #00eaff;
+    }
+
+    #arrowUp {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    #arrowLeft {
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    #arrowDown {
+      grid-column: 2;
+      grid-row: 2;
+    }
+
+    #arrowRight {
+      grid-column: 3;
+      grid-row: 2;
+    }
+
+    /*
+      Direction signal emitted when an arrow is pressed.
+    */
+
+    .direction-pulse {
+      position: absolute;
+
+      left: 50%;
+      top: 50%;
+
+      width: 12px;
+      height: 12px;
+
+      margin-left: -6px;
+      margin-top: -6px;
+
+      border-radius: 50%;
+
+      border: 2px solid #6ff;
+
+      box-shadow:
+        0 0 8px #00ffff,
+        0 0 18px #00ffff;
+
+      pointer-events: none;
+
+      z-index: 10;
+
+      animation: directionPulse 0.7s ease-out forwards;
+    }
+
+    @keyframes directionPulse {
+      0% {
+        transform: translate(0, 0) scale(0.4);
+        opacity: 1;
+      }
+
+      70% {
+        opacity: 0.8;
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
+
+    /*
+      Direction-specific signal lines.
+    */
+
+    .signal-line {
+      position: absolute;
+
+      left: 50%;
+      top: 50%;
+
+      width: 2px;
+      height: 45px;
+
+      background: linear-gradient(
+        #6ff,
+        transparent
+      );
+
+      transform-origin: bottom center;
+
+      pointer-events: none;
+
+      z-index: 9;
+
+      opacity: 0;
+
+      box-shadow: 0 0 8px #00ffff;
+    }
+
+    .signal-line.fire {
+      animation: signalFire 0.45s ease-out forwards;
+    }
+
+    @keyframes signalFire {
+      0% {
+        opacity: 1;
+        height: 8px;
+      }
+
+      100% {
+        opacity: 0;
+        height: 60px;
+      }
+    }
+
+    /* -------------------------------------------------
+       SCAN MODAL
+    ------------------------------------------------- */
+
+    #scan {
+      display: none;
+
+      position: fixed;
+      inset: 0;
+
+      background: #000a;
+
+      align-items: center;
+      justify-content: center;
+
       z-index: 20;
     }
-    #scan.show { display: flex; }
+
+    #scan.show {
+      display: flex;
+    }
+
     .brain {
       width: min(420px, 90vw);
       height: 320px;
+
       border-radius: 50% 50% 46% 46%;
+
       background:
-        radial-gradient(circle at 50% 40%, #2a4a4a 0%, #0b1a1a 70%);
+        radial-gradient(
+          circle at 50% 40%,
+          #2a4a4a 0%,
+          #0b1a1a 70%
+        );
+
       border: 3px solid #4fd;
-      box-shadow: 0 0 40px #0ff4, inset 0 0 40px #0ff3;
+
+      box-shadow:
+        0 0 40px #0ff4,
+        inset 0 0 40px #0ff3;
+
       position: relative;
       overflow: hidden;
     }
+
     .brain::after {
       content: "";
+
       position: absolute;
-      left: 0; right: 0;
+
+      left: 0;
+      right: 0;
+
       height: 18px;
-      background: linear-gradient(#0ff6, transparent);
+
+      background:
+        linear-gradient(
+          #0ff6,
+          transparent
+        );
+
       animation: sweep 1.6s linear infinite;
     }
+
     @keyframes sweep {
-      from { top: -20px; }
-      to { top: 100%; }
+      from {
+        top: -20px;
+      }
+
+      to {
+        top: 100%;
+      }
     }
+
     .popup {
       position: absolute;
+
       left: 10%;
       right: 10%;
+
       top: 22%;
       bottom: 16%;
+
       background: #041010ee;
+
       border: 1px solid #6ff;
+
       border-radius: 10px;
+
       padding: 10px 12px;
+
       overflow: auto;
+
       font-size: 13px;
       line-height: 1.4;
+
       z-index: 2;
     }
-    .popup h3 { color: #8ff; margin-bottom: 6px; font-size: 14px; }
-    .popup a { color: #9df; }
+
+    .popup h3 {
+      color: #8ff;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .popup a {
+      color: #9df;
+    }
+
     .close {
       position: absolute;
+
       top: 8px;
       right: 12px;
+
       background: none;
       border: 0;
+
       color: #8ff;
+
       font-size: 18px;
+
       cursor: pointer;
+
       z-index: 3;
     }
   </style>
 </head>
+
 <body>
+
   <div id="deskWrap">
     <img id="desk" alt="desk" src="desk.png">
   </div>
+
   <div id="thought"></div>
+
   <div id="board"></div>
 
-  <div id="scan">
-    <div class="brain">
-      <button class="close" type="button" id="closeScan">×</button>
-      <div class="popup" id="scanBox">scanning…</div>
+  <!-- =================================================
+       RADAR / ARROW NAVIGATION
+  ================================================== -->
+
+  <div id="radarNav">
+
+    <div id="radar">
+      <div id="radarSweep"></div>
+      <div id="radarCenter"></div>
     </div>
+
+    <div id="radarCross"></div>
+
+    <div id="arrowCluster">
+
+      <button
+        type="button"
+        class="arrow-key"
+        id="arrowUp"
+        data-direction="up"
+        aria-label="Arrow Up">
+        ↑
+      </button>
+
+      <button
+        type="button"
+        class="arrow-key"
+        id="arrowLeft"
+        data-direction="left"
+        aria-label="Arrow Left">
+        ←
+      </button>
+
+      <button
+        type="button"
+        class="arrow-key"
+        id="arrowDown"
+        data-direction="down"
+        aria-label="Arrow Down">
+        ↓
+      </button>
+
+      <button
+        type="button"
+        class="arrow-key"
+        id="arrowRight"
+        data-direction="right"
+        aria-label="Arrow Right">
+        →
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- =================================================
+       SCAN WINDOW
+  ================================================== -->
+
+  <div id="scan">
+
+    <div class="brain">
+
+      <button
+        class="close"
+        type="button"
+        id="closeScan">
+        ×
+      </button>
+
+      <div
+        class="popup"
+        id="scanBox">
+        scanning…
+      </div>
+
+    </div>
+
   </div>
 
   <script>
+
+    /* =================================================
+       NORMAL KEYBOARD
+    ================================================= */
+
     const ROWS = [
       ['`','1','2','3','4','5','6','7','8','9','0','-','='],
+
       ['Tab','Q','W','E','R','T','Y','U','I','O','P','[',']','\\'],
+
       ['Caps','A','S','D','F','G','H','J','K','L',';','\'','Enter'],
+
       ['Shift','Z','X','C','V','B','N','M',',','.','/','Shift'],
+
       ['Ctrl','Alt','Space','Alt','Ctrl']
     ];
+
     const localKeys = new Set(ROWS.flat());
-    const STOP = new Set('a an the and or of to for in on at is are was were be been being what who how why when where which that this those these i you we they it my your our with from about into over after before not no yes please can could would should do does did'.split(' '));
+
+    const STOP = new Set(
+      'a an the and or of to for in on at is are was were be been being what who how why when where which that this those these i you we they it my your our with from about into over after before not no yes please can could would should do does did'
+      .split(' ')
+    );
 
     const board = document.getElementById('board');
     const thoughtEl = document.getElementById('thought');
+
     const deskWrap = document.getElementById('deskWrap');
     const deskImg = document.getElementById('desk');
+
     const scan = document.getElementById('scan');
     const scanBox = document.getElementById('scanBox');
+
     const byLabel = new Map();
+
     let buffer = '';
 
     deskImg.onerror = () => {
-      deskImg.src = 'https://raw.githubusercontent.com/DreamTexc/MoonWave/main/desk.png';
+      deskImg.src =
+        'https://raw.githubusercontent.com/DreamTexc/MoonWave/main/desk.png';
     };
 
+
+    /* =================================================
+       BUILD NORMAL KEYBOARD
+    ================================================= */
+
     for (const row of ROWS) {
+
       const rowEl = document.createElement('div');
+
       rowEl.className = 'row';
+
       for (const label of row) {
+
         const key = document.createElement('button');
+
         key.type = 'button';
+
         key.className = 'key';
+
         key.dataset.label = label;
-        key.textContent = label === 'Space' ? '' : label;
-        if (label === 'Space') key.classList.add('space');
-        if (['Tab','Caps','Enter','Shift','Ctrl','Alt'].includes(label)) key.classList.add('wide');
-        key.addEventListener('click', () => handleLabel(label));
+
+        key.textContent =
+          label === 'Space'
+            ? ''
+            : label;
+
+        if (label === 'Space') {
+          key.classList.add('space');
+        }
+
+        if (
+          [
+            'Tab',
+            'Caps',
+            'Enter',
+            'Shift',
+            'Ctrl',
+            'Alt'
+          ].includes(label)
+        ) {
+          key.classList.add('wide');
+        }
+
+        key.addEventListener(
+          'click',
+          () => handleLabel(label)
+        );
+
         rowEl.appendChild(key);
-        byLabel.set(label.toLowerCase(), key);
+
+        byLabel.set(
+          label.toLowerCase(),
+          key
+        );
       }
+
       board.appendChild(rowEl);
     }
 
+
+    /* =================================================
+       THOUGHT DISPLAY
+    ================================================= */
+
     function paintThought() {
-      thoughtEl.textContent = buffer || 'type a thought, then Enter';
+
+      thoughtEl.textContent =
+        buffer ||
+        'type a thought, then Enter';
     }
+
     paintThought();
 
+
+    /* =================================================
+       NORMAL KEYBOARD CLICK HANDLING
+    ================================================= */
+
     function handleLabel(label) {
+
       if (label === 'Enter') {
+
         submitThought();
+
         return;
       }
-      if (label === 'Space') { buffer += ' '; paintThought(); return; }
-      if (label === 'Tab' || label === 'Caps' || label === 'Shift' || label === 'Ctrl' || label === 'Alt') return;
-      if (label.length === 1) buffer += label.toLowerCase();
+
+      if (label === 'Space') {
+
+        buffer += ' ';
+
+        paintThought();
+
+        return;
+      }
+
+      if (
+        label === 'Tab' ||
+        label === 'Caps' ||
+        label === 'Shift' ||
+        label === 'Ctrl' ||
+        label === 'Alt'
+      ) {
+
+        return;
+      }
+
+      if (label.length === 1) {
+
+        buffer += label.toLowerCase();
+
+      }
+
       paintThought();
     }
 
+
+    /* =================================================
+       KEY NORMALIZATION
+    ================================================= */
+
     function normalize(e) {
+
       if (e.key === ' ') return 'space';
+
       if (e.key === 'Control') return 'ctrl';
+
       if (e.key === 'Alt') return 'alt';
+
       if (e.key === 'Shift') return 'shift';
+
       if (e.key === 'CapsLock') return 'caps';
+
       if (e.key === 'Enter') return 'enter';
+
       if (e.key === 'Tab') return 'tab';
+
       if (e.key === 'Backspace') return 'backspace';
+
       return e.key.toLowerCase();
     }
 
-    window.addEventListener('keydown', (e) => {
-      const n = normalize(e);
-      const el = byLabel.get(n);
-      if (el) el.classList.add('active');
-      if (n === 'enter') {
-        e.preventDefault();
-        submitThought();
-        return;
-      }
-      if (n === 'backspace') {
-        buffer = buffer.slice(0, -1);
-        paintThought();
-        return;
-      }
-      if (n === 'space') {
-        e.preventDefault();
-        buffer += ' ';
-        paintThought();
-        return;
-      }
-      if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
-        buffer += e.key;
-        paintThought();
-      }
-    });
 
-    window.addEventListener('keyup', (e) => {
-      const el = byLabel.get(normalize(e));
-      if (el) el.classList.remove('active');
-    });
+    /* =================================================
+       RADAR DIRECTION SYSTEM
+    ================================================= */
 
-    document.getElementById('closeScan').onclick = () => scan.classList.remove('show');
+    const directionKeys = {
 
-    // backend — not shown in the UI
+      ArrowUp:
+        document.getElementById('arrowUp'),
+
+      ArrowDown:
+        document.getElementById('arrowDown'),
+
+      ArrowLeft:
+        document.getElementById('arrowLeft'),
+
+      ArrowRight:
+        document.getElementById('arrowRight')
+
+    };
+
+
+    /*
+      Create a visual signal traveling
+      in the direction of the pressed arrow.
+    */
+
+    function fireRadarSignal(direction) {
+
+      const radarNav =
+        document.getElementById('radarNav');
+
+      const pulse =
+        document.createElement('div');
+
+      pulse.className =
+        'direction-pulse';
+
+      const line =
+        document.createElement('div');
+
+      line.className =
+        'signal-line fire';
+
+      /*
+        Rotate the signal depending
+        on which arrow was pressed.
+      */
+
+      const rotations = {
+
+        up: 0,
+
+        right: 90,
+
+        down: 180,
+
+        left: 270
+
+      };
+
+      line.style.transform =
+        `translate(-50%, -100%) rotate(${rotations[direction]}deg)`;
+
+      radarNav.appendChild(pulse);
+
+      radarNav.appendChild(line);
+
+      /*
+        Give the pulse a direction.
+      */
+
+      const distance = 48;
+
+      const vectors = {
+
+        up: [0, -distance],
+
+        down: [0, distance],
+
+        left: [-distance, 0],
+
+        right: [distance, 0]
+
+      };
+
+      const [x, y] =
+        vectors[direction];
+
+      pulse.animate(
+        [
+          {
+            transform:
+              'translate(0, 0) scale(.4)',
+            opacity: 1
+          },
+
+          {
+            transform:
+              `translate(${x}px, ${y}px) scale(2.4)`,
+            opacity: 0
+          }
+        ],
+        {
+          duration: 650,
+          easing: 'ease-out'
+        }
+      );
+
+      setTimeout(() => {
+
+        pulse.remove();
+
+        line.remove();
+
+      }, 700);
+    }
+
+
+    /*
+      Handle an arrow key.
+    */
+
+    function handleArrow(direction) {
+
+      const key =
+        directionKeys[
+          'Arrow' +
+          direction.charAt(0).toUpperCase() +
+          direction.slice(1)
+        ];
+
+      if (!key) return;
+
+      key.classList.add('active');
+
+      fireRadarSignal(direction);
+
+      /*
+        Remove the active state after
+        the visual press.
+      */
+
+      setTimeout(() => {
+
+        key.classList.remove('active');
+
+      }, 130);
+    }
+
+
+    /* =================================================
+       CLICK ARROW KEYS
+    ================================================= */
+
+    document
+      .querySelectorAll('.arrow-key')
+      .forEach(key => {
+
+        key.addEventListener(
+          'click',
+          () => {
+
+            const direction =
+              key.dataset.direction;
+
+            handleArrow(direction);
+
+          }
+        );
+
+      });
+
+
+    /* =================================================
+       PHYSICAL KEYBOARD
+    ================================================= */
+
+    window.addEventListener(
+      'keydown',
+      (e) => {
+
+        /*
+          RADAR ARROWS
+        */
+
+        if (
+          e.key === 'ArrowUp' ||
+          e.key === 'ArrowDown' ||
+          e.key === 'ArrowLeft' ||
+          e.key === 'ArrowRight'
+        ) {
+
+          e.preventDefault();
+
+          const direction =
+            e.key
+              .replace('Arrow', '')
+              .toLowerCase();
+
+          const arrowKey =
+            directionKeys[e.key];
+
+          if (arrowKey) {
+            arrowKey.classList.add('active');
+          }
+
+          fireRadarSignal(direction);
+
+          return;
+        }
+
+
+        /*
+          NORMAL KEYBOARD
+        */
+
+        const n = normalize(e);
+
+        const el =
+          byLabel.get(n);
+
+        if (el) {
+          el.classList.add('active');
+        }
+
+
+        if (n === 'enter') {
+
+          e.preventDefault();
+
+          submitThought();
+
+          return;
+        }
+
+
+        if (n === 'backspace') {
+
+          buffer =
+            buffer.slice(0, -1);
+
+          paintThought();
+
+          return;
+        }
+
+
+        if (n === 'space') {
+
+          e.preventDefault();
+
+          buffer += ' ';
+
+          paintThought();
+
+          return;
+        }
+
+
+        if (
+          e.key.length === 1 &&
+          !e.ctrlKey &&
+          !e.metaKey
+        ) {
+
+          buffer += e.key;
+
+          paintThought();
+        }
+
+      }
+    );
+
+
+    /* =================================================
+       PHYSICAL KEY RELEASE
+    ================================================= */
+
+    window.addEventListener(
+      'keyup',
+      (e) => {
+
+        /*
+          Arrow release
+        */
+
+        if (
+          e.key === 'ArrowUp' ||
+          e.key === 'ArrowDown' ||
+          e.key === 'ArrowLeft' ||
+          e.key === 'ArrowRight'
+        ) {
+
+          const arrowKey =
+            directionKeys[e.key];
+
+          if (arrowKey) {
+            arrowKey.classList.remove('active');
+          }
+
+          return;
+        }
+
+
+        /*
+          Normal key release
+        */
+
+        const el =
+          byLabel.get(normalize(e));
+
+        if (el) {
+          el.classList.remove('active');
+        }
+
+      }
+    );
+
+
+    /* =================================================
+       SCAN CLOSE
+    ================================================= */
+
+    document
+      .getElementById('closeScan')
+      .onclick = () => {
+
+        scan.classList.remove('show');
+
+      };
+
+
+    /* =================================================
+       BACKEND — NOT SHOWN IN UI
+    ================================================= */
+
     class OrganizeThoughts {
+
       keywords(text) {
-        const words = String(text).toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(Boolean);
-        const kept = words.filter(w => w.length > 2 && !STOP.has(w));
-        const uniq = [...new Set(kept.length ? kept : words)];
+
+        const words =
+          String(text)
+            .toLowerCase()
+            .replace(
+              /[^a-z0-9\s]/g,
+              ' '
+            )
+            .split(/\s+/)
+            .filter(Boolean);
+
+        const kept =
+          words.filter(
+            w =>
+              w.length > 2 &&
+              !STOP.has(w)
+          );
+
+        const uniq =
+          [
+            ...new Set(
+              kept.length
+                ? kept
+                : words
+            )
+          ];
+
         return uniq.slice(0, 6);
       }
+
+
       query(keys) {
-        return keys.slice(0, 4).join(' ');
+
+        return keys
+          .slice(0, 4)
+          .join(' ');
       }
+
+
       async wikipedia(query) {
-        if (!query) return { title: 'empty', extract: 'No thought to scan.', url: '' };
-        const searchUrl = 'https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&origin=*&srlimit=1&srsearch=' + encodeURIComponent(query);
-        const s = await fetch(searchUrl).then(r => r.json());
-        const hit = s?.query?.search?.[0];
-        if (!hit) return { title: query, extract: 'No Wikipedia match.', url: 'https://en.wikipedia.org/wiki/Special:Search/' + encodeURIComponent(query) };
-        const title = hit.title;
-        const sumUrl = 'https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(title);
-        const sum = await fetch(sumUrl).then(r => r.json());
+
+        if (!query) {
+
+          return {
+            title: 'empty',
+            extract: 'No thought to scan.',
+            url: ''
+          };
+
+        }
+
+        const searchUrl =
+          'https://en.wikipedia.org/w/api.php' +
+          '?action=query' +
+          '&list=search' +
+          '&format=json' +
+          '&origin=*' +
+          '&srlimit=1' +
+          '&srsearch=' +
+          encodeURIComponent(query);
+
+        const s =
+          await fetch(searchUrl)
+            .then(r => r.json());
+
+        const hit =
+          s?.query?.search?.[0];
+
+        if (!hit) {
+
+          return {
+
+            title: query,
+
+            extract:
+              'No Wikipedia match.',
+
+            url:
+              'https://en.wikipedia.org/wiki/Special:Search/' +
+              encodeURIComponent(query)
+
+          };
+
+        }
+
+        const title =
+          hit.title;
+
+        const sumUrl =
+          'https://en.wikipedia.org/api/rest_v1/page/summary/' +
+          encodeURIComponent(title);
+
+        const sum =
+          await fetch(sumUrl)
+            .then(r => r.json());
+
         return {
-          title: sum.title || title,
-          extract: sum.extract || hit.snippet.replace(/<[^>]+>/g, ''),
-          url: sum.content_urls?.desktop?.page || ('https://en.wikipedia.org/wiki/' + encodeURIComponent(title))
+
+          title:
+            sum.title ||
+            title,
+
+          extract:
+            sum.extract ||
+            hit.snippet.replace(
+              /<[^>]+>/g,
+              ''
+            ),
+
+          url:
+            sum.content_urls?.desktop?.page ||
+            (
+              'https://en.wikipedia.org/wiki/' +
+              encodeURIComponent(title)
+            )
+
         };
       }
+
+
       async run(text) {
-        const keys = this.keywords(text);
-        const q = this.query(keys);
-        const page = await this.wikipedia(q);
-        return { keys, q, page };
+
+        const keys =
+          this.keywords(text);
+
+        const q =
+          this.query(keys);
+
+        const page =
+          await this.wikipedia(q);
+
+        return {
+          keys,
+          q,
+          page
+        };
+
       }
+
     }
 
-    const organizer = new OrganizeThoughts();
+
+    const organizer =
+      new OrganizeThoughts();
+
+
+    /* =================================================
+       SUBMIT THOUGHT
+    ================================================= */
 
     async function submitThought() {
-      const text = buffer.trim();
+
+      const text =
+        buffer.trim();
+
       deskWrap.classList.add('show');
+
       scan.classList.add('show');
-      scanBox.innerHTML = '<h3>brain scan</h3><p>organizing…</p>';
+
+      scanBox.innerHTML =
+        '<h3>brain scan</h3>' +
+        '<p>organizing…</p>';
+
+
       if (!text) {
-        scanBox.innerHTML = '<h3>brain scan</h3><p>type a thought first</p>';
+
+        scanBox.innerHTML =
+          '<h3>brain scan</h3>' +
+          '<p>type a thought first</p>';
+
         return;
       }
+
+
       try {
-        const { keys, q, page } = await organizer.run(text);
+
+        const {
+          keys,
+          q,
+          page
+        } =
+          await organizer.run(text);
+
+
         scanBox.innerHTML =
-          '<h3>' + escapeHtml(page.title) + '</h3>' +
-          '<p>' + escapeHtml(page.extract) + '</p>' +
-          (page.url ? '<p><a href="' + page.url + '" target="_blank" rel="noopener">wikipedia</a></p>' : '');
-        void keys; void q;
-      } catch (err) {
-        scanBox.innerHTML = '<h3>brain scan</h3><p>lookup failed</p>';
+
+          '<h3>' +
+          escapeHtml(page.title) +
+          '</h3>' +
+
+          '<p>' +
+          escapeHtml(page.extract) +
+          '</p>' +
+
+          (
+            page.url
+              ? '<p>' +
+                '<a href="' +
+                page.url +
+                '" target="_blank" rel="noopener">' +
+                'wikipedia' +
+                '</a>' +
+                '</p>'
+
+              : ''
+          );
+
+
+        void keys;
+        void q;
+
       }
+
+      catch (err) {
+
+        scanBox.innerHTML =
+          '<h3>brain scan</h3>' +
+          '<p>lookup failed</p>';
+
+      }
+
     }
 
+
+    /* =================================================
+       HTML ESCAPE
+    ================================================= */
+
     function escapeHtml(s) {
-      return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+      return String(s).replace(
+        /[&<>"']/g,
+        c =>
+          ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+          })[c]
+      );
+
     }
+
   </script>
+
 </body>
 </html>
