@@ -25,10 +25,6 @@
       overflow: hidden;
     }
 
-    /* -------------------------------------------------
-       DESK
-    ------------------------------------------------- */
-
     #deskWrap {
       display: none;
       width: min(720px, 92vw);
@@ -47,10 +43,6 @@
       border: 1px solid #444;
     }
 
-    /* -------------------------------------------------
-       THOUGHT BOX
-    ------------------------------------------------- */
-
     #thought {
       width: min(720px, 92vw);
       min-height: 36px;
@@ -60,10 +52,6 @@
       border-radius: 8px;
       font-size: 15px;
     }
-
-    /* -------------------------------------------------
-       KEYBOARD
-    ------------------------------------------------- */
 
     #board {
       background: #2a2a2a;
@@ -107,9 +95,9 @@
       cursor: pointer;
 
       transition:
-        background 0.08s,
-        transform 0.08s,
-        box-shadow 0.08s;
+        background .08s,
+        transform .08s,
+        box-shadow .08s;
     }
 
     .key.wide {
@@ -128,26 +116,20 @@
       box-shadow: 0 1px 0 #111;
     }
 
-    /* -------------------------------------------------
-       RADAR ARROW AREA
-    ------------------------------------------------- */
+    /* ==================================================
+       RADAR
+    ================================================== */
 
     #radarNav {
       position: relative;
-
       width: 190px;
       height: 150px;
-
       margin: 4px auto 2px;
 
       display: flex;
       align-items: center;
       justify-content: center;
     }
-
-    /*
-      Radar screen behind the arrow keys.
-    */
 
     #radar {
       position: absolute;
@@ -180,10 +162,6 @@
       overflow: hidden;
     }
 
-    /*
-      Radar rings.
-    */
-
     #radar::before {
       content: "";
 
@@ -199,10 +177,6 @@
         0 0 0 40px #00eaff06;
     }
 
-    /*
-      Crosshair.
-    */
-
     #radar::after {
       content: "";
 
@@ -215,10 +189,6 @@
       height: 100%;
 
       background: #24eaff33;
-
-      box-shadow:
-        0 71px 0 #24eaff00,
-        0 0 0 0 #24eaff00;
     }
 
     #radarCross {
@@ -237,10 +207,6 @@
       pointer-events: none;
     }
 
-    /*
-      Radar sweep.
-    */
-
     #radarSweep {
       position: absolute;
 
@@ -252,15 +218,17 @@
 
       transform-origin: left center;
 
-      background: linear-gradient(
-        90deg,
-        #00ffffaa,
-        #00ffff00
-      );
+      background:
+        linear-gradient(
+          90deg,
+          #00ffffaa,
+          #00ffff00
+        );
 
       box-shadow: 0 0 8px #00ffff;
 
-      animation: radarSweep 2.4s linear infinite;
+      animation:
+        radarSweep 2.4s linear infinite;
 
       pointer-events: none;
     }
@@ -274,10 +242,6 @@
         transform: rotate(360deg);
       }
     }
-
-    /*
-      Radar center.
-    */
 
     #radarCenter {
       position: absolute;
@@ -300,10 +264,6 @@
 
       z-index: 3;
     }
-
-    /*
-      Arrow key cluster.
-    */
 
     #arrowCluster {
       position: relative;
@@ -349,15 +309,6 @@
         0 0 5px #00eaff22;
 
       user-select: none;
-
-      transition:
-        background 0.08s,
-        transform 0.08s,
-        box-shadow 0.08s;
-    }
-
-    .arrow-key:hover {
-      background: #20505a;
     }
 
     .arrow-key.active,
@@ -392,10 +343,6 @@
       grid-row: 2;
     }
 
-    /*
-      Direction signal emitted when an arrow is pressed.
-    */
-
     .direction-pulse {
       position: absolute;
 
@@ -419,73 +366,352 @@
       pointer-events: none;
 
       z-index: 10;
-
-      animation: directionPulse 0.7s ease-out forwards;
     }
 
-    @keyframes directionPulse {
-      0% {
-        transform: translate(0, 0) scale(0.4);
-        opacity: 1;
-      }
+    /* ==================================================
+       TASK BOARD
+    ================================================== */
 
-      70% {
-        opacity: 0.8;
-      }
+    #taskOverlay {
+      display: none;
 
-      100% {
-        opacity: 0;
-      }
+      position: fixed;
+      inset: 0;
+
+      background: rgba(0, 0, 0, .82);
+
+      align-items: center;
+      justify-content: center;
+
+      z-index: 100;
     }
 
-    /*
-      Direction-specific signal lines.
-    */
+    #taskOverlay.show {
+      display: flex;
+    }
 
-    .signal-line {
-      position: absolute;
+    #taskBoard {
+      width: min(920px, 95vw);
+      max-height: 92vh;
 
-      left: 50%;
-      top: 50%;
+      overflow: auto;
 
-      width: 2px;
-      height: 45px;
+      padding: 18px;
 
-      background: linear-gradient(
-        #6ff,
-        transparent
-      );
+      background:
+        linear-gradient(
+          145deg,
+          #071316,
+          #101b1d
+        );
 
-      transform-origin: bottom center;
+      border: 1px solid #47eaff;
 
-      pointer-events: none;
+      border-radius: 14px;
 
-      z-index: 9;
+      box-shadow:
+        0 0 30px #00eaff44,
+        inset 0 0 25px #00eaff0c;
+    }
+
+    #taskHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      margin-bottom: 14px;
+    }
+
+    #taskHeader h2 {
+      color: #8ff;
+      font-size: 18px;
+    }
+
+    #taskHeader p {
+      color: #7f9;
+      font-size: 11px;
+      margin-top: 3px;
+    }
+
+    #closeTasks {
+      border: 1px solid #466;
+      background: #142326;
+      color: #9ff;
+
+      width: 32px;
+      height: 32px;
+
+      border-radius: 6px;
+
+      cursor: pointer;
+
+      font-size: 18px;
+    }
+
+    /* 4 x 4 */
+
+    #taskGrid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(4, minmax(150px, 1fr));
+
+      gap: 8px;
+    }
+
+    .taskCell {
+      min-height: 165px;
+
+      position: relative;
+
+      padding: 9px;
+
+      border: 1px solid #31555b;
+
+      border-radius: 8px;
+
+      background:
+        linear-gradient(
+          145deg,
+          #111b1d,
+          #0b1315
+        );
+
+      transition:
+        border-color .15s,
+        box-shadow .15s,
+        background .15s;
+    }
+
+    .taskCell.complete {
+      border-color: #55ff99;
+
+      background:
+        linear-gradient(
+          145deg,
+          #10241a,
+          #091510
+        );
+
+      box-shadow:
+        0 0 12px #32ff8844;
+    }
+
+    .taskCellHeader {
+      display: flex;
+
+      justify-content: space-between;
+      align-items: center;
+
+      margin-bottom: 7px;
+    }
+
+    .taskCode {
+      color: #6ff;
+
+      font-size: 10px;
+
+      font-family: monospace;
+    }
+
+    .taskNumber {
+      color: #777;
+
+      font-size: 10px;
+    }
+
+    .taskCell input {
+      width: 100%;
+
+      height: 34px;
+
+      padding: 6px 7px;
+
+      border-radius: 5px;
+
+      border: 1px solid #34484c;
+
+      background: #071012;
+
+      color: #eee;
+
+      outline: none;
+
+      font-size: 12px;
+    }
+
+    .taskCell input:focus {
+      border-color: #55eaff;
+
+      box-shadow:
+        0 0 7px #00eaff33;
+    }
+
+    .todoLabel {
+      display: block;
+
+      margin-top: 7px;
+      margin-bottom: 3px;
+
+      color: #8aa;
+
+      font-size: 9px;
+
+      text-transform: uppercase;
+
+      letter-spacing: 1px;
+    }
+
+    .taskCell textarea {
+      width: 100%;
+
+      height: 52px;
+
+      resize: none;
+
+      padding: 6px 7px;
+
+      border-radius: 5px;
+
+      border: 1px solid #34484c;
+
+      background: #071012;
+
+      color: #eee;
+
+      outline: none;
+
+      font-family: inherit;
+
+      font-size: 11px;
+    }
+
+    .taskCell textarea:focus {
+      border-color: #55eaff;
+
+      box-shadow:
+        0 0 7px #00eaff33;
+    }
+
+    .taskControls {
+      display: flex;
+
+      align-items: center;
+      justify-content: space-between;
+
+      margin-top: 6px;
+    }
+
+    .taskY {
+      width: 34px;
+      height: 27px;
+
+      border-radius: 5px;
+
+      border: 1px solid #487;
+
+      background: #12221d;
+
+      color: #7f9;
+
+      font-weight: bold;
+
+      cursor: pointer;
+    }
+
+    .taskY:hover {
+      background: #1d4030;
+    }
+
+    .taskCheck {
+      color: #55ff99;
+
+      font-size: 20px;
+
+      font-weight: bold;
 
       opacity: 0;
 
-      box-shadow: 0 0 8px #00ffff;
+      transform: scale(.5);
+
+      transition:
+        opacity .15s,
+        transform .15s;
     }
 
-    .signal-line.fire {
-      animation: signalFire 0.45s ease-out forwards;
+    .taskCell.complete .taskCheck {
+      opacity: 1;
+      transform: scale(1);
     }
 
-    @keyframes signalFire {
-      0% {
-        opacity: 1;
-        height: 8px;
-      }
+    #taskFooter {
+      display: flex;
 
-      100% {
-        opacity: 0;
-        height: 60px;
-      }
+      justify-content: space-between;
+      align-items: center;
+
+      gap: 10px;
+
+      margin-top: 14px;
     }
 
-    /* -------------------------------------------------
-       SCAN MODAL
-    ------------------------------------------------- */
+    #taskStatus {
+      color: #8aa;
+
+      font-family: monospace;
+
+      font-size: 11px;
+    }
+
+    #completeTaskList {
+      padding: 9px 13px;
+
+      border: 1px solid #56eaff;
+
+      border-radius: 6px;
+
+      background: #10343a;
+
+      color: #9ff;
+
+      cursor: pointer;
+    }
+
+    #completeTaskList:hover {
+      background: #17505a;
+    }
+
+    #taskOutput {
+      display: none;
+
+      margin-top: 12px;
+
+      padding: 10px;
+
+      border: 1px solid #31555b;
+
+      border-radius: 7px;
+
+      background: #050b0d;
+
+      color: #9ff;
+
+      font-family: monospace;
+
+      font-size: 11px;
+
+      line-height: 1.5;
+
+      white-space: pre-wrap;
+    }
+
+    #taskOutput.show {
+      display: block;
+    }
+
+    /* ==================================================
+       SCAN
+    ================================================== */
 
     #scan {
       display: none;
@@ -525,6 +751,7 @@
         inset 0 0 40px #0ff3;
 
       position: relative;
+
       overflow: hidden;
     }
 
@@ -544,7 +771,8 @@
           transparent
         );
 
-      animation: sweep 1.6s linear infinite;
+      animation:
+        sweep 1.6s linear infinite;
     }
 
     @keyframes sweep {
@@ -577,6 +805,7 @@
       overflow: auto;
 
       font-size: 13px;
+
       line-height: 1.4;
 
       z-index: 2;
@@ -584,7 +813,9 @@
 
     .popup h3 {
       color: #8ff;
+
       margin-bottom: 6px;
+
       font-size: 14px;
     }
 
@@ -599,6 +830,7 @@
       right: 12px;
 
       background: none;
+
       border: 0;
 
       color: #8ff;
@@ -609,28 +841,83 @@
 
       z-index: 3;
     }
+
+    /* ==================================================
+       MOBILE
+    ================================================== */
+
+    @media (max-width: 700px) {
+
+      #taskGrid {
+        grid-template-columns:
+          repeat(2, minmax(135px, 1fr));
+      }
+
+      #taskBoard {
+        padding: 12px;
+      }
+    }
+
+    @media (max-width: 430px) {
+
+      #taskGrid {
+        grid-template-columns: 1fr;
+      }
+
+      .taskCell {
+        min-height: 150px;
+      }
+
+      .key.space {
+        min-width: 180px;
+      }
+    }
+
   </style>
 </head>
 
 <body>
 
+  <!-- ==================================================
+       DESK
+  ================================================== -->
+
   <div id="deskWrap">
-    <img id="desk" alt="desk" src="desk.png">
+
+    <img
+      id="desk"
+      alt="desk"
+      src="desk.png">
+
   </div>
+
+
+  <!-- ==================================================
+       THOUGHT
+  ================================================== -->
 
   <div id="thought"></div>
 
+
+  <!-- ==================================================
+       KEYBOARD
+  ================================================== -->
+
   <div id="board"></div>
 
-  <!-- =================================================
-       RADAR / ARROW NAVIGATION
+
+  <!-- ==================================================
+       RADAR
   ================================================== -->
 
   <div id="radarNav">
 
     <div id="radar">
+
       <div id="radarSweep"></div>
+
       <div id="radarCenter"></div>
+
     </div>
 
     <div id="radarCross"></div>
@@ -641,8 +928,7 @@
         type="button"
         class="arrow-key"
         id="arrowUp"
-        data-direction="up"
-        aria-label="Arrow Up">
+        data-direction="up">
         ↑
       </button>
 
@@ -650,8 +936,7 @@
         type="button"
         class="arrow-key"
         id="arrowLeft"
-        data-direction="left"
-        aria-label="Arrow Left">
+        data-direction="left">
         ←
       </button>
 
@@ -659,8 +944,7 @@
         type="button"
         class="arrow-key"
         id="arrowDown"
-        data-direction="down"
-        aria-label="Arrow Down">
+        data-direction="down">
         ↓
       </button>
 
@@ -668,8 +952,7 @@
         type="button"
         class="arrow-key"
         id="arrowRight"
-        data-direction="right"
-        aria-label="Arrow Right">
+        data-direction="right">
         →
       </button>
 
@@ -677,8 +960,65 @@
 
   </div>
 
-  <!-- =================================================
-       SCAN WINDOW
+
+  <!-- ==================================================
+       4 x 4 TASK BOARD
+  ================================================== -->
+
+  <div id="taskOverlay">
+
+    <div id="taskBoard">
+
+      <div id="taskHeader">
+
+        <div>
+
+          <h2>
+            TB / TR — 4×4 TASK MATRIX
+          </h2>
+
+          <p>
+            nested symbol task system
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          id="closeTasks">
+          ×
+        </button>
+
+      </div>
+
+
+      <div id="taskGrid"></div>
+
+
+      <div id="taskFooter">
+
+        <div id="taskStatus">
+          0 / 16 tasks complete
+        </div>
+
+        <button
+          type="button"
+          id="completeTaskList">
+          COMPLETE TASK LIST
+        </button>
+
+      </div>
+
+
+      <div id="taskOutput"></div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ==================================================
+       SCAN
   ================================================== -->
 
   <div id="scan">
@@ -702,63 +1042,99 @@
 
   </div>
 
+
   <script>
 
-    /* =================================================
-       NORMAL KEYBOARD
-    ================================================= */
+    /* ==================================================
+       KEYBOARD
+    ================================================== */
 
     const ROWS = [
-      ['`','1','2','3','4','5','6','7','8','9','0','-','='],
 
-      ['Tab','Q','W','E','R','T','Y','U','I','O','P','[',']','\\'],
+      [
+        '`','1','2','3','4','5','6','7',
+        '8','9','0','-','='
+      ],
 
-      ['Caps','A','S','D','F','G','H','J','K','L',';','\'','Enter'],
+      [
+        'Tab','Q','W','E','R','T','Y',
+        'U','I','O','P','[',']','\\'
+      ],
 
-      ['Shift','Z','X','C','V','B','N','M',',','.','/','Shift'],
+      [
+        'Caps','A','S','D','F','G','H',
+        'J','K','L',';','\'','Enter'
+      ],
 
-      ['Ctrl','Alt','Space','Alt','Ctrl']
+      [
+        'Shift','Z','X','C','V','B','N',
+        'M',',','.','/','Shift'
+      ],
+
+      [
+        'Ctrl','Alt','Space','Alt','Ctrl'
+      ]
+
     ];
 
-    const localKeys = new Set(ROWS.flat());
 
     const STOP = new Set(
+
       'a an the and or of to for in on at is are was were be been being what who how why when where which that this those these i you we they it my your our with from about into over after before not no yes please can could would should do does did'
-      .split(' ')
+        .split(' ')
+
     );
 
-    const board = document.getElementById('board');
-    const thoughtEl = document.getElementById('thought');
 
-    const deskWrap = document.getElementById('deskWrap');
-    const deskImg = document.getElementById('desk');
+    const board =
+      document.getElementById('board');
 
-    const scan = document.getElementById('scan');
-    const scanBox = document.getElementById('scanBox');
+    const thoughtEl =
+      document.getElementById('thought');
 
-    const byLabel = new Map();
+    const deskWrap =
+      document.getElementById('deskWrap');
+
+    const deskImg =
+      document.getElementById('desk');
+
+    const scan =
+      document.getElementById('scan');
+
+    const scanBox =
+      document.getElementById('scanBox');
+
+    const byLabel =
+      new Map();
+
 
     let buffer = '';
 
+
     deskImg.onerror = () => {
+
       deskImg.src =
         'https://raw.githubusercontent.com/DreamTexc/MoonWave/main/desk.png';
+
     };
 
 
-    /* =================================================
-       BUILD NORMAL KEYBOARD
-    ================================================= */
+    /* ==================================================
+       BUILD KEYBOARD
+    ================================================== */
 
     for (const row of ROWS) {
 
-      const rowEl = document.createElement('div');
+      const rowEl =
+        document.createElement('div');
 
       rowEl.className = 'row';
 
+
       for (const label of row) {
 
-        const key = document.createElement('button');
+        const key =
+          document.createElement('button');
 
         key.type = 'button';
 
@@ -771,9 +1147,13 @@
             ? ''
             : label;
 
+
         if (label === 'Space') {
+
           key.classList.add('space');
+
         }
+
 
         if (
           [
@@ -785,43 +1165,53 @@
             'Alt'
           ].includes(label)
         ) {
+
           key.classList.add('wide');
+
         }
+
 
         key.addEventListener(
           'click',
           () => handleLabel(label)
         );
 
+
         rowEl.appendChild(key);
+
 
         byLabel.set(
           label.toLowerCase(),
           key
         );
+
       }
 
+
       board.appendChild(rowEl);
+
     }
 
 
-    /* =================================================
-       THOUGHT DISPLAY
-    ================================================= */
+    /* ==================================================
+       THOUGHT
+    ================================================== */
 
     function paintThought() {
 
       thoughtEl.textContent =
         buffer ||
         'type a thought, then Enter';
+
     }
+
 
     paintThought();
 
 
-    /* =================================================
-       NORMAL KEYBOARD CLICK HANDLING
-    ================================================= */
+    /* ==================================================
+       KEYBOARD LABEL HANDLER
+    ================================================== */
 
     function handleLabel(label) {
 
@@ -830,16 +1220,18 @@
         submitThought();
 
         return;
+
       }
+
 
       if (label === 'Space') {
 
-        buffer += ' ';
-
-        paintThought();
+        openTaskBoard();
 
         return;
+
       }
+
 
       if (
         label === 'Tab' ||
@@ -850,47 +1242,61 @@
       ) {
 
         return;
+
       }
+
 
       if (label.length === 1) {
 
-        buffer += label.toLowerCase();
+        buffer +=
+          label.toLowerCase();
 
       }
 
+
       paintThought();
+
     }
 
 
-    /* =================================================
-       KEY NORMALIZATION
-    ================================================= */
+    /* ==================================================
+       NORMALIZE PHYSICAL KEYS
+    ================================================== */
 
     function normalize(e) {
 
-      if (e.key === ' ') return 'space';
+      if (e.key === ' ')
+        return 'space';
 
-      if (e.key === 'Control') return 'ctrl';
+      if (e.key === 'Control')
+        return 'ctrl';
 
-      if (e.key === 'Alt') return 'alt';
+      if (e.key === 'Alt')
+        return 'alt';
 
-      if (e.key === 'Shift') return 'shift';
+      if (e.key === 'Shift')
+        return 'shift';
 
-      if (e.key === 'CapsLock') return 'caps';
+      if (e.key === 'CapsLock')
+        return 'caps';
 
-      if (e.key === 'Enter') return 'enter';
+      if (e.key === 'Enter')
+        return 'enter';
 
-      if (e.key === 'Tab') return 'tab';
+      if (e.key === 'Tab')
+        return 'tab';
 
-      if (e.key === 'Backspace') return 'backspace';
+      if (e.key === 'Backspace')
+        return 'backspace';
 
       return e.key.toLowerCase();
+
     }
 
 
-    /* =================================================
-       RADAR DIRECTION SYSTEM
-    ================================================= */
+    /* ==================================================
+       RADAR
+    ================================================== */
 
     const directionKeys = {
 
@@ -909,15 +1315,11 @@
     };
 
 
-    /*
-      Create a visual signal traveling
-      in the direction of the pressed arrow.
-    */
-
     function fireRadarSignal(direction) {
 
       const radarNav =
         document.getElementById('radarNav');
+
 
       const pulse =
         document.createElement('div');
@@ -925,90 +1327,68 @@
       pulse.className =
         'direction-pulse';
 
-      const line =
-        document.createElement('div');
-
-      line.className =
-        'signal-line fire';
-
-      /*
-        Rotate the signal depending
-        on which arrow was pressed.
-      */
-
-      const rotations = {
-
-        up: 0,
-
-        right: 90,
-
-        down: 180,
-
-        left: 270
-
-      };
-
-      line.style.transform =
-        `translate(-50%, -100%) rotate(${rotations[direction]}deg)`;
-
-      radarNav.appendChild(pulse);
-
-      radarNav.appendChild(line);
-
-      /*
-        Give the pulse a direction.
-      */
-
-      const distance = 48;
 
       const vectors = {
 
-        up: [0, -distance],
+        up: [0, -48],
 
-        down: [0, distance],
+        down: [0, 48],
 
-        left: [-distance, 0],
+        left: [-48, 0],
 
-        right: [distance, 0]
+        right: [48, 0]
 
       };
+
 
       const [x, y] =
         vectors[direction];
 
+
+      radarNav.appendChild(pulse);
+
+
       pulse.animate(
+
         [
+
           {
             transform:
-              'translate(0, 0) scale(.4)',
+              'translate(0,0) scale(.4)',
+
             opacity: 1
+
           },
 
           {
+
             transform:
-              `translate(${x}px, ${y}px) scale(2.4)`,
+              `translate(${x}px,${y}px) scale(2.4)`,
+
             opacity: 0
+
           }
+
         ],
+
         {
+
           duration: 650,
+
           easing: 'ease-out'
+
         }
+
       );
 
-      setTimeout(() => {
 
-        pulse.remove();
+      setTimeout(
+        () => pulse.remove(),
+        700
+      );
 
-        line.remove();
-
-      }, 700);
     }
 
-
-    /*
-      Handle an arrow key.
-    */
 
     function handleArrow(direction) {
 
@@ -1019,28 +1399,23 @@
           direction.slice(1)
         ];
 
+
       if (!key) return;
+
 
       key.classList.add('active');
 
+
       fireRadarSignal(direction);
 
-      /*
-        Remove the active state after
-        the visual press.
-      */
 
-      setTimeout(() => {
+      setTimeout(
+        () => key.classList.remove('active'),
+        130
+      );
 
-        key.classList.remove('active');
-
-      }, 130);
     }
 
-
-    /* =================================================
-       CLICK ARROW KEYS
-    ================================================= */
 
     document
       .querySelectorAll('.arrow-key')
@@ -1050,10 +1425,9 @@
           'click',
           () => {
 
-            const direction =
-              key.dataset.direction;
-
-            handleArrow(direction);
+            handleArrow(
+              key.dataset.direction
+            );
 
           }
         );
@@ -1061,17 +1435,443 @@
       });
 
 
-    /* =================================================
+    /* ==================================================
+       4 x 4 TASK SYSTEM
+    ================================================== */
+
+    const taskOverlay =
+      document.getElementById('taskOverlay');
+
+    const taskGrid =
+      document.getElementById('taskGrid');
+
+    const taskStatus =
+      document.getElementById('taskStatus');
+
+    const taskOutput =
+      document.getElementById('taskOutput');
+
+
+    /*
+      Every one of the 16 cells has
+      its own nested TB/TR object.
+
+      TB = task branch
+      TR = task record
+
+      The structure is intentionally nested
+      so more symbol rules can be added later.
+    */
+
+    const taskMatrix = [];
+
+
+    for (let row = 0; row < 4; row++) {
+
+      const rowData = [];
+
+
+      for (let col = 0; col < 4; col++) {
+
+        const index =
+          row * 4 + col + 1;
+
+
+        const cellData = {
+
+          index,
+
+          position: {
+            row: row + 1,
+            column: col + 1
+          },
+
+          TB: {
+
+            TR: {
+
+              information: '',
+
+              todo: '',
+
+              symbol: {
+                pending: '○',
+                complete: '✓'
+              },
+
+              done: false
+
+            }
+
+          }
+
+        };
+
+
+        rowData.push(cellData);
+
+
+        const cell =
+          document.createElement('div');
+
+        cell.className =
+          'taskCell';
+
+        cell.dataset.index =
+          index;
+
+
+        cell.innerHTML = `
+
+          <div class="taskCellHeader">
+
+            <span class="taskCode">
+              TB;TR;4x4.${row + 1}.${col + 1}
+            </span>
+
+            <span class="taskNumber">
+              #${index}
+            </span>
+
+          </div>
+
+          <input
+            type="text"
+            class="taskInfo"
+            placeholder="information">
+
+          <span class="todoLabel">
+            TO DO
+          </span>
+
+          <textarea
+            class="taskTodo"
+            placeholder="add a task..."></textarea>
+
+          <div class="taskControls">
+
+            <button
+              type="button"
+              class="taskY">
+              Y
+            </button>
+
+            <span
+              class="taskCheck">
+              ✓
+            </span>
+
+          </div>
+
+        `;
+
+
+        const info =
+          cell.querySelector('.taskInfo');
+
+        const todo =
+          cell.querySelector('.taskTodo');
+
+        const y =
+          cell.querySelector('.taskY');
+
+
+        info.addEventListener(
+          'input',
+          () => {
+
+            cellData.TB.TR.information =
+              info.value;
+
+          }
+        );
+
+
+        todo.addEventListener(
+          'input',
+          () => {
+
+            cellData.TB.TR.todo =
+              todo.value;
+
+          }
+        );
+
+
+        y.addEventListener(
+          'click',
+          () => {
+
+            completeTask(
+              cellData,
+              cell
+            );
+
+          }
+        );
+
+
+        taskGrid.appendChild(cell);
+
+      }
+
+
+      taskMatrix.push(rowData);
+
+    }
+
+
+    /* ==================================================
+       OPEN TASK BOARD
+    ================================================== */
+
+    function openTaskBoard() {
+
+      taskOverlay.classList.add('show');
+
+      updateTaskStatus();
+
+    }
+
+
+    /* ==================================================
+       CLOSE TASK BOARD
+    ================================================== */
+
+    document
+      .getElementById('closeTasks')
+      .addEventListener(
+        'click',
+        () => {
+
+          taskOverlay.classList.remove(
+            'show'
+          );
+
+        }
+      );
+
+
+    /* ==================================================
+       COMPLETE ONE TASK
+    ================================================== */
+
+    function completeTask(data, cell) {
+
+      data.TB.TR.done = true;
+
+
+      /*
+        This is the nested symbol code.
+
+        pending:
+          ○
+
+        complete:
+          ✓
+
+        The Y operation changes
+        the nested symbol state.
+      */
+
+      data.TB.TR.symbol =
+        data.TB.TR.symbol.complete;
+
+
+      cell.classList.add('complete');
+
+
+      updateTaskStatus();
+
+
+      /*
+        Message requested:
+        "task done"
+      */
+
+      showTaskMessage(
+        data
+      );
+
+    }
+
+
+    /* ==================================================
+       TASK DONE MESSAGE
+    ================================================== */
+
+    function showTaskMessage(data) {
+
+      const info =
+        data.TB.TR.information ||
+        '(no information)';
+
+      const todo =
+        data.TB.TR.todo ||
+        '(no to-do description)';
+
+
+      taskOutput.classList.add('show');
+
+
+      taskOutput.textContent =
+        'TASK DONE\n' +
+        'TB;TR;4x4.' +
+        data.position.row +
+        '.' +
+        data.position.column +
+        '\n' +
+        '✓ task done\n' +
+        'information: ' +
+        info +
+        '\n' +
+        'to do: ' +
+        todo;
+
+    }
+
+
+    /* ==================================================
+       STATUS
+    ================================================== */
+
+    function updateTaskStatus() {
+
+      let completed = 0;
+
+
+      for (const row of taskMatrix) {
+
+        for (const data of row) {
+
+          if (data.TB.TR.done) {
+
+            completed++;
+
+          }
+
+        }
+
+      }
+
+
+      taskStatus.textContent =
+        `${completed} / 16 tasks complete`;
+
+    }
+
+
+    /* ==================================================
+       COMPLETE TASK LIST
+    ================================================== */
+
+    document
+      .getElementById('completeTaskList')
+      .addEventListener(
+        'click',
+        () => {
+
+          const lines = [];
+
+          let completed = 0;
+
+
+          lines.push(
+            'TB;TR;4x4 TASK LIST'
+          );
+
+          lines.push(
+            '===================='
+          );
+
+
+          for (const row of taskMatrix) {
+
+            for (const data of row) {
+
+              const cell =
+                data.position;
+
+
+              const symbol =
+                data.TB.TR.done
+                  ? data.TB.TR.symbol
+                  : data.TB.TR.symbol.pending;
+
+
+              if (data.TB.TR.done) {
+
+                completed++;
+
+              }
+
+
+              lines.push(
+
+                `[${symbol}] ` +
+
+                `TB;TR;` +
+
+                `${cell.row},${cell.column}` +
+
+                ' | ' +
+
+                (
+                  data.TB.TR.information ||
+                  '(no information)'
+                ) +
+
+                ' | TO DO: ' +
+
+                (
+                  data.TB.TR.todo ||
+                  '(empty)'
+                )
+
+              );
+
+            }
+
+          }
+
+
+          lines.push('');
+
+          lines.push(
+            `COMPLETED: ${completed}/16`
+          );
+
+
+          if (completed === 16) {
+
+            lines.push(
+              '✓ TASK LIST COMPLETE — TASK DONE'
+            );
+
+          }
+
+
+          taskOutput.classList.add('show');
+
+
+          taskOutput.textContent =
+            lines.join('\n');
+
+        }
+      );
+
+
+    /* ==================================================
        PHYSICAL KEYBOARD
-    ================================================= */
+    ================================================== */
 
     window.addEventListener(
       'keydown',
       (e) => {
 
-        /*
-          RADAR ARROWS
-        */
+        /* ----------------------------------------------
+           RADAR
+        ---------------------------------------------- */
 
         if (
           e.key === 'ArrowUp' ||
@@ -1082,37 +1882,63 @@
 
           e.preventDefault();
 
+
           const direction =
             e.key
-              .replace('Arrow', '')
+              .replace(
+                'Arrow',
+                ''
+              )
               .toLowerCase();
+
 
           const arrowKey =
             directionKeys[e.key];
 
+
           if (arrowKey) {
-            arrowKey.classList.add('active');
+
+            arrowKey.classList.add(
+              'active'
+            );
+
           }
 
-          fireRadarSignal(direction);
+
+          fireRadarSignal(
+            direction
+          );
+
 
           return;
+
         }
 
 
-        /*
-          NORMAL KEYBOARD
-        */
+        /* ----------------------------------------------
+           NORMAL KEYBOARD
+        ---------------------------------------------- */
 
-        const n = normalize(e);
+        const n =
+          normalize(e);
+
 
         const el =
           byLabel.get(n);
 
+
         if (el) {
-          el.classList.add('active');
+
+          el.classList.add(
+            'active'
+          );
+
         }
 
+
+        /* ----------------------------------------------
+           ENTER
+        ---------------------------------------------- */
 
         if (n === 'enter') {
 
@@ -1121,8 +1947,13 @@
           submitThought();
 
           return;
+
         }
 
+
+        /* ----------------------------------------------
+           BACKSPACE
+        ---------------------------------------------- */
 
         if (n === 'backspace') {
 
@@ -1132,20 +1963,28 @@
           paintThought();
 
           return;
+
         }
 
+
+        /* ----------------------------------------------
+           SPACE
+        ---------------------------------------------- */
 
         if (n === 'space') {
 
           e.preventDefault();
 
-          buffer += ' ';
-
-          paintThought();
+          openTaskBoard();
 
           return;
+
         }
 
+
+        /* ----------------------------------------------
+           LETTERS / NUMBERS
+        ---------------------------------------------- */
 
         if (
           e.key.length === 1 &&
@@ -1156,23 +1995,20 @@
           buffer += e.key;
 
           paintThought();
+
         }
 
       }
     );
 
 
-    /* =================================================
-       PHYSICAL KEY RELEASE
-    ================================================= */
+    /* ==================================================
+       KEY RELEASE
+    ================================================== */
 
     window.addEventListener(
       'keyup',
       (e) => {
-
-        /*
-          Arrow release
-        */
 
         if (
           e.key === 'ArrowUp' ||
@@ -1184,45 +2020,57 @@
           const arrowKey =
             directionKeys[e.key];
 
+
           if (arrowKey) {
-            arrowKey.classList.remove('active');
+
+            arrowKey.classList.remove(
+              'active'
+            );
+
           }
 
+
           return;
+
         }
 
 
-        /*
-          Normal key release
-        */
-
         const el =
-          byLabel.get(normalize(e));
+          byLabel.get(
+            normalize(e)
+          );
+
 
         if (el) {
-          el.classList.remove('active');
+
+          el.classList.remove(
+            'active'
+          );
+
         }
 
       }
     );
 
 
-    /* =================================================
+    /* ==================================================
        SCAN CLOSE
-    ================================================= */
+    ================================================== */
 
     document
       .getElementById('closeScan')
       .onclick = () => {
 
-        scan.classList.remove('show');
+        scan.classList.remove(
+          'show'
+        );
 
       };
 
 
-    /* =================================================
-       BACKEND — NOT SHOWN IN UI
-    ================================================= */
+    /* ==================================================
+       BACKEND
+    ================================================== */
 
     class OrganizeThoughts {
 
@@ -1238,12 +2086,14 @@
             .split(/\s+/)
             .filter(Boolean);
 
+
         const kept =
           words.filter(
             w =>
               w.length > 2 &&
               !STOP.has(w)
           );
+
 
         const uniq =
           [
@@ -1254,7 +2104,12 @@
             )
           ];
 
-        return uniq.slice(0, 6);
+
+        return uniq.slice(
+          0,
+          6
+        );
+
       }
 
 
@@ -1263,6 +2118,7 @@
         return keys
           .slice(0, 4)
           .join(' ');
+
       }
 
 
@@ -1271,12 +2127,18 @@
         if (!query) {
 
           return {
+
             title: 'empty',
-            extract: 'No thought to scan.',
+
+            extract:
+              'No thought to scan.',
+
             url: ''
+
           };
 
         }
+
 
         const searchUrl =
           'https://en.wikipedia.org/w/api.php' +
@@ -1288,12 +2150,15 @@
           '&srsearch=' +
           encodeURIComponent(query);
 
+
         const s =
           await fetch(searchUrl)
             .then(r => r.json());
 
+
         const hit =
           s?.query?.search?.[0];
+
 
         if (!hit) {
 
@@ -1312,16 +2177,20 @@
 
         }
 
+
         const title =
           hit.title;
+
 
         const sumUrl =
           'https://en.wikipedia.org/api/rest_v1/page/summary/' +
           encodeURIComponent(title);
 
+
         const sum =
           await fetch(sumUrl)
             .then(r => r.json());
+
 
         return {
 
@@ -1344,6 +2213,7 @@
             )
 
         };
+
       }
 
 
@@ -1357,6 +2227,7 @@
 
         const page =
           await this.wikipedia(q);
+
 
         return {
           keys,
@@ -1373,18 +2244,25 @@
       new OrganizeThoughts();
 
 
-    /* =================================================
+    /* ==================================================
        SUBMIT THOUGHT
-    ================================================= */
+    ================================================== */
 
     async function submitThought() {
 
       const text =
         buffer.trim();
 
-      deskWrap.classList.add('show');
 
-      scan.classList.add('show');
+      deskWrap.classList.add(
+        'show'
+      );
+
+
+      scan.classList.add(
+        'show'
+      );
+
 
       scanBox.innerHTML =
         '<h3>brain scan</h3>' +
@@ -1398,6 +2276,7 @@
           '<p>type a thought first</p>';
 
         return;
+
       }
 
 
@@ -1408,17 +2287,23 @@
           q,
           page
         } =
-          await organizer.run(text);
+          await organizer.run(
+            text
+          );
 
 
         scanBox.innerHTML =
 
           '<h3>' +
-          escapeHtml(page.title) +
+          escapeHtml(
+            page.title
+          ) +
           '</h3>' +
 
           '<p>' +
-          escapeHtml(page.extract) +
+          escapeHtml(
+            page.extract
+          ) +
           '</p>' +
 
           (
@@ -1451,14 +2336,16 @@
     }
 
 
-    /* =================================================
+    /* ==================================================
        HTML ESCAPE
-    ================================================= */
+    ================================================== */
 
     function escapeHtml(s) {
 
       return String(s).replace(
+
         /[&<>"']/g,
+
         c =>
           ({
             '&': '&amp;',
@@ -1467,6 +2354,7 @@
             '"': '&quot;',
             "'": '&#39;'
           })[c]
+
       );
 
     }
