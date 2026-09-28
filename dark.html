@@ -14,10 +14,12 @@ html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial,sa
 #oracleLayer{display:none;position:fixed;inset:0;z-index:10;background:#000;perspective:420px}
 #oracleWorld{position:absolute;inset:0;transform-style:preserve-3d;transform-origin:50% 72%}
 #oracleWorld b{position:absolute;left:50%;top:62%;background:#fff;border-radius:50%;pointer-events:none}
+#oracleWorld b.hot{background:#9cf;box-shadow:0 0 8px #9cf}
 body.character-mode #oracleLayer{display:block}
 #touchPad{display:none;position:fixed;inset:0;z-index:30}
 body.character-mode #touchPad{display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr 1fr}
-#touchPad span{background:transparent}
+#hud{display:none;position:fixed;left:8px;bottom:8px;z-index:41;font-size:11px;color:#9ab;max-width:70%}
+body.character-mode #hud{display:block}
 </style>
 </head>
 <body>
@@ -30,9 +32,10 @@ body.character-mode #touchPad{display:grid;grid-template-columns:1fr 1fr 1fr;gri
   <div id="oracleLayer"><div id="oracleWorld"></div></div>
   <div id="touchPad">
     <span data-go=""></span><span data-go="up"></span><span data-go=""></span>
-    <span data-go="left"></span><span data-go=""></span><span data-go="right"></span>
+    <span data-go="left"></span><span data-pick="1"></span><span data-go="right"></span>
     <span data-go=""></span><span data-go="down"></span><span data-go=""></span>
   </div>
+  <div id="hud">ARRAY idle</div>
 </div>
 <script>
 "use strict";
@@ -41,6 +44,7 @@ const header = document.getElementById("starHeader");
 const onBtn = document.getElementById("on");
 const offBtn = document.getElementById("off");
 const world = document.getElementById("oracleWorld");
+const hud = document.getElementById("hud");
 
 for (let n = 0; n < 80; n++) {
   const dot = document.createElement("i");
@@ -67,12 +71,59 @@ const vault = {
     this.stars = [];
     for (let i = 0; i < 420; i++) {
       this.stars.push({
+        id: i,
         x: (Math.random() - 0.5) * 1400,
         y: (Math.random() - 0.55) * 520,
         z: Math.random() * 1600 + 40,
-        s: 0.6 + Math.random() * 2.2
+        s: 0.6 + Math.random() * 2.2,
+        mark: false
       });
     }
+  }
+};
+
+const rack = {
+  view: [],
+  picked: [],
+  live: null,
+  project: function () {
+    this.view = [];
+    const fov = 240;
+    const cos = Math.cos($.heading);
+    const sin = Math.sin($.heading);
+    for (let i = 0; i < vault.stars.length; i++) {
+      const s = vault.stars[i];
+      const dx = s.x - $.x;
+      const dz = s.z - $.z;
+      const rx = dx * cos - dz * sin;
+      const rz = dx * sin + dz * cos;
+      if (rz < 18) continue;
+      const scale = fov / rz;
+      this.view.push({
+        id: s.id,
+        sx: rx * scale,
+        sy: (s.y - $.y) * scale,
+        scale: scale,
+        s: s
+      });
+    }
+  },
+  pickNearest: function () {
+    if (!this.view.length) return;
+    this.view.sort(function (a, b) { return b.scale - a.scale; });
+    const hit = this.view[0];
+    hit.s.mark = !hit.s.mark;
+    this.live = hit.s;
+    if (hit.s.mark) this.picked.push(hit.s.id);
+    else this.picked = this.picked.filter(function (id) { return id !== hit.s.id; });
+    hud.textContent = "ARRAY [" + this.picked.join(",") + "] live:" + (this.live ? this.live.id : "-");
+  },
+  clear: function () {
+    this.view = [];
+    this.picked = [];
+    this.live = null;
+    vault.stars.forEach(function (s) { s.mark = false; });
+    hud.textContent = "ARRAY idle";
   }
 };
 
@@ -86,7 +137,7 @@ const oracle = {
     header.style.display = "block";
     $.x = 0; $.y = 12; $.z = 0; $.heading = 0;
     vault.fill();
-    this.draw();
+    rack.clear();
     cancelAnimationFrame(this.tick);
     const loop = () => { this.draw(); this.tick = requestAnimationFrame(loop); };
     this.tick = requestAnimationFrame(loop);
@@ -97,30 +148,22 @@ const oracle = {
     header.style.display = "none";
     cancelAnimationFrame(this.tick);
     world.innerHTML = "";
+    rack.clear();
   },
   draw: function () {
     $.step();
+    rack.project();
     world.innerHTML = "";
-    const fov = 240;
-    const cos = Math.cos($.heading);
-    const sin = Math.sin($.heading);
     world.style.transform = "rotateX(64deg) translateZ(40px)";
-    for (let i = 0; i < vault.stars.length; i++) {
-      const s = vault.stars[i];
-      const dx = s.x - $.x;
-      const dz = s.z - $.z;
-      const rx = dx * cos - dz * sin;
-      const rz = dx * sin + dz * cos;
-      if (rz < 18) continue;
-      const scale = fov / rz;
-      const sx = rx * scale;
-      const sy = (s.y - $.y) * scale;
+    for (let i = 0; i < rack.view.length; i++) {
+      const v = rack.view[i];
       const star = document.createElement("b");
-      const size = Math.max(1, s.s * scale * 1.8);
+      const size = Math.max(1, v.s.s * v.scale * 1.8);
       star.style.width = size + "px";
       star.style.height = size + "px";
-      star.style.opacity = String(Math.min(1, 0.15 + scale * 0.9));
-      star.style.transform = "translate(" + sx + "px," + sy + "px)";
+      star.style.opacity = String(Math.min(1, 0.15 + v.scale * 0.9));
+      star.style.transform = "translate(" + v.sx + "px," + v.sy + "px)";
+      if (v.s.mark) star.className = "hot";
       world.appendChild(star);
     }
   }
@@ -132,27 +175,29 @@ offBtn.onclick = function () { standEval("oracle.exit()"); };
 standEval("oracle.exit()");
 
 document.addEventListener("keydown", function (e) {
-  const k = e.key;
-  if (k === "ArrowUp") $.keys.up = 1;
-  if (k === "ArrowDown") $.keys.down = 1;
-  if (k === "ArrowLeft") $.keys.left = 1;
-  if (k === "ArrowRight") $.keys.right = 1;
+  if (e.key === "ArrowUp") $.keys.up = 1;
+  if (e.key === "ArrowDown") $.keys.down = 1;
+  if (e.key === "ArrowLeft") $.keys.left = 1;
+  if (e.key === "ArrowRight") $.keys.right = 1;
+  if (e.key === "Enter" && oracle.mode === "character") rack.pickNearest();
 });
 document.addEventListener("keyup", function (e) {
-  const k = e.key;
-  if (k === "ArrowUp") $.keys.up = 0;
-  if (k === "ArrowDown") $.keys.down = 0;
-  if (k === "ArrowLeft") $.keys.left = 0;
-  if (k === "ArrowRight") $.keys.right = 0;
+  if (e.key === "ArrowUp") $.keys.up = 0;
+  if (e.key === "ArrowDown") $.keys.down = 0;
+  if (e.key === "ArrowLeft") $.keys.left = 0;
+  if (e.key === "ArrowRight") $.keys.right = 0;
 });
-document.getElementById("touchPad").addEventListener("pointerdown", function (e) {
+const pad = document.getElementById("touchPad");
+pad.addEventListener("pointerdown", function (e) {
   const go = e.target.getAttribute("data-go");
+  const pick = e.target.getAttribute("data-pick");
   if (go) $.keys[go] = 1;
+  if (pick) rack.pickNearest();
 });
-document.getElementById("touchPad").addEventListener("pointerup", function () {
+pad.addEventListener("pointerup", function () {
   $.keys.up = $.keys.down = $.keys.left = $.keys.right = 0;
 });
-document.getElementById("touchPad").addEventListener("pointerleave", function () {
+pad.addEventListener("pointerleave", function () {
   $.keys.up = $.keys.down = $.keys.left = $.keys.right = 0;
 });
 </script>
