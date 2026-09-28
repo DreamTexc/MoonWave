@@ -6,7 +6,7 @@
 <title>Universal Node</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial,sans-serif;overflow:hidden}
+html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial,sans-serif;overflow:hidden;touch-action:none}
 #universal{min-height:100vh}
 #starHeader{height:72px;background:#000;overflow:hidden;position:relative;z-index:3}
 #starHeader i{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%}
@@ -18,8 +18,14 @@ html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial,sa
 #oracleWorld b.hot{background:#9cf;box-shadow:0 0 8px #9cf}
 #focusCore{width:220px;height:220px;object-fit:contain;transform-origin:center center;filter:drop-shadow(0 0 18px #245)}
 body.character-mode #oracleLayer{display:block}
-#touchPad{display:none;position:fixed;inset:0;z-index:30}
-body.character-mode #touchPad{display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr 1fr}
+#touchPad{
+  display:none;position:fixed;left:50%;bottom:18px;transform:translateX(-50%);
+  z-index:30;width:168px;height:168px;
+  grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr 1fr;gap:4px
+}
+body.character-mode #touchPad{display:grid}
+#touchPad span{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px}
+#touchPad span[data-go=""],#touchPad span:not([data-go]):not([data-pick]){background:transparent;border:none}
 #hud{display:none;position:fixed;left:8px;bottom:8px;z-index:41;font-size:11px;color:#9ab;max-width:78%}
 body.character-mode #hud{display:block}
 </style>
@@ -37,9 +43,9 @@ body.character-mode #hud{display:block}
     </div>
   </div>
   <div id="touchPad">
-    <span data-go=""></span><span data-go="up"></span><span data-go=""></span>
+    <span></span><span data-go="up"></span><span></span>
     <span data-go="left"></span><span data-pick="1"></span><span data-go="right"></span>
-    <span data-go=""></span><span data-go="down"></span><span data-go=""></span>
+    <span></span><span data-go="down"></span><span></span>
   </div>
   <div id="hud">ARRAY idle</div>
 </div>
@@ -67,14 +73,23 @@ const $ = {
   space: {
     center: { x: 0, y: 0, z: 640, locked: true }
   },
-  step: function () {
-    this.heading += (this.keys.right - this.keys.left) * 0.035;
-    const go = this.keys.up - this.keys.down;
-    const nx = this.x + Math.sin(this.heading) * go * this.speed;
-    const nz = this.z + Math.cos(this.heading) * go * this.speed;
+  lookAtCenter: function () {
     const c = this.space.center;
-    const dist = Math.hypot(nx - c.x, nz - c.z);
-    if (dist > 48) { this.x = nx; this.z = nz; }
+    this.heading = Math.atan2(c.x - this.x, c.z - this.z);
+  },
+  step: function () {
+    const c = this.space.center;
+    this.lookAtCenter();
+    const dx = this.x - c.x;
+    const dz = this.z - c.z;
+    let dist = Math.hypot(dx, dz) || 1;
+    dist += (this.keys.down - this.keys.up) * this.speed;
+    dist = Math.max(48, Math.min(1600, dist));
+    const yaw = (this.keys.right - this.keys.left) * 0.028;
+    const ang = Math.atan2(dx, dz) + yaw;
+    this.x = c.x + Math.sin(ang) * dist;
+    this.z = c.z + Math.cos(ang) * dist;
+    this.lookAtCenter();
   }
 };
 
@@ -125,8 +140,10 @@ const rack = {
   },
   pickNearest: function () {
     if (!this.view.length) return;
-    this.view.sort(function (a, b) { return b.scale - a.scale; });
-    const hit = this.view[0];
+    let hit = this.view[0];
+    for (let i = 1; i < this.view.length; i++) {
+      if (this.view[i].scale > hit.scale) hit = this.view[i];
+    }
     hit.s.mark = !hit.s.mark;
     this.live = hit.s;
     if (hit.s.mark) this.picked.push(hit.s.id);
@@ -148,7 +165,8 @@ const oracle = {
     this.mode = "character";
     document.body.classList.add("character-mode");
     header.style.display = "block";
-    $.x = 0; $.y = 12; $.z = 0; $.heading = 0;
+    $.x = 0; $.y = 12; $.z = 0;
+    $.lookAtCenter();
     vault.fill();
     rack.clear();
     cancelAnimationFrame(this.tick);
@@ -161,6 +179,7 @@ const oracle = {
     header.style.display = "none";
     cancelAnimationFrame(this.tick);
     world.querySelectorAll("b").forEach(function (n) { n.remove(); });
+    $.keys.up = $.keys.down = $.keys.left = $.keys.right = 0;
     rack.clear();
   },
   draw: function () {
@@ -218,19 +237,23 @@ document.addEventListener("keyup", function (e) {
   if (e.key === "ArrowLeft") $.keys.left = 0;
   if (e.key === "ArrowRight") $.keys.right = 0;
 });
+
+function clearNav() {
+  $.keys.up = $.keys.down = $.keys.left = $.keys.right = 0;
+}
 const pad = document.getElementById("touchPad");
 pad.addEventListener("pointerdown", function (e) {
+  e.preventDefault();
   const go = e.target.getAttribute("data-go");
   const pick = e.target.getAttribute("data-pick");
+  clearNav();
   if (go) $.keys[go] = 1;
   if (pick) rack.pickNearest();
+  if (e.target.setPointerCapture) e.target.setPointerCapture(e.pointerId);
 });
-pad.addEventListener("pointerup", function () {
-  $.keys.up = $.keys.down = $.keys.left = $.keys.right = 0;
-});
-pad.addEventListener("pointerleave", function () {
-  $.keys.up = $.keys.down = $.keys.left = $.keys.right = 0;
-});
+pad.addEventListener("pointerup", clearNav);
+pad.addEventListener("pointercancel", clearNav);
+pad.addEventListener("pointerleave", clearNav);
 </script>
 </body>
 </html>
