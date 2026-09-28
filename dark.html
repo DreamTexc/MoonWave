@@ -6,15 +6,18 @@
 <title>Universal Node</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#050505;color:#fff;font-family:Arial,sans-serif}
-#universal{min-height:100vh;position:relative}
-#starHeader{height:72px;background:#000;overflow:hidden;position:relative}
+html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial,sans-serif;overflow:hidden}
+#universal{min-height:100vh}
+#starHeader{height:72px;background:#000;overflow:hidden;position:relative;z-index:3}
 #starHeader i{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%}
-#on,#off{margin:12px 6px;padding:5px 10px;border:1px solid #666;background:#151515;color:#fff;cursor:pointer;font-size:11px}
-#oracleLayer{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);perspective:900px;z-index:20;pointer-events:none}
-#oracleWorld{position:absolute;inset:0;transform-style:preserve-3d}
-#oracleWorld b{position:absolute;left:50%;top:50%;background:#fff;border-radius:50%;display:block}
+#on,#off{position:relative;z-index:40;margin:12px 6px;padding:5px 10px;border:1px solid #666;background:#151515;color:#fff;cursor:pointer;font-size:11px}
+#oracleLayer{display:none;position:fixed;inset:0;z-index:10;background:#000;perspective:420px}
+#oracleWorld{position:absolute;inset:0;transform-style:preserve-3d;transform-origin:50% 72%}
+#oracleWorld b{position:absolute;left:50%;top:62%;background:#fff;border-radius:50%;pointer-events:none}
 body.character-mode #oracleLayer{display:block}
+#touchPad{display:none;position:fixed;inset:0;z-index:30}
+body.character-mode #touchPad{display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr 1fr}
+#touchPad span{background:transparent}
 </style>
 </head>
 <body>
@@ -25,6 +28,11 @@ body.character-mode #oracleLayer{display:block}
   <!-- OFF state control -->
   <button id="off" type="button">OFF</button>
   <div id="oracleLayer"><div id="oracleWorld"></div></div>
+  <div id="touchPad">
+    <span data-go=""></span><span data-go="up"></span><span data-go=""></span>
+    <span data-go="left"></span><span data-go=""></span><span data-go="right"></span>
+    <span data-go=""></span><span data-go="down"></span><span data-go=""></span>
+  </div>
 </div>
 <script>
 "use strict";
@@ -38,47 +46,82 @@ for (let n = 0; n < 80; n++) {
   const dot = document.createElement("i");
   dot.style.left = Math.random() * 100 + "%";
   dot.style.top = Math.random() * 100 + "%";
-  dot.style.opacity = 0.3 + Math.random() * 0.7;
+  dot.style.opacity = 0.25 + Math.random() * 0.75;
   header.appendChild(dot);
 }
+
+const $ = {
+  x: 0, y: 12, z: 0, heading: 0, speed: 7,
+  keys: { up: 0, down: 0, left: 0, right: 0 },
+  step: function () {
+    this.heading += (this.keys.right - this.keys.left) * 0.035;
+    const go = this.keys.up - this.keys.down;
+    this.x += Math.sin(this.heading) * go * this.speed;
+    this.z += Math.cos(this.heading) * go * this.speed;
+  }
+};
+
+const vault = {
+  stars: [],
+  fill: function () {
+    this.stars = [];
+    for (let i = 0; i < 420; i++) {
+      this.stars.push({
+        x: (Math.random() - 0.5) * 1400,
+        y: (Math.random() - 0.55) * 520,
+        z: Math.random() * 1600 + 40,
+        s: 0.6 + Math.random() * 2.2
+      });
+    }
+  }
+};
 
 const oracle = {
   mode: "idle",
   layout: "4XD",
+  tick: 0,
   enter: function () {
     this.mode = "character";
     document.body.classList.add("character-mode");
     header.style.display = "block";
-    this.spray();
+    $.x = 0; $.y = 12; $.z = 0; $.heading = 0;
+    vault.fill();
+    this.draw();
+    cancelAnimationFrame(this.tick);
+    const loop = () => { this.draw(); this.tick = requestAnimationFrame(loop); };
+    this.tick = requestAnimationFrame(loop);
   },
   exit: function () {
     this.mode = "idle";
     document.body.classList.remove("character-mode");
     header.style.display = "none";
+    cancelAnimationFrame(this.tick);
     world.innerHTML = "";
   },
-  spray: function () {
+  draw: function () {
+    $.step();
     world.innerHTML = "";
-    const axes = ["n", "e", "s", "w"];
-    for (let a = 0; a < 4; a++) {
-      for (let i = 0; i < 28; i++) {
-        const star = document.createElement("b");
-        const depth = 0.2 + Math.random() * 0.8;
-        const reach = 40 + Math.random() * 220;
-        const drift = (Math.random() - 0.5) * 70;
-        let x = 0, y = 0;
-        if (axes[a] === "n") { x = drift; y = -reach; }
-        if (axes[a] === "s") { x = drift; y = reach; }
-        if (axes[a] === "e") { x = reach; y = drift; }
-        if (axes[a] === "w") { x = -reach; y = drift; }
-        const size = 1 + depth * 3;
-        star.style.width = size + "px";
-        star.style.height = size + "px";
-        star.style.opacity = String(0.25 + depth * 0.75);
-        star.style.transform =
-          "translate(-50%,-50%) translate3d(" + x + "px," + y + "px," + (depth * 180 - 80) + "px)";
-        world.appendChild(star);
-      }
+    const fov = 240;
+    const cos = Math.cos($.heading);
+    const sin = Math.sin($.heading);
+    world.style.transform = "rotateX(64deg) translateZ(40px)";
+    for (let i = 0; i < vault.stars.length; i++) {
+      const s = vault.stars[i];
+      const dx = s.x - $.x;
+      const dz = s.z - $.z;
+      const rx = dx * cos - dz * sin;
+      const rz = dx * sin + dz * cos;
+      if (rz < 18) continue;
+      const scale = fov / rz;
+      const sx = rx * scale;
+      const sy = (s.y - $.y) * scale;
+      const star = document.createElement("b");
+      const size = Math.max(1, s.s * scale * 1.8);
+      star.style.width = size + "px";
+      star.style.height = size + "px";
+      star.style.opacity = String(Math.min(1, 0.15 + scale * 0.9));
+      star.style.transform = "translate(" + sx + "px," + sy + "px)";
+      world.appendChild(star);
     }
   }
 };
@@ -87,6 +130,31 @@ function standEval(code) { eval(code); }
 onBtn.onclick = function () { standEval("oracle.enter()"); };
 offBtn.onclick = function () { standEval("oracle.exit()"); };
 standEval("oracle.exit()");
+
+document.addEventListener("keydown", function (e) {
+  const k = e.key;
+  if (k === "ArrowUp") $.keys.up = 1;
+  if (k === "ArrowDown") $.keys.down = 1;
+  if (k === "ArrowLeft") $.keys.left = 1;
+  if (k === "ArrowRight") $.keys.right = 1;
+});
+document.addEventListener("keyup", function (e) {
+  const k = e.key;
+  if (k === "ArrowUp") $.keys.up = 0;
+  if (k === "ArrowDown") $.keys.down = 0;
+  if (k === "ArrowLeft") $.keys.left = 0;
+  if (k === "ArrowRight") $.keys.right = 0;
+});
+document.getElementById("touchPad").addEventListener("pointerdown", function (e) {
+  const go = e.target.getAttribute("data-go");
+  if (go) $.keys[go] = 1;
+});
+document.getElementById("touchPad").addEventListener("pointerup", function () {
+  $.keys.up = $.keys.down = $.keys.left = $.keys.right = 0;
+});
+document.getElementById("touchPad").addEventListener("pointerleave", function () {
+  $.keys.up = $.keys.down = $.keys.left = $.keys.right = 0;
+});
 </script>
 </body>
 </html>
