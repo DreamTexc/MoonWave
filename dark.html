@@ -7,10 +7,14 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#050505;color:#fff;font-family:Arial,sans-serif}
-#universal{min-height:100vh}
+#universal{min-height:100vh;position:relative}
 #starHeader{height:72px;background:#000;overflow:hidden;position:relative}
 #starHeader i{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%}
 #on,#off{margin:12px 6px;padding:5px 10px;border:1px solid #666;background:#151515;color:#fff;cursor:pointer;font-size:11px}
+#oracleLayer{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);perspective:900px;z-index:20;pointer-events:none}
+#oracleWorld{position:absolute;inset:0;transform-style:preserve-3d}
+#oracleWorld b{position:absolute;left:50%;top:50%;background:#fff;border-radius:50%;display:block}
+body.character-mode #oracleLayer{display:block}
 </style>
 </head>
 <body>
@@ -20,6 +24,7 @@ body{background:#050505;color:#fff;font-family:Arial,sans-serif}
   <button id="on" type="button">ON</button>
   <!-- OFF state control -->
   <button id="off" type="button">OFF</button>
+  <div id="oracleLayer"><div id="oracleWorld"></div></div>
 </div>
 <script>
 "use strict";
@@ -27,6 +32,8 @@ const parent = document.getElementById("universal");
 const header = document.getElementById("starHeader");
 const onBtn = document.getElementById("on");
 const offBtn = document.getElementById("off");
+const world = document.getElementById("oracleWorld");
+
 for (let n = 0; n < 80; n++) {
   const dot = document.createElement("i");
   dot.style.left = Math.random() * 100 + "%";
@@ -34,12 +41,52 @@ for (let n = 0; n < 80; n++) {
   dot.style.opacity = 0.3 + Math.random() * 0.7;
   header.appendChild(dot);
 }
-function standEval(code) {
-  eval(code);
-}
-onBtn.onclick = function () { standEval("header.style.display='block'"); };
-offBtn.onclick = function () { standEval("header.style.display='none'"); };
-standEval("header.style.display='none'");
+
+const oracle = {
+  mode: "idle",
+  layout: "4XD",
+  enter: function () {
+    this.mode = "character";
+    document.body.classList.add("character-mode");
+    header.style.display = "block";
+    this.spray();
+  },
+  exit: function () {
+    this.mode = "idle";
+    document.body.classList.remove("character-mode");
+    header.style.display = "none";
+    world.innerHTML = "";
+  },
+  spray: function () {
+    world.innerHTML = "";
+    const axes = ["n", "e", "s", "w"];
+    for (let a = 0; a < 4; a++) {
+      for (let i = 0; i < 28; i++) {
+        const star = document.createElement("b");
+        const depth = 0.2 + Math.random() * 0.8;
+        const reach = 40 + Math.random() * 220;
+        const drift = (Math.random() - 0.5) * 70;
+        let x = 0, y = 0;
+        if (axes[a] === "n") { x = drift; y = -reach; }
+        if (axes[a] === "s") { x = drift; y = reach; }
+        if (axes[a] === "e") { x = reach; y = drift; }
+        if (axes[a] === "w") { x = -reach; y = drift; }
+        const size = 1 + depth * 3;
+        star.style.width = size + "px";
+        star.style.height = size + "px";
+        star.style.opacity = String(0.25 + depth * 0.75);
+        star.style.transform =
+          "translate(-50%,-50%) translate3d(" + x + "px," + y + "px," + (depth * 180 - 80) + "px)";
+        world.appendChild(star);
+      }
+    }
+  }
+};
+
+function standEval(code) { eval(code); }
+onBtn.onclick = function () { standEval("oracle.enter()"); };
+offBtn.onclick = function () { standEval("oracle.exit()"); };
+standEval("oracle.exit()");
 </script>
 </body>
 </html>
