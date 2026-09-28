@@ -24,8 +24,8 @@ body.character-mode #oracleLayer{display:block}
   grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr 1fr;gap:4px
 }
 body.character-mode #touchPad{display:grid}
-#touchPad span{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px}
-#touchPad span[data-go=""],#touchPad span:not([data-go]):not([data-pick]){background:transparent;border:none}
+#touchPad span{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;font-size:9px;color:#8aa;display:flex;align-items:center;justify-content:center}
+#touchPad span:empty{background:transparent;border:none}
 #hud{display:none;position:fixed;left:8px;bottom:8px;z-index:41;font-size:11px;color:#9ab;max-width:78%}
 body.character-mode #hud{display:block}
 </style>
@@ -43,9 +43,9 @@ body.character-mode #hud{display:block}
     </div>
   </div>
   <div id="touchPad">
-    <span></span><span data-go="up"></span><span></span>
-    <span data-go="left"></span><span data-pick="1"></span><span data-go="right"></span>
-    <span></span><span data-go="down"></span><span></span>
+    <span data-go="over">OV</span><span data-go="up">↑</span><span></span>
+    <span data-go="left">←</span><span data-pick="1">•</span><span data-go="right">→</span>
+    <span></span><span data-go="down">↓</span><span data-go="under">UN</span>
   </div>
   <div id="hud">ARRAY idle</div>
 </div>
@@ -68,8 +68,8 @@ for (let n = 0; n < 80; n++) {
 }
 
 const $ = {
-  x: 0, y: 12, z: 0, heading: 0, speed: 7,
-  keys: { up: 0, down: 0, left: 0, right: 0 },
+  x: 0, y: 12, z: 0, heading: 0, pitch: 0, speed: 7,
+  keys: { up: 0, down: 0, left: 0, right: 0, over: 0, under: 0 },
   space: {
     center: { x: 0, y: 0, z: 640, locked: true }
   },
@@ -89,6 +89,10 @@ const $ = {
     const ang = Math.atan2(dx, dz) + yaw;
     this.x = c.x + Math.sin(ang) * dist;
     this.z = c.z + Math.cos(ang) * dist;
+    this.pitch += (this.keys.over - this.keys.under) * 0.02;
+    if (this.pitch > 0.7) this.pitch = 0.7;
+    if (this.pitch < -0.7) this.pitch = -0.7;
+    this.y = 12 + this.pitch * 90;
     this.lookAtCenter();
   }
 };
@@ -115,14 +119,18 @@ function projectPoint(x, y, z) {
   const fov = 240;
   const cos = Math.cos($.heading);
   const sin = Math.sin($.heading);
+  const cp = Math.cos($.pitch);
+  const sp = Math.sin($.pitch);
   const dx = x - $.x;
   const dy = y - $.y;
   const dz = z - $.z;
   const rx = dx * cos - dz * sin;
-  const rz = dx * sin + dz * cos;
+  let rz = dx * sin + dz * cos;
+  const ry = dy * cp - rz * sp;
+  rz = dy * sp + rz * cp;
   if (rz < 16) return null;
   const scale = fov / rz;
-  return { sx: rx * scale, sy: dy * scale, scale: scale, rz: rz };
+  return { sx: rx * scale, sy: ry * scale, scale: scale, rz: rz };
 }
 
 const rack = {
@@ -165,7 +173,7 @@ const oracle = {
     this.mode = "character";
     document.body.classList.add("character-mode");
     header.style.display = "block";
-    $.x = 0; $.y = 12; $.z = 0;
+    $.x = 0; $.y = 12; $.z = 0; $.pitch = 0;
     $.lookAtCenter();
     vault.fill();
     rack.clear();
@@ -179,14 +187,14 @@ const oracle = {
     header.style.display = "none";
     cancelAnimationFrame(this.tick);
     world.querySelectorAll("b").forEach(function (n) { n.remove(); });
-    $.keys.up = $.keys.down = $.keys.left = $.keys.right = 0;
+    clearNav();
     rack.clear();
   },
   draw: function () {
     $.step();
     rack.project();
     world.querySelectorAll("b").forEach(function (n) { n.remove(); });
-    world.style.transform = "rotateX(64deg) translateZ(40px)";
+    world.style.transform = "rotateX(" + (64 - $.pitch * 28) + "deg) translateZ(40px)";
     const c = $.space.center;
     const focus = projectPoint(c.x, c.y, c.z);
     if (focus) {
@@ -214,6 +222,7 @@ const oracle = {
     const range = Math.hypot($.x - c.x, $.z - c.z).toFixed(0);
     hud.textContent =
       "CENTER locked · range " + range +
+      " · pitch " + $.pitch.toFixed(2) +
       " · ARRAY [" + rack.picked.join(",") + "]" +
       " · live:" + (rack.live ? rack.live.id : "-");
   }
@@ -229,6 +238,8 @@ document.addEventListener("keydown", function (e) {
   if (e.key === "ArrowDown") $.keys.down = 1;
   if (e.key === "ArrowLeft") $.keys.left = 1;
   if (e.key === "ArrowRight") $.keys.right = 1;
+  if (e.key === "q" || e.key === "Q" || e.key === "PageUp") $.keys.over = 1;
+  if (e.key === "e" || e.key === "E" || e.key === "PageDown") $.keys.under = 1;
   if (e.key === "Enter" && oracle.mode === "character") rack.pickNearest();
 });
 document.addEventListener("keyup", function (e) {
@@ -236,10 +247,12 @@ document.addEventListener("keyup", function (e) {
   if (e.key === "ArrowDown") $.keys.down = 0;
   if (e.key === "ArrowLeft") $.keys.left = 0;
   if (e.key === "ArrowRight") $.keys.right = 0;
+  if (e.key === "q" || e.key === "Q" || e.key === "PageUp") $.keys.over = 0;
+  if (e.key === "e" || e.key === "E" || e.key === "PageDown") $.keys.under = 0;
 });
 
 function clearNav() {
-  $.keys.up = $.keys.down = $.keys.left = $.keys.right = 0;
+  $.keys.up = $.keys.down = $.keys.left = $.keys.right = $.keys.over = $.keys.under = 0;
 }
 const pad = document.getElementById("touchPad");
 pad.addEventListener("pointerdown", function (e) {
