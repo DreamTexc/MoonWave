@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Universal Node</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#050505;color:#fff;font-family:Arial,sans-serif}
+#universal{min-height:100vh}
+#starHeader{height:72px;background:#000;overflow:hidden;position:relative}
+#starHeader i{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%}
+#on,#off{margin:16px 8px;padding:10px 18px;border:1px solid #666;background:#151515;color:#fff;cursor:pointer}
+#on.is-on{background:#2a4a2a;border-color:#8c8}
+#off.is-off{background:#4a2a2a;border-color:#c88}
+</style>
+</head>
+<body>
+<div id="universal">
+  <header id="starHeader"></header>
+  <!-- ON state control -->
+  <button id="on" type="button">ON</button>
+  <!-- OFF state control -->
+  <button id="off" type="button">OFF</button>
+</div>
+<script>
+"use strict";
+const parent = document.getElementById("universal");
+const header = document.getElementById("starHeader");
+const onBtn = document.getElementById("on");
+const offBtn = document.getElementById("off");
+for (let n = 0; n < 80; n++) {
+  const dot = document.createElement("i");
+  dot.style.left = Math.random() * 100 + "%";
+  dot.style.top = Math.random() * 100 + "%";
+  dot.style.opacity = 0.3 + Math.random() * 0.7;
+  header.appendChild(dot);
+}
+function setPower(on) {
+  onBtn.classList.toggle("is-on", on);
+  offBtn.classList.toggle("is-off", !on);
+  parent.dataset.power = on ? "on" : "off";
+}
+onBtn.onclick = function () { setPower(true); };
+offBtn.onclick = function () { setPower(false); };
+setPower(false);
+</script>
+</body>
+</html>
