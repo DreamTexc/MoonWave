@@ -13,12 +13,14 @@ html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial,sa
 #on,#off{position:relative;z-index:40;margin:12px 6px;padding:5px 10px;border:1px solid #666;background:#151515;color:#fff;cursor:pointer;font-size:11px}
 #oracleLayer{display:none;position:fixed;inset:0;z-index:10;background:#000;perspective:420px}
 #oracleWorld{position:absolute;inset:0;transform-style:preserve-3d;transform-origin:50% 72%}
-#oracleWorld b{position:absolute;left:50%;top:62%;background:#fff;border-radius:50%;pointer-events:none}
+#oracleWorld b,#focusCore{position:absolute;left:50%;top:62%;pointer-events:none}
+#oracleWorld b{background:#fff;border-radius:50%}
 #oracleWorld b.hot{background:#9cf;box-shadow:0 0 8px #9cf}
+#focusCore{width:220px;height:220px;object-fit:contain;transform-origin:center center;filter:drop-shadow(0 0 18px #245)}
 body.character-mode #oracleLayer{display:block}
 #touchPad{display:none;position:fixed;inset:0;z-index:30}
 body.character-mode #touchPad{display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr 1fr}
-#hud{display:none;position:fixed;left:8px;bottom:8px;z-index:41;font-size:11px;color:#9ab;max-width:70%}
+#hud{display:none;position:fixed;left:8px;bottom:8px;z-index:41;font-size:11px;color:#9ab;max-width:78%}
 body.character-mode #hud{display:block}
 </style>
 </head>
@@ -29,7 +31,11 @@ body.character-mode #hud{display:block}
   <button id="on" type="button">ON</button>
   <!-- OFF state control -->
   <button id="off" type="button">OFF</button>
-  <div id="oracleLayer"><div id="oracleWorld"></div></div>
+  <div id="oracleLayer">
+    <div id="oracleWorld">
+      <img id="focusCore" src="dark.png" alt="space center">
+    </div>
+  </div>
   <div id="touchPad">
     <span data-go=""></span><span data-go="up"></span><span data-go=""></span>
     <span data-go="left"></span><span data-pick="1"></span><span data-go="right"></span>
@@ -45,6 +51,7 @@ const onBtn = document.getElementById("on");
 const offBtn = document.getElementById("off");
 const world = document.getElementById("oracleWorld");
 const hud = document.getElementById("hud");
+const focusCore = document.getElementById("focusCore");
 
 for (let n = 0; n < 80; n++) {
   const dot = document.createElement("i");
@@ -57,11 +64,17 @@ for (let n = 0; n < 80; n++) {
 const $ = {
   x: 0, y: 12, z: 0, heading: 0, speed: 7,
   keys: { up: 0, down: 0, left: 0, right: 0 },
+  space: {
+    center: { x: 0, y: 0, z: 640, locked: true }
+  },
   step: function () {
     this.heading += (this.keys.right - this.keys.left) * 0.035;
     const go = this.keys.up - this.keys.down;
-    this.x += Math.sin(this.heading) * go * this.speed;
-    this.z += Math.cos(this.heading) * go * this.speed;
+    const nx = this.x + Math.sin(this.heading) * go * this.speed;
+    const nz = this.z + Math.cos(this.heading) * go * this.speed;
+    const c = this.space.center;
+    const dist = Math.hypot(nx - c.x, nz - c.z);
+    if (dist > 48) { this.x = nx; this.z = nz; }
   }
 };
 
@@ -69,12 +82,13 @@ const vault = {
   stars: [],
   fill: function () {
     this.stars = [];
+    const c = $.space.center;
     for (let i = 0; i < 420; i++) {
       this.stars.push({
         id: i,
-        x: (Math.random() - 0.5) * 1400,
-        y: (Math.random() - 0.55) * 520,
-        z: Math.random() * 1600 + 40,
+        x: c.x + (Math.random() - 0.5) * 1400,
+        y: c.y + (Math.random() - 0.55) * 520,
+        z: c.z + (Math.random() - 0.25) * 1200,
         s: 0.6 + Math.random() * 2.2,
         mark: false
       });
@@ -82,30 +96,31 @@ const vault = {
   }
 };
 
+function projectPoint(x, y, z) {
+  const fov = 240;
+  const cos = Math.cos($.heading);
+  const sin = Math.sin($.heading);
+  const dx = x - $.x;
+  const dy = y - $.y;
+  const dz = z - $.z;
+  const rx = dx * cos - dz * sin;
+  const rz = dx * sin + dz * cos;
+  if (rz < 16) return null;
+  const scale = fov / rz;
+  return { sx: rx * scale, sy: dy * scale, scale: scale, rz: rz };
+}
+
 const rack = {
   view: [],
   picked: [],
   live: null,
   project: function () {
     this.view = [];
-    const fov = 240;
-    const cos = Math.cos($.heading);
-    const sin = Math.sin($.heading);
     for (let i = 0; i < vault.stars.length; i++) {
       const s = vault.stars[i];
-      const dx = s.x - $.x;
-      const dz = s.z - $.z;
-      const rx = dx * cos - dz * sin;
-      const rz = dx * sin + dz * cos;
-      if (rz < 18) continue;
-      const scale = fov / rz;
-      this.view.push({
-        id: s.id,
-        sx: rx * scale,
-        sy: (s.y - $.y) * scale,
-        scale: scale,
-        s: s
-      });
+      const p = projectPoint(s.x, s.y, s.z);
+      if (!p) continue;
+      this.view.push({ id: s.id, sx: p.sx, sy: p.sy, scale: p.scale, s: s });
     }
   },
   pickNearest: function () {
@@ -116,14 +131,12 @@ const rack = {
     this.live = hit.s;
     if (hit.s.mark) this.picked.push(hit.s.id);
     else this.picked = this.picked.filter(function (id) { return id !== hit.s.id; });
-    hud.textContent = "ARRAY [" + this.picked.join(",") + "] live:" + (this.live ? this.live.id : "-");
   },
   clear: function () {
     this.view = [];
     this.picked = [];
     this.live = null;
     vault.stars.forEach(function (s) { s.mark = false; });
-    hud.textContent = "ARRAY idle";
   }
 };
 
@@ -147,14 +160,27 @@ const oracle = {
     document.body.classList.remove("character-mode");
     header.style.display = "none";
     cancelAnimationFrame(this.tick);
-    world.innerHTML = "";
+    world.querySelectorAll("b").forEach(function (n) { n.remove(); });
     rack.clear();
   },
   draw: function () {
     $.step();
     rack.project();
-    world.innerHTML = "";
+    world.querySelectorAll("b").forEach(function (n) { n.remove(); });
     world.style.transform = "rotateX(64deg) translateZ(40px)";
+    const c = $.space.center;
+    const focus = projectPoint(c.x, c.y, c.z);
+    if (focus) {
+      const size = Math.max(36, 180 * focus.scale);
+      focusCore.style.display = "block";
+      focusCore.style.width = size + "px";
+      focusCore.style.height = size + "px";
+      focusCore.style.transform = "translate(-50%,-50%) translate(" + focus.sx + "px," + focus.sy + "px)";
+      focusCore.style.opacity = String(Math.min(1, 0.35 + focus.scale));
+      if (rack.live) focusCore.dataset.parentOf = String(rack.live.id);
+    } else {
+      focusCore.style.display = "none";
+    }
     for (let i = 0; i < rack.view.length; i++) {
       const v = rack.view[i];
       const star = document.createElement("b");
@@ -166,6 +192,11 @@ const oracle = {
       if (v.s.mark) star.className = "hot";
       world.appendChild(star);
     }
+    const range = Math.hypot($.x - c.x, $.z - c.z).toFixed(0);
+    hud.textContent =
+      "CENTER locked · range " + range +
+      " · ARRAY [" + rack.picked.join(",") + "]" +
+      " · live:" + (rack.live ? rack.live.id : "-");
   }
 };
 
